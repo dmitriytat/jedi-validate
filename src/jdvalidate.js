@@ -3,7 +3,7 @@
 
 	$.fn.jdvalidate = function (options) {
 		var defaultOptions = {
-			ajax: {
+			ajax: { // can be false
 				dataType: 'json'
 			},
 			classes: {
@@ -12,15 +12,14 @@
 				valid: "valid"
 			},
 			clean: true,
-			rules: {}
+			rules: {},
+			messages: {}
 		};
 
 		options = $.extend(defaultOptions, options);
 
 		return this.each(function () {
 			form = $(this);
-
-			var clientError = false;
 
 			var ajaxOptions = {};
 			var baseErrorLabel = $('<div></div>')
@@ -34,11 +33,23 @@
 			var errorLabels = {};
 			var inputs = {};
 
-			form.find('[name]').each(function () {
-				var input = $(this);
+			form.find('[name]')
+				.each(function () {
+					var input = $(this);
+					var name = input.attr('name');
 
-				inputs[ input.attr('name') ] = input;
-			});
+					inputs[ name ] = input;
+
+					options.rules[ name ] = options.rules[ name ] || {};
+
+					options.rules[ name ].required = input.is('[required]') || input.hasClass('required');
+					options.rules[ name ].email = input.is('[type="email"]') || input.hasClass('email');
+				})
+				.on('change', function () {
+					var name = $(this).attr('name');
+
+					checkInput(name, options.rules[ name ]);
+				});
 
 			var markError = function (name, errors) {
 				if (!errorLabels[ name ]) {
@@ -49,46 +60,68 @@
 					inputs[ name ].after(errorLabels[ name ]);
 				}
 
-				inputs[ name ].addClass(options.classes.error)
+				inputs[ name ]
+					.addClass(options.classes.error)
 					.removeClass(options.classes.valid);
+
 				errorLabels[ name ].text(errors.join(', ')).show();
 			};
 
-			var hideError = function (name) {
+			var markValid = function (name) {
+				inputs[ name ]
+					.removeClass(options.classes.error)
+					.addClass(options.classes.valid);
+
 				if (errorLabels[ name ]) {
 					errorLabels[ name ].hide();
-					inputs[ name ]
-						.removeClass(options.classes.error)
-						.addClass(options.classes.valid);
 				}
 			};
 
-			form.on('submit', function (event) {
-				event.preventDefault();
+			var checkInput = function (name, rules) {
+				var isValid = true;
 
-				clientError = false;
+				var errors = [];
 
-				$.each(options.rules, function (name, rules) {
-					var errors = [];
-
-					$.each(rules, function (method, params) {
+				$.each(rules, function (method, params) {
+					if (params) {
 						var valid = methods[ method ].func(inputs[ name ].val(), inputs[ name ], params);
 
 						if (!valid) {
-							errors.push(methods[ method ].message);
+							var message = options.messages[name] ? options.messages[name][method] ? options.messages[name][method] : methods[ method ].message : methods[ method ].message;
+							errors.push(message);
 						}
-					});
-
-					if (errors.length) {
-						markError(name, errors);
-
-						clientError = true;
-					} else {
-						hideError(name);
 					}
 				});
 
-				if (clientError) {
+				if (errors.length) {
+					markError(name, errors);
+
+					isValid = false;
+				} else {
+					markValid(name);
+				}
+
+				return isValid;
+			};
+
+			var checkForm = function () {
+				var isValid = true;
+
+				$.each(options.rules, function (name, rules) {
+					isValid = checkInput(name, rules) && isValid;
+				});
+
+				return isValid;
+			};
+
+			form.on('submit', function (event) {
+				if (!checkForm()) {
+					event.preventDefault();
+
+					return;
+				}
+
+				if (!options.ajax) {
 					return;
 				}
 
@@ -98,7 +131,7 @@
 
 				ajaxOptions = $.extend(ajaxOptions, options.ajax);
 
-				$.each(errorLabels, hideError);
+				$.each(errorLabels, markValid);
 
 				$.ajax(ajaxOptions)
 					.done(function (response) {
@@ -137,5 +170,30 @@
 			func: func,
 			message: message
 		};
-	}
+	};
+
+	/**
+	 * Standart validation methods
+	 */
+
+	$.jdvalidate.addMethod("required", function (value) {
+		return value.trim() != '';
+	}, "Field is required");
+
+	$.jdvalidate.addMethod("regex", function (value, element, regexp) {
+		var re = new RegExp(regexp);
+		return re.test(value);
+	}, "Please check your input.");
+
+	$.jdvalidate.addMethod("email", function (value) {
+		return /[a-z]+@[a-z]+\.[a-z]+/.test(value);
+	}, "Please check your e-mail.");
+
+	$.jdvalidate.addMethod('filesize', function (value, element, size) {
+		return !element.get(0).files[ 0 ] || element.get(0).files[ 0 ].size <= size;
+	}, "File too big");
+
+	$.jdvalidate.addMethod('extension', function (value, element, extensions) {
+		return !element.get(0).files[ 0 ] || extensions.indexOf(element.get(0).files[0].name.split('.').pop()) > -1;
+	}, "Extension is wrong");
 })(jQuery);

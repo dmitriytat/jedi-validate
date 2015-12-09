@@ -28,7 +28,8 @@
 <form id="myForm" action="ajax.php" method="post">
     <label for="name">Name:</label><input id="name" type="text" name="name" required><br/>
     <label for="phone">Phone:</label><input id="phone" type="text" name="phone"><br/>
-    <label for="email">E-mail:</label><input id="email" type="text" name="email"><br/>
+    <label for="email">E-mail:</label><input id="email" type="email" name="email" class="required"><br/>
+    <label for="file">File:</label><input id="file" type="file" name="file" class="required"><br/>
     <input type="submit" value="Send">
 </form>
 
@@ -36,23 +37,24 @@
 <script src="src/jdvalidate.js"></script>
 
 <script>
-    $.jdvalidate.addMethod("regex", function (value, element, regexp) {
-        var re = new RegExp(regexp);
-        return re.test(value);
-    }, "Please check your input.");
-
-    $.jdvalidate.addMethod("required", function (value) {
-        return value.trim() != '';
-    }, "Field is required");
 
     $('#myForm').jdvalidate({
-        clean: true,
+        ajax: false,
         rules: {
-            name: {
-                required: true
-            },
             phone: {
-                regex: "^[123]{1}$"
+                regex: "^([\+]+)*[0-9\x20\x28\x29\-]{5,20}$"
+            },
+            file: {
+                filesize: 10000,
+                extension: "html|css"
+            }
+        },
+        messages: {
+            phone: {
+                regex: "Телефон в формате +7 999 123 45 67"
+            },
+            file: {
+                filesize: "Файл слишком большой"
             }
         }
     });
