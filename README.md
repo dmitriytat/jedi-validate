@@ -1,2 +1,2 @@
 # jdvalidate
-JQuery form validation plugin by DImko
+JQuery form validation plugin by Dimko
