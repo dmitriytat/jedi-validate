@@ -13,7 +13,8 @@
 			},
 			clean: true,
 			rules: {},
-			messages: {}
+			messages: {},
+			baseError: null
 		};
 
 		options = $.extend(defaultOptions, options);
@@ -22,12 +23,15 @@
 			form = $(this);
 
 			var ajaxOptions = {};
-			var baseErrorLabel = $('<div></div>')
+			var baseErrorLabel = options.baseError ? options.baseError : $('<div></div>')
 				.addClass(options.classes.baseError)
 				.addClass(options.classes.error)
 				.hide();
 
-			form.prepend(baseErrorLabel);
+			if (!options.baseError) {
+				form.prepend(baseErrorLabel);
+			}
+
 			form.attr('novalidate', 'true');
 
 			var errorLabels = {};
@@ -87,7 +91,7 @@
 						var valid = methods[ method ].func(inputs[ name ].val(), inputs[ name ], params);
 
 						if (!valid) {
-							var message = options.messages[name] ? options.messages[name][method] ? options.messages[name][method] : methods[ method ].message : methods[ method ].message;
+							var message = options.messages[ name ] ? options.messages[ name ][ method ] ? options.messages[ name ][ method ] : methods[ method ].message : methods[ method ].message;
 							errors.push(message);
 						}
 					}
@@ -123,6 +127,8 @@
 
 				if (!options.ajax) {
 					return;
+				} else {
+					event.preventDefault();
 				}
 
 				ajaxOptions.url = form.attr('action');
@@ -151,6 +157,8 @@
 							}
 
 							$.each(response.validationErrors, markError);
+						} else if (response.redirect) {
+							window.location.replace(response.redirect);
 						} else {
 							if (options.clean) {
 								form.get(0).reset();
@@ -194,6 +202,6 @@
 	}, "File too big");
 
 	$.jdvalidate.addMethod('extension', function (value, element, extensions) {
-		return !element.get(0).files[ 0 ] || extensions.indexOf(element.get(0).files[0].name.split('.').pop()) > -1;
+		return !element.get(0).files[ 0 ] || extensions.indexOf(element.get(0).files[ 0 ].name.split('.').pop()) > -1;
 	}, "Extension is wrong");
 })(jQuery);
