@@ -29,24 +29,24 @@
     <label for="name">Name:</label><input id="name" type="text" name="name" required><br/>
     <label for="phone">Phone:</label><input id="phone" type="text" name="phone"><br/>
     <label for="email">E-mail:</label><input id="email" type="email" name="email" class="required"><br/>
-    <label for="file">File:</label><input id="file" type="file" name="file" class="required"><br/>
+    <label for="file">File (html, css, txt):</label><input id="file" type="file" name="file" class="required"><br/>
     <input type="submit" value="Send">
 </form>
+
+<div class="base-error"></div>
 
 <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
 <script src="src/jdvalidate.js"></script>
 
 <script>
-
     $('#myForm').jdvalidate({
-        ajax: false,
         rules: {
             phone: {
                 regex: "^([\+]+)*[0-9\x20\x28\x29\-]{5,20}$"
             },
             file: {
                 filesize: 10000,
-                extension: "html|css"
+                extension: "html|css|txt"
             }
         },
         messages: {
@@ -56,7 +56,8 @@
             file: {
                 filesize: "Файл слишком большой"
             }
-        }
+        },
+        baseError: $('.base-error')
     });
 </script>
 </body>
