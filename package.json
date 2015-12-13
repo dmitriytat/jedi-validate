@@ -1,0 +1,32 @@
+{
+  "name": "jdvalidate",
+  "version": "1.0.0",
+  "description": "JQuery form validation plugin by Dimko",
+  "main": "gulpfile.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dimkosru/jdvalidate.git"
+  },
+  "keywords": [
+    "form",
+    "validation",
+    "formdata"
+  ],
+  "author": "Dmitriy Tatarintsev <tatarintsevd@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/dimkosru/jdvalidate/issues"
+  },
+  "homepage": "https://github.com/dimkosru/jdvalidate#readme",
+  "devDependencies": {
+    "gulp": "^3.9.0",
+    "gulp-concat": "^2.6.0",
+    "gulp-plumber": "^1.0.1",
+    "gulp-rename": "^1.2.2",
+    "gulp-sourcemaps": "^1.6.0",
+    "gulp-uglify": "^1.5.1"
+  }
+}
