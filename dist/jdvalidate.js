@@ -1,225 +1,232 @@
 (function ($) {
-	var methods = {};
+    var methods = {};
 
-	$.fn.jdvalidate = function (options) {
-		var defaultOptions = {
-			ajax: {
-				dataType: 'json'
-			},
-			sendType: 'serialize',
-			classes: {
-				error: "error",
-				baseError: "base-error",
-				valid: "valid"
-			},
-			clean: true,
-			rules: {},
-			messages: {},
-			baseError: null
-		};
+    $.fn.jdvalidate = function (options) {
+        var defaultOptions = {
+            ajax: {
+                dataType: 'json'
+            },
+            sendType: 'serialize',
+            classes: {
+                error: "error",
+                baseError: "base-error",
+                valid: "valid"
+            },
+            clean: true,
+            rules: {},
+            messages: {},
+            baseError: null
+        };
 
-		options = $.extend(defaultOptions, options);
+        var self = {};
 
-		return this.each(function () {
-			form = $(this);
+        self.options = $.extend(defaultOptions, options);
 
-			var ajaxOptions = {};
-			var baseErrorLabel = options.baseError ? options.baseError : $('<div></div>')
-				.addClass(options.classes.baseError)
-				.addClass(options.classes.error)
-				.hide();
+        self.form = this;
 
-			if (!options.baseError) {
-				form.prepend(baseErrorLabel);
-			}
+        self.baseError = self.options.baseError ? self.options.baseError : $('<div></div>')
+            .addClass(self.options.classes.baseError)
+            .addClass(self.options.classes.error)
+            .hide();
 
-			form.attr('novalidate', 'true');
+        if (!self.options.baseError) {
+            self.form.prepend(self.baseError);
+        }
 
-			var errorLabels = {};
-			var inputs = {};
+        self.form.attr('novalidate', 'true');
 
-			form.find('[name]')
-				.each(function () {
-					var input = $(this);
-					var name = input.attr('name');
+        self.inputs = {};
+        self.labels = {};
+        self.rules = {};
 
-					inputs[ name ] = input;
+        self.form.find('[name]')
+            .each(function () {
+                var input = $(this);
+                var name = input.attr('name');
 
-					options.rules[ name ] = options.rules[ name ] || {};
+                self.inputs[name] = input;
 
-					options.rules[ name ].required = input.is('[required]') || input.hasClass('required');
-					options.rules[ name ].email = input.is('[type="email"]') || input.hasClass('email');
-				})
-				.on('change', function () {
-					var name = $(this).attr('name');
+                self.rules[name] = self.options.rules[name] || {};
 
-					checkInput(name, options.rules[ name ]);
-				});
+                self.rules[name].required = input.is('[required]') || input.hasClass('required');
+                self.rules[name].email = input.is('[type="email"]') || input.hasClass('email');
+            })
+            .on('change.jdvalidate', function () {
+                var name = $(this).attr('name');
 
-			var markError = function (name, errors) {
-				if (!errorLabels[ name ]) {
-					errorLabels[ name ] = $('<label></label>')
-						.attr('for', name)
-						.addClass(options.classes.error);
+                self.checkInput(name, self.rules[name]);
+            });
 
-					inputs[ name ].after(errorLabels[ name ]);
-				}
+        self.form.on('submit.jdvalidate', function (event) {
+            if (!self.checkForm()) {
+                event.preventDefault();
+                return false;
+            }
 
-				inputs[ name ]
-					.addClass(options.classes.error)
-					.removeClass(options.classes.valid);
+            if (!self.options.ajax) {
+                return false;
+            } else {
+                event.preventDefault();
+            }
 
-				errorLabels[ name ].text(errors.join(', ')).show();
-			};
+            var ajaxOptions = {};
 
-			var markValid = function (name) {
-				inputs[ name ]
-					.removeClass(options.classes.error)
-					.addClass(options.classes.valid);
+            ajaxOptions.url = self.form.attr('action');
+            ajaxOptions.method = self.form.attr('method');
 
-				if (errorLabels[ name ]) {
-					errorLabels[ name ].hide();
-				}
-			};
+            if (self.options.sendType === "formData") {
+                ajaxOptions.processData = false;
+                ajaxOptions.data = new FormData(self.form.get(0));
+            } else if (self.options.sendType === "json") {
+                var data = {};
 
-			var checkInput = function (name, rules) {
-				var isValid = true;
+                $.each(self.inputs, function (name, element) {
+                    data[name] = element.val();
+                });
 
-				var errors = [];
+                ajaxOptions.data = JSON.stringify(data);
+            } else if (self.options.sendType === "serialize") {
+                ajaxOptions.data = self.form.serialize();
+            }
 
-				$.each(rules, function (method, params) {
-					if (params) {
-						if (methods[ method ]) {
-							var valid = methods[ method ].func(inputs[ name ].val(), inputs[ name ], params);
+            ajaxOptions = $.extend(ajaxOptions, self.options.ajax);
 
-							if (!valid) {
-								var message = options.messages[ name ] ? options.messages[ name ][ method ] ? options.messages[ name ][ method ] : methods[ method ].message : methods[ method ].message;
-								errors.push(message);
-							}
-						} else {
-							console.error('Method "' + method + '" not found');
-							errors.push('Method "' + method + '" not found');
-						}
-					}
-				});
+            $.each(self.labels, self.markValid);
 
-				if (errors.length) {
-					markError(name, errors);
+            $.ajax(ajaxOptions).done(function (response) {
+                if (response.validationErrors) {
+                    $.each(self.inputs, function (name) {
+                        if (self.labels[name] && !response.validationErrors[name]) {
+                            self.labels[name].hide();
+                        }
+                    });
 
-					isValid = false;
-				} else {
-					markValid(name);
-				}
+                    if (response.validationErrors.base) {
+                        self.baseError.text(response.validationErrors.base.join(', ')).show();
 
-				return isValid;
-			};
+                        delete response.validationErrors.base;
+                    } else {
+                        self.baseError.hide();
+                    }
 
-			var checkForm = function () {
-				var isValid = true;
+                    $.each(response.validationErrors, self.markError);
+                } else if (response.redirect) {
+                    window.location.replace(response.redirect);
+                } else {
+                    if (self.options.clean) {
+                        self.form.get(0).reset();
+                    }
+                }
+            }).fail(function (response) {
+                var error = ajaxOptions.method + ' ' + ajaxOptions.url + ' ' + response.status + ' (' + response.statusText + ')';
 
-				$.each(options.rules, function (name, rules) {
-					isValid = checkInput(name, rules) && isValid;
-				});
+                self.baseError.text(error);
+                console.error(error);
+            });
+        });
 
-				return isValid;
-			};
+        self.markError = function (name, errors) {
+            if (!self.labels[name]) {
+                self.labels[name] = $('<label></label>')
+                    .attr('for', name)
+                    .addClass(self.options.classes.error);
 
-			form.on('submit', function (event) {
-				if (!checkForm()) {
-					event.preventDefault();
-					return false;
-				}
+                self.inputs[name].after(self.labels[name]);
+            }
 
-				if (!options.ajax) {
-					return false;
-				} else {
-					event.preventDefault();
-				}
+            self.inputs[name]
+                .addClass(self.options.classes.error)
+                .removeClass(self.options.classes.valid);
 
-				ajaxOptions.url = form.attr('action');
-				ajaxOptions.method = form.attr('method');
+            self.labels[name].text(errors.join(', ')).show();
+        };
 
-				if (options.sendType === "formData") {
-					ajaxOptions.processData = false;
-					ajaxOptions.data = new FormData(form.get(0));
-				} else if (options.sendType === "json") {
-					var data = {};
+        self.markValid = function (name) {
+            self.inputs[name]
+                .removeClass(self.options.classes.error)
+                .addClass(self.options.classes.valid);
 
-					$.each(inputs, function (name, element) {
-						data[ name ] = element.val();
-					});
+            if (self.labels[name]) {
+                self.labels[name].hide();
+            }
+        };
 
-					ajaxOptions.data = JSON.stringify(data);
-				} else if (options.sendType === "serialize") {
-					ajaxOptions.data = form.serialize();
-				}
+        self.checkInput = function (name, rules) {
+            var isValid = true;
 
-				ajaxOptions = $.extend(ajaxOptions, options.ajax);
+            var errors = [];
 
-				$.each(errorLabels, markValid);
+            $.each(rules, function (method, params) {
+                if (params) {
+                    if (methods[method]) {
+                        var valid = methods[method].func(self.inputs[name].val(), self.inputs[name], params);
 
-				$.ajax(ajaxOptions)
-					.done(function (response) {
-						if (response.validationErrors) {
-							$.each(inputs, function (name) {
-								if (errorLabels[ name ] && !response.validationErrors[ name ]) {
-									errorLabels[ name ].hide();
-								}
-							});
+                        if (!valid) {
+                            var message = self.options.messages[name] ? self.options.messages[name][method] ? self.options.messages[name][method] : methods[method].message : methods[method].message;
+                            errors.push(message);
+                        }
+                    } else {
+                        console.error('Method "' + method + '" not found');
+                        errors.push('Method "' + method + '" not found');
+                    }
+                }
+            });
 
-							if (response.validationErrors.base) {
-								baseErrorLabel.text(response.validationErrors.base.join(', ')).show();
+            if (errors.length) {
+                self.markError(name, errors);
 
-								delete response.validationErrors.base;
-							} else {
-								baseErrorLabel.hide();
-							}
+                isValid = false;
+            } else {
+                self.markValid(name);
+            }
 
-							$.each(response.validationErrors, markError);
-						} else if (response.redirect) {
-							window.location.replace(response.redirect);
-						} else {
-							if (options.clean) {
-								form.get(0).reset();
-							}
-						}
-					}).fail(function (response) {
-						console.log(response);
-					});
-			});
-		});
-	};
+            return isValid;
+        };
 
-	$.jdvalidate = {};
+        self.checkForm = function () {
+            var isValid = true;
 
-	$.jdvalidate.addMethod = function (rule, func, message) {
-		methods[ rule ] = {
-			func: func,
-			message: message
-		};
-	};
+            $.each(self.rules, function (name, rules) {
+                isValid = self.checkInput(name, rules) && isValid;
+            });
 
-	/**
-	 * Standart validation methods
-	 */
+            return isValid;
+        };
 
-	$.jdvalidate.addMethod("required", function (value, element) {
-		return (value.trim() != '' && !element.is('[type="checkbox"]')) || (element.is('[type="checkbox"]') && element.is(':checked'));
-	}, "Field is required");
+        return self.form;
+    };
 
-	$.jdvalidate.addMethod("regexp", function (value, element, regexp) {
-		return regexp.test(value);
-	}, "Please check your input.");
+    $.jdvalidate = {};
 
-	$.jdvalidate.addMethod("email", function (value) {
-		return /[a-z]+@[a-z]+\.[a-z]+/.test(value);
-	}, "Please check your e-mail.");
+    $.jdvalidate.addMethod = function (rule, func, message) {
+        methods[rule] = {
+            func: func,
+            message: message
+        };
+    };
+})(jQuery);
+/**
+ * Standart validation methods
+ */
 
-	$.jdvalidate.addMethod('filesize', function (value, element, size) {
-		return !element.get(0).files[ 0 ] || element.get(0).files[ 0 ].size <= size;
-	}, "File too big");
+(function ($) {
+    $.jdvalidate.addMethod("required", function (value, element) {
+        return (value.trim() != '' && !element.is('[type="checkbox"]')) || (element.is('[type="checkbox"]') && element.is(':checked'));
+    }, "The field is required");
 
-	$.jdvalidate.addMethod('extension', function (value, element, extensions) {
-		return !element.get(0).files[ 0 ] || extensions.indexOf(element.get(0).files[ 0 ].name.split('.').pop()) > -1;
-	}, "Extension is wrong");
+    $.jdvalidate.addMethod("regexp", function (value, element, regexp) {
+        return regexp.test(value);
+    }, "The field value is invalid");
+
+    $.jdvalidate.addMethod("email", function (value) {
+        return /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i.test(value);
+    }, "The e-mail is invalid");
+
+    $.jdvalidate.addMethod('filesize', function (value, element, size) {
+        return !element.get(0).files[0] || element.get(0).files[0].size <= size;
+    }, "The file is too large");
+
+    $.jdvalidate.addMethod('extension', function (value, element, extensions) {
+        return !element.get(0).files[0] || extensions.indexOf(element.get(0).files[0].name.split('.').pop()) > -1;
+    }, "The file extension is invalid");
 })(jQuery);
