@@ -8,14 +8,15 @@
             },
             sendType: 'serialize',
             classes: {
-                error: "error",
-                baseError: "base-error",
-                valid: "valid"
+                error: 'error',
+                baseError: 'base-error',
+                valid: 'valid'
             },
             clean: true,
             rules: {},
             messages: {},
-            baseError: null
+            baseError: null,
+            parent: {}
         };
 
         var self = {};
@@ -74,18 +75,18 @@
             ajaxOptions.url = self.form.attr('action');
             ajaxOptions.method = self.form.attr('method');
 
-            if (self.options.sendType === "formData") {
+            if (self.options.sendType === 'formData') {
                 ajaxOptions.processData = false;
                 ajaxOptions.data = new FormData(self.form.get(0));
-            } else if (self.options.sendType === "json") {
+            } else if (self.options.sendType === 'json') {
                 var data = {};
 
                 $.each(self.inputs, function (name, element) {
-                    data[name] = element.val();
+                    data[name] = (element.is('[type="checkbox"]') && element.is(':checked') || !element.is('[type="checkbox"]')) ? element.val() : '';
                 });
 
                 ajaxOptions.data = JSON.stringify(data);
-            } else if (self.options.sendType === "serialize") {
+            } else if (self.options.sendType === 'serialize') {
                 ajaxOptions.data = self.form.serialize();
             }
 
@@ -120,7 +121,7 @@
             }).fail(function (response) {
                 var error = ajaxOptions.method + ' ' + ajaxOptions.url + ' ' + response.status + ' (' + response.statusText + ')';
 
-                self.baseError.text(error);
+                self.baseError.text(error).show();
                 console.error(error);
             });
         });
@@ -131,10 +132,20 @@
                     .attr('for', name)
                     .addClass(self.options.classes.error);
 
-                self.inputs[name].after(self.labels[name]);
+                if (!self.options.parent) {
+                    self.inputs[name].after(self.labels[name]);
+                } else {
+                    self.inputs[name ].closest(self.options.parent.selector).append(self.labels[name]);
+                }
             }
 
-            self.inputs[name]
+            if (self.options.parent) {
+				self.inputs[name ].closest(self.options.parent.selector)
+					.addClass(self.options.parent.classes.error)
+					.removeClass(self.options.parent.classes.valid);
+            }
+
+			self.inputs[name]
                 .addClass(self.options.classes.error)
                 .removeClass(self.options.classes.valid);
 
@@ -146,6 +157,12 @@
                 .removeClass(self.options.classes.error)
                 .addClass(self.options.classes.valid);
 
+			if (self.options.parent) {
+				self.inputs[name ].closest(self.options.parent.selector)
+					.addClass(self.options.parent.classes.valid)
+					.removeClass(self.options.parent.classes.error);
+			}
+
             if (self.labels[name]) {
                 self.labels[name].hide();
             }
@@ -156,21 +173,28 @@
 
             var errors = [];
 
-            $.each(rules, function (method, params) {
-                if (params) {
-                    if (methods[method]) {
-                        var valid = methods[method].func(self.inputs[name].val(), self.inputs[name], params);
+            var isEmpty = !methods['required'].func(self.inputs[name].val(), self.inputs[name]);
 
-                        if (!valid) {
-                            var message = self.options.messages[name] ? self.options.messages[name][method] ? self.options.messages[name][method] : methods[method].message : methods[method].message;
-                            errors.push(message);
+            if (isEmpty && rules['required']){
+				var message = self.options.messages[name] ? self.options.messages[name]['required'] ? self.options.messages[name]['required'] : methods['required'].message : methods['required'].message;
+				errors.push(message);
+            } else if (!isEmpty) {
+                $.each(rules, function (method, params) {
+                    if (params) {
+                        if (methods[method]) {
+                            var valid = methods[method].func(self.inputs[name].val(), self.inputs[name], params);
+
+                            if (!valid) {
+                                var message = self.options.messages[name] ? self.options.messages[name][method] ? self.options.messages[name][method] : methods[method].message : methods[method].message;
+                                errors.push(message);
+                            }
+                        } else {
+                            console.error('Method "' + method + '" not found');
+                            errors.push('Method "' + method + '" not found');
                         }
-                    } else {
-                        console.error('Method "' + method + '" not found');
-                        errors.push('Method "' + method + '" not found');
                     }
-                }
-            });
+                });
+            }
 
             if (errors.length) {
                 self.markError(name, errors);
@@ -189,6 +213,8 @@
             $.each(self.rules, function (name, rules) {
                 isValid = self.checkInput(name, rules) && isValid;
             });
+
+			self.baseError.text('').hide();
 
             return isValid;
         };
@@ -210,23 +236,23 @@
  */
 
 (function ($) {
-    $.jdvalidate.addMethod("required", function (value, element) {
+    $.jdvalidate.addMethod('required', function (value, element) {
         return (value.trim() != '' && !element.is('[type="checkbox"]')) || (element.is('[type="checkbox"]') && element.is(':checked'));
-    }, "The field is required");
+    }, 'The field is required');
 
-    $.jdvalidate.addMethod("regexp", function (value, element, regexp) {
+    $.jdvalidate.addMethod('regexp', function (value, element, regexp) {
         return regexp.test(value);
-    }, "The field value is invalid");
+    }, 'The field value is invalid');
 
-    $.jdvalidate.addMethod("email", function (value) {
+    $.jdvalidate.addMethod('email', function (value) {
         return /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i.test(value);
-    }, "The e-mail is invalid");
+    }, 'The e-mail is invalid');
 
     $.jdvalidate.addMethod('filesize', function (value, element, size) {
         return !element.get(0).files[0] || element.get(0).files[0].size <= size;
-    }, "The file is too large");
+    }, 'The file is too large');
 
     $.jdvalidate.addMethod('extension', function (value, element, extensions) {
         return !element.get(0).files[0] || extensions.indexOf(element.get(0).files[0].name.split('.').pop()) > -1;
-    }, "The file extension is invalid");
+    }, 'The file extension is invalid');
 })(jQuery);

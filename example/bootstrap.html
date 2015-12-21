@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="/bower_components/bootstrap/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/bower_components/bootstrap/dist/css/bootstrap-theme.min.css"/>
+    <style>
+        .f-form {
+            margin: 0 auto;
+            width: 1000px;
+        }
+    </style>
+</head>
+<body>
+<h1>Sample bootstrap form</h1>
+<div class="js-form f-form">
+    <form id="myForm" action="./ajax.php" method="post" class="form-horizontal">
+        <div class="form-group">
+            <label for="name" class="col-sm-2 control-label">Name:</label>
+
+            <div class="col-sm-6">
+                <input name="name" type="text" class="form-control" id="name" placeholder="Name">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="phone" class="col-sm-2 control-label">Phone:</label>
+
+            <div class="col-sm-6">
+                <input name="phone" type="tel" class="form-control" id="phone" placeholder="Phone" required>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="email" class="col-sm-2 control-label">E-mail:</label>
+
+            <div class="col-sm-6">
+                <input name="email" type="email" class="form-control" id="email" placeholder="E-mail" required>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="file" class="col-sm-2 control-label">File (html, css, txt):</label>
+
+            <div class="col-sm-6">
+                <input name="file" type="file" class="form-control" id="file">
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-6">
+                <div class="checkbox">
+                    <label>
+                        <input name="check" type="checkbox"> Check it:
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-6">
+                <button type="submit" class="btn btn-default">Send</button>
+            </div>
+        </div>
+    </form>
+    <div class="base-error alert alert-danger" role="alert" style="display: none"></div>
+</div>
+
+<script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+<script src="../dist/jdvalidate.js"></script>
+
+<script>
+    $('.js-form form').jdvalidate({
+        sendType: 'json',
+        rules: {
+            phone: {
+                regexp: /^([\+]+)*[0-9\x20\x28\x29\-]{5,20}$/
+            },
+            file: {
+                filesize: 10000,
+                extension: 'html|css|txt'
+            }
+        },
+        messages: {
+            phone: {
+                regex: 'Телефон в формате +7 999 123 45 67'
+            },
+            file: {
+                filesize: 'Файл слишком большой'
+            }
+        },
+        baseError: $('.base-error'),
+        parent: {
+            selector: '.form-group',
+            classes: {
+                error: 'has-error',
+                valid: 'has-success'
+            }
+        }
+    });
+</script>
+</body>
+</html>

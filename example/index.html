@@ -38,14 +38,17 @@
     </style>
 </head>
 <body>
-<form id="myForm" action="./ajax.php" method="post">
-    <label for="name">Name:</label><input id="name" type="text" name="name" required><br/>
-    <label for="phone">Phone:</label><input id="phone" type="text" name="phone"><br/>
-    <label for="email">E-mail:</label><input id="email" type="email" name="email" class="required"><br/>
-    <label for="file">File (html, css, txt):</label><input id="file" type="file" name="file" required><br/>
-    <label for="check">Check it:</label><input id="check" type="checkbox" name="check" required><br/>
-    <input type="submit" value="Send">
-</form>
+
+<div class="js-form">
+    <form id="myForm" action="./ajax.php" method="post">
+        <label for="name">Name:</label><input id="name" type="text" name="name"><br/>
+        <label for="phone">Phone:</label><input id="phone" type="text" name="phone"><br/>
+        <label for="email">E-mail:</label><input id="email" type="email" name="email"><br/>
+        <label for="file">File (html, css, txt):</label><input id="file" type="file" name="file"><br/>
+        <label for="check">Check it:</label><input id="check" type="checkbox" name="check"><br/>
+        <input type="submit" value="Send">
+    </form>
+</div>
 
 <div class="base-error"></div>
 
@@ -53,7 +56,7 @@
 <script src="../dist/jdvalidate.js"></script>
 
 <script>
-    $('#myForm').jdvalidate({
+    $('.js-form form').jdvalidate({
         sendType: 'serialize',
         rules: {
             phone: {
@@ -72,7 +75,8 @@
                 filesize: "Файл слишком большой"
             }
         },
-        baseError: $('.base-error')
+        baseError: $('.base-error'),
+//        parent: '.'
     });
 </script>
 </body>
