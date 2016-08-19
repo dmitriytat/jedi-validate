@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dimkosru/jdvalidate.git"
+    "url": "git+https://github.com/dimkosru/jedi-validate.git"
   },
   "keywords": [
     "form",
@@ -18,15 +18,18 @@
   "author": "Dmitriy Tatarintsev <tatarintsevd@gmail.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/dimkosru/jdvalidate/issues"
+    "url": "https://github.com/dimkosru/jedi-validate/issues"
   },
-  "homepage": "https://github.com/dimkosru/jdvalidate#readme",
+  "homepage": "https://github.com/dimkosru/jedi-validate#readme",
   "devDependencies": {
+    "babel-preset-es2015": "^6.13.2",
     "gulp": "^3.9.0",
+    "gulp-babel": "^6.1.2",
     "gulp-concat": "^2.6.0",
     "gulp-plumber": "^1.0.1",
     "gulp-rename": "^1.2.2",
     "gulp-sourcemaps": "^1.6.0",
-    "gulp-uglify": "^1.5.1"
+    "gulp-uglify": "^1.5.1",
+    "gulp-umd": "^0.2.0"
   }
 }
