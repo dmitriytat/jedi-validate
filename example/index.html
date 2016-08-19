@@ -39,45 +39,126 @@
 </head>
 <body>
 
-<div class="js-form">
-    <form id="myForm" action="./ajax.php" method="post">
-        <label for="name">Name:</label><input id="name" type="text" name="name"><br/>
-        <label for="phone">Phone:</label><input id="phone" type="text" name="phone"><br/>
-        <label for="email">E-mail:</label><input id="email" type="email" name="email"><br/>
-        <label for="file">File (html, css, txt):</label><input id="file" type="file" name="file"><br/>
-        <label for="check">Check it:</label><input id="check" type="checkbox" name="check"><br/>
-        <input type="submit" value="Send">
+<div class="f-form js-form">
+    <div class="f-base-message">
+        Может находится где угодно внутри ".f-form"
+    </div>
+    <!-- Атрибуты action, method а также enctype="multipart/form-data" (для отправки файла) используются для отправки аяксом -->
+    <form action="/ajax/registration.php" method="POST">
+        <div class="f-group">
+            <div class="f-group-title">Организация</div>
+            <div class="f-line">
+                <div class="f-field">
+                    <label class="f-label" for="company">Название компании</label>
+                    <input id="company" name="company" class="f-input" type="text" required autofocus>
+                    <span class="f-message"></span>
+                </div>
+            </div>
+            <div class="f-line">
+                <!-- внутри .f-line поля могут распологаться горизонтально -->
+                <div class="f-field">
+                    <label class="f-label" for="inn">ИНН</label>
+                    <input id="inn" name="inn" class="f-input" type="text" required>
+                    <span class="f-message"></span>
+                </div>
+                <div class="f-field" id="if-jure">
+                    <label class="f-label" for="kpp">КПП</label>
+                    <input id="kpp" name="kpp" class="f-input" type="text" required>
+                    <span class="f-message"></span>
+                </div>
+            </div>
+            <div class="f-line">
+                <div class="f-field">
+                    <label class="f-label" for="oborot">Предполагаемый оборот, руб./мес</label>
+                    <select id="oborot" name="oborot" class="f-select js-select-input">
+                        <option selected="" value="Неизвестно">Неизвестно</option>
+                        <option value="от 10 000 до 30 000">от 10 000 до 30 000</option>
+                        <option value="от 30 000 до 50 000">от 30 000 до 50 000</option>
+                        <option value="от 50 000 до 100 000">от 50 000 до 100 000</option>
+                        <option value="от 100 000 и выше">от 100 000 и выше</option>
+                    </select>
+                    <span class="f-message"></span>
+                </div>
+            </div>
+        </div>
+        <div class="f-group">
+            <div class="f-group-title">Контактные данные</div>
+            <div class="f-line">
+                <div class="f-field">
+                    <label class="f-label" for="fio">Контактное лицо (ФИО)</label>
+                    <input id="fio" name="fio" class="f-input" type="text" required>
+                    <span class="f-message"></span>
+                </div>
+            </div>
+            <div class="f-line">
+                <div class="f-field">
+                    <label class="f-label" for="phone">Телефон</label>
+                    <input id="phone" name="phone" class="f-input js-phone-input" type="text" required> <!--  Класс tel для валидации телефона -->
+                    <span class="f-message"></span>
+                </div>
+            </div>
+            <div class="f-line">
+                <div class="f-field">
+                    <label class="f-label" for="email">Электронная почта</label>
+                    <input id="email" name="email" class="f-input" type="text" required> <!--  Класс email для валидации email -->
+                    <span class="f-message"></span>
+                </div>
+            </div>
+        </div>
+        <div class="f-group">
+            <div class="f-group-title">Доставка</div>
+            <div class="f-line">
+                <div class="f-field">
+                    <label class="f-label" for="city">Город</label>
+                    <input id="city" name="city" class="f-input" type="text" pattern="2-[0-9]{3}-[0-9]{3}" required>  <!--  Атрибут pattern для валидации регуляркой -->
+                    <span class="f-message"></span>
+                </div>
+            </div>
+            <div class="f-line">
+                <div class="f-field">
+                    <label class="f-label" for="street">Улица</label>
+                    <input id="street" name="street" class="f-input" type="text" required>
+                    <span class="f-message"></span>
+                </div>
+            </div>
+            <div class="f-line">
+                <div class="f-field">
+                    <label class="f-label" for="house">Дом</label>
+                    <input id="house" name="house" class="f-input" type="text" required>
+                    <span class="f-message"></span>
+                </div>
+                <div class="f-field">
+                    <label class="f-label" for="housing">Корпус / строение</label>
+                    <input id="housing" name="housing" class="f-input" type="text">
+                    <span class="f-message"></span>
+                </div>
+            </div>
+            <div class="f-line">
+                <div class="f-field">
+                    <label class="f-label" for="office">Офис</label>
+                    <input id="office" name="office" class="f-input" type="text">
+                    <span class="f-message"></span>
+                </div>
+                <div class="f-field">
+                    <label class="f-label" for="index">Индекс</label>
+                    <input id="index" name="index" class="f-input" type="text">
+                    <span class="f-message"></span>
+                </div>
+            </div>
+        </div>
+        <div class="f-line">
+            <div class="f-field">
+                <button class="f-submit" type="submit">Отправить</button>
+            </div>
+        </div>
     </form>
 </div>
-
-<div class="base-error"></div>
 
 <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
 <script src="../dist/jedi-validate.js"></script>
 
 <script>
-    $('.js-form form').jdvalidate({
-        sendType: 'serialize',
-        rules: {
-            phone: {
-                regexp: /^([\+]+)*[0-9\x20\x28\x29\-]{5,20}$/
-            },
-            file: {
-                filesize: 10000,
-                extension: "html|css|txt"
-            }
-        },
-        messages: {
-            phone: {
-                regex: "Телефон в формате +7 999 123 45 67"
-            },
-            file: {
-                filesize: "Файл слишком большой"
-            }
-        },
-        baseError: $('.base-error'),
-//        parent: '.'
-    });
+    new FormValidator($('.js-form'));
 </script>
 </body>
 </html>
