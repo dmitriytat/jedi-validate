@@ -1,4 +1,6 @@
-# jdvalidate
+# Now does not depend on jQuery
+
+# TODO rewrite README
 JQuery form validation plugin by Dimko
 
 ## How can I use it?

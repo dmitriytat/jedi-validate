@@ -1,7 +1,7 @@
 <?php
         $randomError = "Error " . rand(0,1000);
-        $baseErrors = array("Form validaion error", $randomError);
-        $nameErrors = array("Name is required", "Lol");
+        $baseErrors = array("Form validation error", $randomError);
+        $nameErrors = array("Name is required", "Another error");
         $emailErrors = array("E-mail is not valid");
 
         $validationErrors = array(

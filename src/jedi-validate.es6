@@ -1,233 +1,318 @@
-(function ($) {
-    var methods = {};
-
-    $.fn.jdvalidate = function (options) {
-        var defaultOptions = {
+class JediValidate {
+    constructor(root, options = {}) {
+        const defaultOptions = {
             ajax: {
                 dataType: 'json'
             },
             sendType: 'serialize',
-            classes: {
-                error: 'error',
-                baseError: 'base-error',
-                valid: 'valid'
-            },
-            clean: true,
             rules: {},
             messages: {},
-            baseError: null,
-            parent: {}
+            containers: {
+                parent: 'form-group',
+                message: 'help-block',
+                baseMessage: 'base-error'
+            },
+            states: {
+                error: 'error',
+                valid: 'valid'
+            },
+            callbacks: {
+                success: function () {},
+                error: function () {}
+            }
         };
 
-        var self = {};
+        this.root = root;
 
-        self.options = $.extend(defaultOptions, options);
+        this.options = Object.assign(defaultOptions, options);
 
-        self.form = this;
+        this.fields = {};
+        this.inputs = {};
+        this.messages = {};
+        this.rules = {};
 
-        self.baseError = self.options.baseError ? self.options.baseError : $('<div></div>')
-            .addClass(self.options.classes.baseError)
-            .addClass(self.options.classes.error)
-            .hide();
+        this._cacheNodes();
+        this._ready();
+    }
 
-        if (!self.options.baseError) {
-            self.form.prepend(self.baseError);
+    _cacheNodes() {
+        this.nodes = {
+            form: this.root.querySelector('form'),
+            inputs: this.root.querySelectorAll('[name]'),
+            baseMessage: this.root.querySelector(`.${this.options.containers.baseMessage}`),
         }
+    }
 
-        self.form.attr('novalidate', 'true');
+    _ready() {
+        this.nodes.form.setAttribute('novalidate', 'novalidate');
 
-        self.inputs = {};
-        self.labels = {};
-        self.rules = {};
+        this.nodes.form.addEventListener('submit', (event) => {
+            var errors = this.checkForm();
 
-        self.form.find('[name]')
-            .each(function () {
-                var input = $(this);
-                var name = input.attr('name');
+            if (Object.keys(errors).length !== 0) {
+                this.options.callbacks.error(errors);
 
-                self.inputs[name] = input;
-
-                self.rules[name] = self.options.rules[name] || {};
-
-                self.rules[name].required = input.is('[required]') || input.hasClass('required');
-                self.rules[name].email = input.is('[type="email"]') || input.hasClass('email');
-            })
-            .on('change.jdvalidate', function () {
-                var name = $(this).attr('name');
-
-                self.checkInput(name, self.rules[name]);
-            });
-
-        self.form.on('submit.jdvalidate', function (event) {
-            if (!self.checkForm()) {
                 event.preventDefault();
-                return false;
+                return;
             }
 
-            if (!self.options.ajax) {
-                return false;
-            } else {
+            if (this.options.ajax) {
                 event.preventDefault();
+            } else {
+                return;
             }
 
             var ajaxOptions = {};
 
-            ajaxOptions.url = self.form.attr('action');
-            ajaxOptions.method = self.form.attr('method');
+            ajaxOptions.url = this.nodes.form.getAttribute('action');
+            ajaxOptions.method = this.nodes.form.getAttribute('method');
 
-            if (self.options.sendType === 'formData') {
-                ajaxOptions.processData = false;
-                ajaxOptions.data = new FormData(self.form.get(0));
-            } else if (self.options.sendType === 'json') {
-                var data = {};
-
-                $.each(self.inputs, function (name, element) {
-                    data[name] = (element.is('[type="checkbox"]') && element.is(':checked') || !element.is('[type="checkbox"]')) ? element.val() : '';
-                });
-
-                ajaxOptions.data = JSON.stringify(data);
-            } else if (self.options.sendType === 'serialize') {
-                ajaxOptions.data = self.form.serialize();
-            }
-
-            ajaxOptions = $.extend(ajaxOptions, self.options.ajax);
-
-            $.each(self.labels, self.markValid);
-
-            $.ajax(ajaxOptions).done(function (response) {
-                if (response.validationErrors) {
-                    $.each(self.inputs, function (name) {
-                        if (self.labels[name] && !response.validationErrors[name]) {
-                            self.labels[name].hide();
-                        }
-                    });
-
-                    if (response.validationErrors.base) {
-                        self.baseError.text(response.validationErrors.base.join(', ')).show();
-
-                        delete response.validationErrors.base;
-                    } else {
-                        self.baseError.hide();
-                    }
-
-                    $.each(response.validationErrors, self.markError);
-                } else if (response.redirect) {
-                    window.location.replace(response.redirect);
-                } else {
-                    if (self.options.clean) {
-                        self.form.get(0).reset();
-                    }
-                }
-            }).fail(function (response) {
-                var error = ajaxOptions.method + ' ' + ajaxOptions.url + ' ' + response.status + ' (' + response.statusText + ')';
-
-                self.baseError.text(error).show();
-                console.error(error);
-            });
+            this._send(ajaxOptions);
         });
 
-        self.markError = function (name, errors) {
-            if (!self.labels[name]) {
-                self.labels[name] = $('<label></label>')
-                    .attr('for', name)
-                    .addClass(self.options.classes.error);
+        this.nodes.inputs.forEach((input) => {
+            const name = input.name;
+            this.inputs[name] = input;
 
-                if (!self.options.parent) {
-                    self.inputs[name].after(self.labels[name]);
-                } else {
-                    self.inputs[name ].closest(self.options.parent.selector).append(self.labels[name]);
+            let field = input.parentNode;
+
+            do {
+                if (field.classList.contains(this.options.containers.parent)) {
+                    this.fields[name] = field;
+                    break;
                 }
+            } while (field = field.parentNode);
+
+            if (!this.fields[name]) {
+                throw 'Have no parent field';
             }
 
-            if (self.options.parent) {
-				self.inputs[name ].closest(self.options.parent.selector)
-					.addClass(self.options.parent.classes.error)
-					.removeClass(self.options.parent.classes.valid);
+            var messageElement = this.fields[name].querySelector(`.${this.options.containers.message}`);
+
+            if (messageElement) {
+                this.messages[name] = messageElement;
+            } else {
+                this.messages[name] = document.createElement("div");
+                this.messages[name].classList.add(this.options.containers.message);
+                this.fields[name].appendChild(this.messages[name]);
             }
 
-			self.inputs[name]
-                .addClass(self.options.classes.error)
-                .removeClass(self.options.classes.valid);
+            this._defineRules(name);
 
-            self.labels[name].text(errors.join(', ')).show();
-        };
+            input.addEventListener('change', () => {
+                this.checkInput(name);
+            });
+        });
+    }
 
-        self.markValid = function (name) {
-            self.inputs[name]
-                .removeClass(self.options.classes.error)
-                .addClass(self.options.classes.valid);
+    _send(options) {
+        let data = '';
 
-			if (self.options.parent) {
-				self.inputs[name ].closest(self.options.parent.selector)
-					.addClass(self.options.parent.classes.valid)
-					.removeClass(self.options.parent.classes.error);
-			}
+        this.nodes.inputs.forEach((input) => {
+            data += `${input.name}=${encodeURIComponent(input.value)}&`;
+        });
 
-            if (self.labels[name]) {
-                self.labels[name].hide();
-            }
-        };
+        data = data.slice(0, -1);
 
-        self.checkInput = function (name, rules) {
-            var isValid = true;
+        const xhttp = new XMLHttpRequest();
 
-            var errors = [];
+        xhttp.open("GET", options.url + (options.method.toUpperCase() === 'GET' ? ('?' + data) : ''), true); // todo concat url and params
 
-            var isEmpty = !methods['required'].func(self.inputs[name].val(), self.inputs[name]);
+        xhttp.onreadystatechange = () => {
+            if (xhttp.readyState == 4) {
+                if (xhttp.status == 200) {
+                    let response = {};
 
-            if (isEmpty && rules['required']){
-				var message = self.options.messages[name] ? self.options.messages[name]['required'] ? self.options.messages[name]['required'] : methods['required'].message : methods['required'].message;
-				errors.push(message);
-            } else if (!isEmpty) {
-                $.each(rules, function (method, params) {
-                    if (params) {
-                        if (methods[method]) {
-                            var valid = methods[method].func(self.inputs[name].val(), self.inputs[name], params);
+                    try {
+                        response = JSON.parse(xhttp.responseText);
+                    } catch (e) {
+                        response.validationErrors = {base: ['JSON parsing error']};  // todo: language extension
+                    }
 
-                            if (!valid) {
-                                var message = self.options.messages[name] ? self.options.messages[name][method] ? self.options.messages[name][method] : methods[method].message : methods[method].message;
-                                errors.push(message);
-                            }
+                    if (response.validationErrors) {
+                        this.options.callbacks.error(response.validationErrors);
+
+                        if (response.validationErrors.base) {
+                            this.nodes.baseMessage.innerHTML = response.validationErrors.base.join(', ');
+                            this.root.classList.add(this.options.states.error);
+                            this.root.classList.remove(this.options.states.valid);
+                            delete response.validationErrors.base;
                         } else {
-                            console.error('Method "' + method + '" not found');
-                            errors.push('Method "' + method + '" not found');
+                            this.nodes.baseMessage.innerHTML = '';
+                        }
+
+                        for (let name in response.validationErrors) {
+                            this._markError(name, response.validationErrors[name]);
+                        }
+                    } else {
+                        this.options.callbacks.success(response);
+
+                        if (this.options.redirect && response.redirect) {
+                            window.location.href = response.redirect;
+                            return;
+                        }
+
+                        if (this.options.clean) {
+                            this.nodes.form.reset();
                         }
                     }
-                });
+                } else {
+                    console.warn(options.method + ' ' + options.url + ' ' + xhttp.status + ' (' + xhttp.statusText + ')');
+
+                    this.nodes.baseMessage.innerHTML = 'Can not send form!'; // todo: language extension
+                    this.root.classList.add(this.options.states.error);
+                    this.root.classList.remove(this.options.states.valid);
+                }
             }
+        };
 
-            if (errors.length) {
-                self.markError(name, errors);
+        xhttp.send(options.method.toUpperCase() === 'POST' ? data : '');
+    }
 
-                isValid = false;
-            } else {
-                self.markValid(name);
+    _defineRules(name) {
+        const input = this.inputs[name];
+
+        this.rules[name] = {};
+
+        const rules = ['required', 'email', 'tel', 'url'];
+
+        for (let rule of rules) {
+            if (input.hasAttribute(rule) || input.classList.contains(rule)) {
+                this.rules[name][rule] = true;
             }
+        }
 
-            return isValid;
-        };
+        if (input.hasAttribute('pattern')) {
+            this.rules[name].regexp = new RegExp(input.getAttribute('pattern'));
+        }
 
-        self.checkForm = function () {
-            var isValid = true;
+        this.rules[name] = Object.assign(this.rules[name], this.options.rules[name]);
 
-            $.each(self.rules, function (name, rules) {
-                isValid = self.checkInput(name, rules) && isValid;
-            });
+        for (let rule in this.rules[name]) {
+            if (this.rules[name][rule]) {
+                this.fields[name].classList.add(rule);
+            }
+        }
+    }
 
-			self.baseError.text('').hide();
+    checkForm() {
+        var errors = {};
 
-            return isValid;
-        };
+        for (let name in this.rules) {
+            var inputErrors = this.checkInput(name);
 
-        return self.form;
+            if (inputErrors.length) {
+                errors[name] = inputErrors;
+            }
+        }
+
+        return errors;
+    }
+
+    checkInput(name) {
+        const rules = this.rules[name];
+        const errors = [];
+        const isEmpty = !JediValidate.methods.required.func(this.inputs[name].value, this.inputs[name]);
+
+        if (isEmpty && rules.required) {
+            errors.push(this._getErrorMessage(name));
+        } else if (!isEmpty) {
+            for (let method in rules) {
+                const params = rules[method];
+
+                if (params) {
+                    if (JediValidate.methods[method]) {
+                        var valid = JediValidate.methods[method].func(this.inputs[name].value, this.inputs[name], params);
+
+                        if (!valid) {
+                            errors.push(this._getErrorMessage(name));
+                        }
+                    } else {
+                        errors.push('Method "' + method + '" not found');
+                    }
+                }
+            }
+        }
+
+        if (errors.length) {
+            this._markError(name, errors);
+        } else {
+            this._markValid(name);
+        }
+
+        return errors;
+    }
+
+    _markError(name, errors) {
+        if (!this.fields[name] || !this.messages[name]) {
+            return;
+        }
+
+        this.fields[name].classList.add(this.options.states.error);
+        this.fields[name].classList.remove(this.options.states.valid);
+
+        this.messages[name].innerHTML = errors.join(', ');
+    }
+
+    _markValid(name) {
+        if (!this.fields[name] || !this.messages[name]) {
+            return;
+        }
+
+        this.fields[name].classList.add(this.options.states.valid);
+        this.fields[name].classList.remove(this.options.states.error);
+
+        this.messages[name].innerHTML = '';
+    }
+
+    _getErrorMessage(name) {
+        let message = '';
+
+        if (this.options.messages[name] && this.options.messages[name].required) {
+            message = this.options.messages[name].required;
+        } else {
+            message = JediValidate.methods.required.message;
+        }
+
+        return message;
     };
+}
 
-    $.jdvalidate = {};
+JediValidate.methods = {};
 
-    $.jdvalidate.addMethod = function (rule, func, message) {
-        methods[rule] = {
-            func: func,
-            message: message
-        };
+JediValidate.addMethod = function (rule, func, message) {
+    JediValidate.methods[rule] = {
+        func: func,
+        message: message
     };
-})(jQuery);
+};
+
+// todo languages
+
+JediValidate.addMethod('required', function (value, element) {
+    return (value && value.trim() !== '') && (element.getAttribute('type') !== "checkbox") || (element.getAttribute('type') === "checkbox" && element.hasAttribute('checked'));
+}, 'Это поле необходимо заполнить');
+
+JediValidate.addMethod('regexp', function (value, element, regexp) {
+    return regexp.test(value);
+}, 'Пожалуйста, введите корректное значение');
+
+JediValidate.addMethod('email', function (value) {
+    return /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i.test(value);
+}, 'Пожалуйста, введите корректный адрес электронной почты');
+
+JediValidate.addMethod('filesize', function (value, element, size) {
+    return !element.get(0).files[0] || element.get(0).files[0].size <= size;
+}, 'Попробуйте загрузить файл поменьше');
+
+JediValidate.addMethod('extension', function (value, element, extensions) {
+    return !element.get(0).files[0] || extensions.indexOf(element.get(0).files[0].name.split('.').pop()) > -1;
+}, 'Пожалуйста, выберите файл с правильным расширением');
+
+JediValidate.addMethod('tel', function (value) {
+    return /^([\+]+)*[0-9\x20\x28\x29\-]{5,20}$/.test(value);
+}, 'Не корректный номер телефона');
+
+JediValidate.addMethod('url', function (value) {
+    return /[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi.test(value);
+}, 'Не корректный url');
