@@ -1,7 +1,7 @@
 {
   "name": "jedi-validate",
-  "version": "1.0.0",
-  "description": "Validation component by Dimko",
+  "version": "1.0.1",
+  "description": "Lightweight form validation component",
   "main": "gulpfile.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
