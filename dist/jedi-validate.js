@@ -55,7 +55,9 @@ var JediValidate = function () {
 
         var formOptions = JediValidate.getFormOptions(this.nodes.form);
 
-        this.options = mergeDeep(defaultOptions, formOptions, options);
+        this.options = mergeDeep(this.options, defaultOptions);
+        this.options = mergeDeep(this.options, formOptions);
+        this.options = mergeDeep(this.options, options);
 
         this._ready();
     }
