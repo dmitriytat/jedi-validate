@@ -150,7 +150,7 @@ var JediValidate = function () {
             if (this.options.sendType === 'serialize') {
 
                 this.nodes.inputs.forEach(function (input) {
-                    data += input.name + '=' + encodeURIComponent(Utils.getInputValue(input)) + '&';
+                    data += input.name + '=' + encodeURIComponent(JediValidate.getInputValue(input)) + '&';
                 });
 
                 data = data.slice(0, -1);
@@ -160,7 +160,7 @@ var JediValidate = function () {
                 data = {};
 
                 this.nodes.inputs.forEach(function (input) {
-                    data[input.name] = Utils.getInputValue(input);
+                    data[input.name] = JediValidate.getInputValue(input);
                 });
 
                 data = JSON.stringify(data);
@@ -294,7 +294,7 @@ var JediValidate = function () {
         value: function checkInput(name) {
             var rules = this.rules[name];
             var errors = [];
-            var isEmpty = !JediValidate.methods.required.func(Utils.getInputValue(this.inputs[name]), this.inputs[name]);
+            var isEmpty = !JediValidate.methods.required.func(JediValidate.getInputValue(this.inputs[name]), this.inputs[name]);
 
             if (isEmpty && rules.required) {
                 errors.push(this._getErrorMessage(name));
@@ -304,7 +304,7 @@ var JediValidate = function () {
 
                     if (params) {
                         if (JediValidate.methods[method]) {
-                            var valid = JediValidate.methods[method].func(Utils.getInputValue(this.inputs[name]), this.inputs[name], params);
+                            var valid = JediValidate.methods[method].func(JediValidate.getInputValue(this.inputs[name]), this.inputs[name], params);
 
                             if (!valid) {
                                 errors.push(this._getErrorMessage(name));
@@ -384,6 +384,79 @@ var JediValidate = function () {
 
             return options;
         }
+    }, {
+        key: 'getRadioGroupValue',
+        value: function getRadioGroupValue(elements) {
+            var _iteratorNormalCompletion2 = true;
+            var _didIteratorError2 = false;
+            var _iteratorError2 = undefined;
+
+            try {
+                for (var _iterator2 = elements[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                    var element = _step2.value;
+
+                    var value = JediValidate.getInputValue(element);
+
+                    if (value !== '') {
+                        return value;
+                    }
+                }
+            } catch (err) {
+                _didIteratorError2 = true;
+                _iteratorError2 = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion2 && _iterator2.return) {
+                        _iterator2.return();
+                    }
+                } finally {
+                    if (_didIteratorError2) {
+                        throw _iteratorError2;
+                    }
+                }
+            }
+
+            return '';
+        }
+    }, {
+        key: 'getInputValue',
+        value: function getInputValue(element) {
+            var value = '';
+            var type = element.type;
+
+
+            if (type === 'select-one') {
+                if (element.options.length) {
+                    value = element.options[element.selectedIndex].value;
+                }
+
+                return value;
+            }
+
+            if (type === 'select-multiple') {
+                value = [];
+
+                for (var i = 0; i < element.options.length; i++) {
+                    if (element.options[i].selected) {
+                        value.push(element.options[i].value);
+                    }
+                }
+
+                if (value.length === 0) {
+                    value = '';
+                }
+
+                return value;
+            }
+
+            if (type === 'checkbox' || type === 'radio') {
+                if (element.checked) return element.value;else {
+                    return '';
+                }
+            }
+
+            return element.value;
+        }
     }]);
 
     return JediValidate;
@@ -430,46 +503,6 @@ JediValidate.addMethod('url', function (value) {
     return (/[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi.test(value)
     );
 }, 'Не корректный url');
-
-var Utils = {
-    getInputValue: function getFormElementValue(element) {
-        var value = '';
-        var type = element.type;
-
-
-        if (type === 'select-one') {
-            if (element.options.length) {
-                value = element.options[element.selectedIndex].value;
-            }
-
-            return value;
-        }
-
-        if (type === 'select-multiple') {
-            value = [];
-
-            for (var i = 0; i < element.options.length; i++) {
-                if (element.options[i].selected) {
-                    value.push(element.options[i].value);
-                }
-            }
-
-            if (value.length === 0) {
-                value = '';
-            }
-
-            return value;
-        }
-
-        if (type === 'checkbox' || type === 'radio') {
-            if (element.checked) return element.value;else {
-                return '';
-            }
-        }
-
-        return element.value;
-    }
-};
 
 function isObject(item) {
     return item && (typeof item === 'undefined' ? 'undefined' : _typeof(item)) === 'object' && !Array.isArray(item) && item !== null;

@@ -71,6 +71,57 @@ class JediValidate {
 
         return options;
     }
+    
+    static getRadioGroupValue(elements) {
+        for (let element of elements) {
+            var value = JediValidate.getInputValue(element);
+
+            if (value !== '') {
+                return value;
+            }
+        }
+
+        return '';
+    }
+
+    static getInputValue(element) {
+        let value = '';
+        let {type} = element;
+
+        if (type === 'select-one') {
+            if (element.options.length) {
+                value = element.options[element.selectedIndex].value;
+            }
+
+            return value;
+        }
+
+        if (type === 'select-multiple') {
+            value = [];
+
+            for (let i = 0; i < element.options.length; i++) {
+                if (element.options[i].selected) {
+                    value.push(element.options[i].value);
+                }
+            }
+
+            if (value.length === 0) {
+                value = ''
+            }
+
+            return value;
+        }
+
+        if (type === 'checkbox' || type === 'radio') {
+            if (element.checked)
+                return element.value;
+            else {
+                return '';
+            }
+        }
+
+        return element.value;
+    }
 
     _cacheNodes() {
         this.nodes = {
@@ -152,7 +203,7 @@ class JediValidate {
         if (this.options.sendType === 'serialize') {
 
             this.nodes.inputs.forEach((input) => {
-                data += `${input.name}=${encodeURIComponent(Utils.getInputValue(input))}&`;
+                data += `${input.name}=${encodeURIComponent(JediValidate.getInputValue(input))}&`;
             });
 
             data = data.slice(0, -1);
@@ -162,7 +213,7 @@ class JediValidate {
             data = {};
 
             this.nodes.inputs.forEach((input) => {
-                data[input.name] = Utils.getInputValue(input);
+                data[input.name] = JediValidate.getInputValue(input);
             });
 
             data = JSON.stringify(data);
@@ -272,7 +323,7 @@ class JediValidate {
     checkInput(name) {
         const rules = this.rules[name];
         const errors = [];
-        const isEmpty = !JediValidate.methods.required.func(Utils.getInputValue(this.inputs[name]), this.inputs[name]);
+        const isEmpty = !JediValidate.methods.required.func(JediValidate.getInputValue(this.inputs[name]), this.inputs[name]);
 
         if (isEmpty && rules.required) {
             errors.push(this._getErrorMessage(name));
@@ -282,7 +333,7 @@ class JediValidate {
 
                 if (params) {
                     if (JediValidate.methods[method]) {
-                        var valid = JediValidate.methods[method].func(Utils.getInputValue(this.inputs[name]), this.inputs[name], params);
+                        var valid = JediValidate.methods[method].func(JediValidate.getInputValue(this.inputs[name]), this.inputs[name], params);
 
                         if (!valid) {
                             errors.push(this._getErrorMessage(name));
@@ -376,47 +427,6 @@ JediValidate.addMethod('tel', function (value) {
 JediValidate.addMethod('url', function (value) {
     return /[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi.test(value);
 }, 'Не корректный url');
-
-var Utils = {
-    getInputValue: function getFormElementValue(element) {
-        let value = '';
-        let {type} = element;
-
-        if (type === 'select-one') {
-            if (element.options.length) {
-                value = element.options[element.selectedIndex].value;
-            }
-
-            return value;
-        }
-
-        if (type === 'select-multiple') {
-            value = [];
-
-            for (let i = 0; i < element.options.length; i++) {
-                if (element.options[i].selected) {
-                    value.push(element.options[i].value);
-                }
-            }
-
-            if (value.length === 0) {
-                value = ''
-            }
-
-            return value;
-        }
-
-        if (type === 'checkbox' || type === 'radio') {
-            if (element.checked)
-                return element.value;
-            else {
-                return '';
-            }
-        }
-
-        return element.value;
-    }
-};
 
 function isObject(item) {
     return (item && typeof item === 'object' && !Array.isArray(item) && item !== null);

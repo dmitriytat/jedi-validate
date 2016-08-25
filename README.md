@@ -1,6 +1,8 @@
 # Jedi Validate
 Lightweight form validation component.
 
+[![NPM](https://nodei.co/npm/jedi-validate.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/jedi-validate/)
+
 ## How can I use it?
 
 This is a JS class, and you can instance it with DOM element and options object.
