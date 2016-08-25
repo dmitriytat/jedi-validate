@@ -17,7 +17,7 @@
         <div class="col-lg-6">
             <h1>Jedi Validate</h1>
             <div id="form">
-                <form id="myForm" action="./ajax.json" method="post" class="form-horizontal">
+                <form id="myForm" action="./ajax.php" method="post" class="form-horizontal" enctype="multipart/form-data">
                     <div class="help-block base-error"></div>
                     <div class="form-group">
                         <label for="name" class="col-sm-2 control-label">Name:</label>
@@ -45,7 +45,7 @@
                         <label for="file" class="col-sm-2 control-label">File (html, css, txt):</label>
 
                         <div class="col-sm-6">
-                            <input name="file" type="file" class="form-control" id="file">
+                            <input name="file" type="file" class="form-control" id="file" required>
                         </div>
                     </div>
                     <div class="form-group">
@@ -69,7 +69,7 @@
     </div>
 </div>
 
-<script src="../dist/jedi-validate.min.js"></script>
+<script src="../dist/jedi-validate.js"></script>
 
 <script>
     var formWrapper = document.querySelector('#form');

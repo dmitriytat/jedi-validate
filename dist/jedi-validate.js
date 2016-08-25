@@ -127,14 +127,14 @@ var JediValidate = function () {
             var data = '';
 
             this.nodes.inputs.forEach(function (input) {
-                data += input.name + '=' + encodeURIComponent(input.value) + '&';
+                data += input.name + '=' + encodeURIComponent(Utils.getInputValue(input)) + '&';
             });
 
             data = data.slice(0, -1);
 
             var xhttp = new XMLHttpRequest();
 
-            xhttp.open("GET", options.url + (options.method.toUpperCase() === 'GET' ? '?' + data : ''), true); // todo concat url and params
+            xhttp.open(options.method, options.url + (options.method.toUpperCase() === 'GET' ? '?' + data : ''), true); // todo concat url and params
 
             xhttp.onreadystatechange = function () {
                 if (xhttp.readyState == 4) {
@@ -254,7 +254,7 @@ var JediValidate = function () {
         value: function checkInput(name) {
             var rules = this.rules[name];
             var errors = [];
-            var isEmpty = !JediValidate.methods.required.func(this.inputs[name].value, this.inputs[name]);
+            var isEmpty = !JediValidate.methods.required.func(Utils.getInputValue(this.inputs[name]), this.inputs[name]);
 
             if (isEmpty && rules.required) {
                 errors.push(this._getErrorMessage(name));
@@ -264,7 +264,7 @@ var JediValidate = function () {
 
                     if (params) {
                         if (JediValidate.methods[method]) {
-                            var valid = JediValidate.methods[method].func(this.inputs[name].value, this.inputs[name], params);
+                            var valid = JediValidate.methods[method].func(Utils.getInputValue(this.inputs[name]), this.inputs[name], params);
 
                             if (!valid) {
                                 errors.push(this._getErrorMessage(name));
@@ -337,8 +337,8 @@ JediValidate.addMethod = function (rule, func, message) {
 
 // todo languages
 
-JediValidate.addMethod('required', function (value, element) {
-    return value && value.trim() !== '' && element.getAttribute('type') !== "checkbox" || element.getAttribute('type') === "checkbox" && element.hasAttribute('checked');
+JediValidate.addMethod('required', function (value) {
+    return value && value.trim() !== '';
 }, 'Это поле необходимо заполнить');
 
 JediValidate.addMethod('regexp', function (value, element, regexp) {
@@ -367,3 +367,57 @@ JediValidate.addMethod('url', function (value) {
     return (/[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi.test(value)
     );
 }, 'Не корректный url');
+
+var Utils = {
+    getInputValue: function getFormElementValue(element) {
+        var value = null;
+        var type = element.type;
+
+
+        if (type === 'select-one') {
+            if (element.options.length) {
+                value = element.options[element.selectedIndex].value;
+            }
+
+            return value;
+        }
+
+        if (type === 'select-multiple') {
+            value = [];
+
+            for (var i = 0; i < element.options.length; i++) {
+                if (element.options[i].selected) {
+                    value.push(element.options[i].value);
+                }
+            }
+
+            if (value.length === 0) {
+                value = null;
+            }
+
+            return value;
+        }
+
+        if (type === 'file' && 'files' in element) {
+            if (element.multiple) {
+                value = Array.prototype.slice.call(element.files);
+
+                if (value.length === 0) {
+                    value = null;
+                }
+            } else {
+                value = element.files[0];
+            }
+
+            return value;
+        }
+
+        if (type === 'checkbox' || type === 'radio') {
+            if (element.checked) return element.value;else {
+                return null;
+            }
+        }
+
+        return element.value;
+    }
+};

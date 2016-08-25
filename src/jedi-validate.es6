@@ -2,9 +2,12 @@ class JediValidate {
     constructor(root, options = {}) {
         const defaultOptions = {
             ajax: {
-                dataType: 'json'
+                dataType: 'json',
+                url: null,
+                enctype: 'application/x-www-form-urlencoded',
+                method: 'GET'
             },
-            sendType: 'serialize',
+            sendType: 'serialize', // 'formData', 'json'
             rules: {},
             messages: {},
             containers: {
@@ -14,12 +17,18 @@ class JediValidate {
             },
             states: {
                 error: 'error',
-                valid: 'valid'
+                valid: 'valid',
+                pristine: 'pristine',
+                dirty: 'dirty'
             },
             callbacks: {
-                success: function () {},
-                error: function () {}
-            }
+                success: function () {
+                },
+                error: function () {
+                }
+            },
+            clean: true,
+            redirect: true
         };
 
         this.root = root;
@@ -32,7 +41,28 @@ class JediValidate {
         this.rules = {};
 
         this._cacheNodes();
+
+        const formOptions = JediValidate.getFormOptions(this.nodes.form);
+
+        this.options = Object.assign(defaultOptions, formOptions, options);
+
         this._ready();
+    }
+
+    static getFormOptions(form) {
+        const options = {
+            ajax: {
+                url: form.getAttribute('action'),
+                method: form.getAttribute('method'),
+                enctype: form.getAttribute('enctype')
+            }
+        };
+
+        if (options.ajax.enctype === 'multipart/form-data') {
+            options.sendType = 'formData';
+        }
+
+        return options;
     }
 
     _cacheNodes() {
@@ -62,12 +92,7 @@ class JediValidate {
                 return;
             }
 
-            var ajaxOptions = {};
-
-            ajaxOptions.url = this.nodes.form.getAttribute('action');
-            ajaxOptions.method = this.nodes.form.getAttribute('method');
-
-            this._send(ajaxOptions);
+            this._send();
         });
 
         this.nodes.inputs.forEach((input) => {
@@ -87,6 +112,8 @@ class JediValidate {
                 throw 'Have no parent field';
             }
 
+            this.fields[name].classList.add(this.options.states.pristine);
+
             var messageElement = this.fields[name].querySelector(`.${this.options.containers.message}`);
 
             if (messageElement) {
@@ -100,31 +127,50 @@ class JediValidate {
             this._defineRules(name);
 
             input.addEventListener('change', () => {
+                this.fields[name].classList.remove(this.options.states.dirty);
                 this.checkInput(name);
+            });
+
+            input.addEventListener('input', () => {
+                this.fields[name].classList.remove(this.options.states.pristine);
+                this.fields[name].classList.add(this.options.states.dirty);
             });
         });
     }
 
     _send(options) {
         let data = '';
+        const xhr = new XMLHttpRequest();
 
-        this.nodes.inputs.forEach((input) => {
-            data += `${input.name}=${encodeURIComponent(input.value)}&`;
-        });
+        if (this.options.sendType === 'serialize') {
+            this.nodes.inputs.forEach((input) => {
+                data += `${input.name}=${encodeURIComponent(Utils.getInputValue(input))}&`;
+            });
 
-        data = data.slice(0, -1);
+            data = data.slice(0, -1);
+        } else if (this.options.sendType === 'formData') {
+            data = new FormData(this.nodes.form);
+        } else if (this.options.sendType === 'json') {
+            xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
 
-        const xhttp = new XMLHttpRequest();
+            data = {};
 
-        xhttp.open("GET", options.url + (options.method.toUpperCase() === 'GET' ? ('?' + data) : ''), true); // todo concat url and params
+            this.nodes.inputs.forEach((input) => {
+                data[input.name] = Utils.getInputValue(input);
+            });
 
-        xhttp.onreadystatechange = () => {
-            if (xhttp.readyState == 4) {
-                if (xhttp.status == 200) {
+            data = JSON.stringify(data);
+        }
+
+        xhr.open(this.options.ajax.method, this.options.ajax.url + (this.options.ajax.method.toUpperCase() === 'GET' ? ('?' + data) : ''), true); // todo concat url and params
+
+        xhr.onreadystatechange = () => {
+            if (xhr.readyState == 4) {
+                if (xhr.status == 200) {
                     let response = {};
 
                     try {
-                        response = JSON.parse(xhttp.responseText);
+                        response = JSON.parse(xhr.responseText);
                     } catch (e) {
                         response.validationErrors = {base: ['JSON parsing error']};  // todo: language extension
                     }
@@ -157,7 +203,7 @@ class JediValidate {
                         }
                     }
                 } else {
-                    console.warn(options.method + ' ' + options.url + ' ' + xhttp.status + ' (' + xhttp.statusText + ')');
+                    console.warn(options.method + ' ' + options.url + ' ' + xhr.status + ' (' + xhr.statusText + ')');
 
                     this.nodes.baseMessage.innerHTML = 'Can not send form!'; // todo: language extension
                     this.root.classList.add(this.options.states.error);
@@ -166,7 +212,7 @@ class JediValidate {
             }
         };
 
-        xhttp.send(options.method.toUpperCase() === 'POST' ? data : '');
+        xhr.send(this.options.ajax.method.toUpperCase() === 'POST' ? data : '');
     }
 
     _defineRules(name) {
@@ -212,7 +258,7 @@ class JediValidate {
     checkInput(name) {
         const rules = this.rules[name];
         const errors = [];
-        const isEmpty = !JediValidate.methods.required.func(this.inputs[name].value, this.inputs[name]);
+        const isEmpty = !JediValidate.methods.required.func(Utils.getInputValue(this.inputs[name]), this.inputs[name]);
 
         if (isEmpty && rules.required) {
             errors.push(this._getErrorMessage(name));
@@ -222,7 +268,7 @@ class JediValidate {
 
                 if (params) {
                     if (JediValidate.methods[method]) {
-                        var valid = JediValidate.methods[method].func(this.inputs[name].value, this.inputs[name], params);
+                        var valid = JediValidate.methods[method].func(Utils.getInputValue(this.inputs[name]), this.inputs[name], params);
 
                         if (!valid) {
                             errors.push(this._getErrorMessage(name));
@@ -289,8 +335,8 @@ JediValidate.addMethod = function (rule, func, message) {
 
 // todo languages
 
-JediValidate.addMethod('required', function (value, element) {
-    return (value && value.trim() !== '') && (element.getAttribute('type') !== "checkbox") || (element.getAttribute('type') === "checkbox" && element.hasAttribute('checked'));
+JediValidate.addMethod('required', function (value) {
+    return (value && value.trim() !== '');
 }, 'Это поле необходимо заполнить');
 
 JediValidate.addMethod('regexp', function (value, element, regexp) {
@@ -316,3 +362,44 @@ JediValidate.addMethod('tel', function (value) {
 JediValidate.addMethod('url', function (value) {
     return /[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi.test(value);
 }, 'Не корректный url');
+
+var Utils = {
+    getInputValue: function getFormElementValue(element) {
+        let value = '';
+        let {type} = element;
+
+        if (type === 'select-one') {
+            if (element.options.length) {
+                value = element.options[element.selectedIndex].value;
+            }
+
+            return value;
+        }
+
+        if (type === 'select-multiple') {
+            value = [];
+
+            for (let i = 0; i < element.options.length; i++) {
+                if (element.options[i].selected) {
+                    value.push(element.options[i].value);
+                }
+            }
+
+            if (value.length === 0) {
+                value = ''
+            }
+
+            return value;
+        }
+
+        if (type === 'checkbox' || type === 'radio') {
+            if (element.checked)
+                return element.value;
+            else {
+                return '';
+            }
+        }
+
+        return element.value;
+    }
+};
