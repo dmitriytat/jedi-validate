@@ -1,6 +1,10 @@
 'use strict';
 
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -12,9 +16,11 @@ var JediValidate = function () {
 
         var defaultOptions = {
             ajax: {
-                dataType: 'json'
+                url: null,
+                enctype: 'application/x-www-form-urlencoded',
+                method: 'GET'
             },
-            sendType: 'serialize',
+            sendType: 'serialize', // 'formData', 'json'
             rules: {},
             messages: {},
             containers: {
@@ -24,17 +30,21 @@ var JediValidate = function () {
             },
             states: {
                 error: 'error',
-                valid: 'valid'
+                valid: 'valid',
+                pristine: 'pristine',
+                dirty: 'dirty'
             },
             callbacks: {
                 success: function success() {},
                 error: function error() {}
-            }
+            },
+            clean: true,
+            redirect: true
         };
 
         this.root = root;
 
-        this.options = Object.assign(defaultOptions, options);
+        this.options = mergeDeep(defaultOptions, options);
 
         this.fields = {};
         this.inputs = {};
@@ -42,6 +52,11 @@ var JediValidate = function () {
         this.rules = {};
 
         this._cacheNodes();
+
+        var formOptions = JediValidate.getFormOptions(this.nodes.form);
+
+        this.options = mergeDeep(defaultOptions, formOptions, options);
+
         this._ready();
     }
 
@@ -77,12 +92,7 @@ var JediValidate = function () {
                     return;
                 }
 
-                var ajaxOptions = {};
-
-                ajaxOptions.url = _this.nodes.form.getAttribute('action');
-                ajaxOptions.method = _this.nodes.form.getAttribute('method');
-
-                _this._send(ajaxOptions);
+                _this._send();
             });
 
             this.nodes.inputs.forEach(function (input) {
@@ -102,6 +112,8 @@ var JediValidate = function () {
                     throw 'Have no parent field';
                 }
 
+                _this.fields[name].classList.add(_this.options.states.pristine);
+
                 var messageElement = _this.fields[name].querySelector('.' + _this.options.containers.message);
 
                 if (messageElement) {
@@ -115,7 +127,13 @@ var JediValidate = function () {
                 _this._defineRules(name);
 
                 input.addEventListener('change', function () {
+                    _this.fields[name].classList.remove(_this.options.states.dirty);
                     _this.checkInput(name);
+                });
+
+                input.addEventListener('input', function () {
+                    _this.fields[name].classList.remove(_this.options.states.pristine);
+                    _this.fields[name].classList.add(_this.options.states.dirty);
                 });
             });
         }
@@ -125,24 +143,44 @@ var JediValidate = function () {
             var _this2 = this;
 
             var data = '';
+            var xhr = new XMLHttpRequest();
 
-            this.nodes.inputs.forEach(function (input) {
-                data += input.name + '=' + encodeURIComponent(Utils.getInputValue(input)) + '&';
-            });
+            if (this.options.sendType === 'serialize') {
 
-            data = data.slice(0, -1);
+                this.nodes.inputs.forEach(function (input) {
+                    data += input.name + '=' + encodeURIComponent(Utils.getInputValue(input)) + '&';
+                });
 
-            var xhttp = new XMLHttpRequest();
+                data = data.slice(0, -1);
+            } else if (this.options.sendType === 'formData') {
+                data = new FormData(this.nodes.form);
+            } else if (this.options.sendType === 'json') {
+                data = {};
 
-            xhttp.open(options.method, options.url + (options.method.toUpperCase() === 'GET' ? '?' + data : ''), true); // todo concat url and params
+                this.nodes.inputs.forEach(function (input) {
+                    data[input.name] = Utils.getInputValue(input);
+                });
 
-            xhttp.onreadystatechange = function () {
-                if (xhttp.readyState == 4) {
-                    if (xhttp.status == 200) {
+                data = JSON.stringify(data);
+            }
+
+            xhr.open(this.options.ajax.method, this.options.ajax.url + (this.options.ajax.method.toUpperCase() === 'GET' ? '?' + data : ''), true); // todo concat url and params
+
+            if (this.options.sendType === 'serialize') {
+                xhr.setRequestHeader('Content-type', this.options.ajax.enctype);
+            } else if (this.options.sendType === 'json') {
+                xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+            }
+
+            console.dir(this.options);
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4) {
+                    if (xhr.status == 200) {
                         var response = {};
 
                         try {
-                            response = JSON.parse(xhttp.responseText);
+                            response = JSON.parse(xhr.responseText);
                         } catch (e) {
                             response.validationErrors = { base: ['JSON parsing error'] }; // todo: language extension
                         }
@@ -175,7 +213,7 @@ var JediValidate = function () {
                             }
                         }
                     } else {
-                        console.warn(options.method + ' ' + options.url + ' ' + xhttp.status + ' (' + xhttp.statusText + ')');
+                        console.warn(options.method + ' ' + options.url + ' ' + xhr.status + ' (' + xhr.statusText + ')');
 
                         _this2.nodes.baseMessage.innerHTML = 'Can not send form!'; // todo: language extension
                         _this2.root.classList.add(_this2.options.states.error);
@@ -184,7 +222,7 @@ var JediValidate = function () {
                 }
             };
 
-            xhttp.send(options.method.toUpperCase() === 'POST' ? data : '');
+            xhr.send(this.options.ajax.method.toUpperCase() === 'POST' ? data : '');
         }
     }, {
         key: '_defineRules',
@@ -226,7 +264,7 @@ var JediValidate = function () {
                 this.rules[name].regexp = new RegExp(input.getAttribute('pattern'));
             }
 
-            this.rules[name] = Object.assign(this.rules[name], this.options.rules[name]);
+            this.rules[name] = mergeDeep(this.rules[name], this.options.rules[name]);
 
             for (var rule in this.rules[name]) {
                 if (this.rules[name][rule]) {
@@ -321,6 +359,29 @@ var JediValidate = function () {
 
             return message;
         }
+    }], [{
+        key: 'getFormOptions',
+        value: function getFormOptions(form) {
+            var options = { ajax: {} };
+
+            if (form.getAttribute('method')) {
+                options.ajax.method = form.getAttribute('method');
+            }
+
+            if (form.getAttribute('action')) {
+                options.ajax.url = form.getAttribute('action');
+            }
+
+            if (form.getAttribute('enctype')) {
+                options.ajax.enctype = form.getAttribute('enctype');
+            }
+
+            if (options.ajax.enctype === 'multipart/form-data') {
+                options.sendType = 'formData';
+            }
+
+            return options;
+        }
     }]);
 
     return JediValidate;
@@ -370,7 +431,7 @@ JediValidate.addMethod('url', function (value) {
 
 var Utils = {
     getInputValue: function getFormElementValue(element) {
-        var value = null;
+        var value = '';
         var type = element.type;
 
 
@@ -392,21 +453,7 @@ var Utils = {
             }
 
             if (value.length === 0) {
-                value = null;
-            }
-
-            return value;
-        }
-
-        if (type === 'file' && 'files' in element) {
-            if (element.multiple) {
-                value = Array.prototype.slice.call(element.files);
-
-                if (value.length === 0) {
-                    value = null;
-                }
-            } else {
-                value = element.files[0];
+                value = '';
             }
 
             return value;
@@ -414,10 +461,28 @@ var Utils = {
 
         if (type === 'checkbox' || type === 'radio') {
             if (element.checked) return element.value;else {
-                return null;
+                return '';
             }
         }
 
         return element.value;
     }
 };
+
+function isObject(item) {
+    return item && (typeof item === 'undefined' ? 'undefined' : _typeof(item)) === 'object' && !Array.isArray(item) && item !== null;
+}
+
+function mergeDeep(target, source) {
+    var output = Object.assign({}, target);
+    if (isObject(target) && isObject(source)) {
+        Object.keys(source).forEach(function (key) {
+            if (isObject(source[key])) {
+                if (!(key in target)) Object.assign(output, _defineProperty({}, key, source[key]));else output[key] = mergeDeep(target[key], source[key]);
+            } else {
+                Object.assign(output, _defineProperty({}, key, source[key]));
+            }
+        });
+    }
+    return output;
+}

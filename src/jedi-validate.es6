@@ -2,7 +2,6 @@ class JediValidate {
     constructor(root, options = {}) {
         const defaultOptions = {
             ajax: {
-                dataType: 'json',
                 url: null,
                 enctype: 'application/x-www-form-urlencoded',
                 method: 'GET'
@@ -33,7 +32,7 @@ class JediValidate {
 
         this.root = root;
 
-        this.options = Object.assign(defaultOptions, options);
+        this.options = mergeDeep(defaultOptions, options);
 
         this.fields = {};
         this.inputs = {};
@@ -44,19 +43,25 @@ class JediValidate {
 
         const formOptions = JediValidate.getFormOptions(this.nodes.form);
 
-        this.options = Object.assign(defaultOptions, formOptions, options);
+        this.options = mergeDeep(defaultOptions, formOptions, options);
 
         this._ready();
     }
 
     static getFormOptions(form) {
-        const options = {
-            ajax: {
-                url: form.getAttribute('action'),
-                method: form.getAttribute('method'),
-                enctype: form.getAttribute('enctype')
-            }
-        };
+        const options = {ajax: {}};
+
+        if (form.getAttribute('method')) {
+            options.ajax.method = form.getAttribute('method');
+        }
+
+        if (form.getAttribute('action')) {
+            options.ajax.url = form.getAttribute('action');
+        }
+
+        if (form.getAttribute('enctype')) {
+            options.ajax.enctype = form.getAttribute('enctype');
+        }
 
         if (options.ajax.enctype === 'multipart/form-data') {
             options.sendType = 'formData';
@@ -143,6 +148,7 @@ class JediValidate {
         const xhr = new XMLHttpRequest();
 
         if (this.options.sendType === 'serialize') {
+
             this.nodes.inputs.forEach((input) => {
                 data += `${input.name}=${encodeURIComponent(Utils.getInputValue(input))}&`;
             });
@@ -151,8 +157,6 @@ class JediValidate {
         } else if (this.options.sendType === 'formData') {
             data = new FormData(this.nodes.form);
         } else if (this.options.sendType === 'json') {
-            xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
-
             data = {};
 
             this.nodes.inputs.forEach((input) => {
@@ -163,6 +167,14 @@ class JediValidate {
         }
 
         xhr.open(this.options.ajax.method, this.options.ajax.url + (this.options.ajax.method.toUpperCase() === 'GET' ? ('?' + data) : ''), true); // todo concat url and params
+
+        if (this.options.sendType === 'serialize') {
+            xhr.setRequestHeader('Content-type', this.options.ajax.enctype);
+        } else if (this.options.sendType === 'json') {
+            xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+        }
+
+        console.dir(this.options);
 
         xhr.onreadystatechange = () => {
             if (xhr.readyState == 4) {
@@ -232,7 +244,7 @@ class JediValidate {
             this.rules[name].regexp = new RegExp(input.getAttribute('pattern'));
         }
 
-        this.rules[name] = Object.assign(this.rules[name], this.options.rules[name]);
+        this.rules[name] = mergeDeep(this.rules[name], this.options.rules[name]);
 
         for (let rule in this.rules[name]) {
             if (this.rules[name][rule]) {
@@ -403,3 +415,24 @@ var Utils = {
         return element.value;
     }
 };
+
+function isObject(item) {
+    return (item && typeof item === 'object' && !Array.isArray(item) && item !== null);
+}
+
+function mergeDeep(target, source) {
+    let output = Object.assign({}, target);
+    if (isObject(target) && isObject(source)) {
+        Object.keys(source).forEach(key => {
+            if (isObject(source[key])) {
+                if (!(key in target))
+                    Object.assign(output, {[key]: source[key]});
+                else
+                    output[key] = mergeDeep(target[key], source[key]);
+            } else {
+                Object.assign(output, {[key]: source[key]});
+            }
+        });
+    }
+    return output;
+}
