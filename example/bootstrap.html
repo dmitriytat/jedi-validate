@@ -17,13 +17,13 @@
         <div class="col-lg-6">
             <h1>Jedi Validate</h1>
             <div id="form">
-                <form id="myForm" action="./ajax.php" method="post" class="form-horizontal" enctype="multipart/form-data">
+                <form id="myForm" action="./ajax.php" method="post" class="form-horizontal">
                     <div class="help-block base-error"></div>
                     <div class="form-group">
                         <label for="name" class="col-sm-2 control-label">Name:</label>
 
                         <div class="col-sm-6">
-                            <input name="name" type="text" class="form-control" id="name" placeholder="Name">
+                            <input name="name[]" type="text" class="form-control" id="name" placeholder="Name">
                         </div>
                     </div>
                     <div class="form-group">
@@ -45,7 +45,7 @@
                         <label for="file" class="col-sm-2 control-label">File (html, css, txt):</label>
 
                         <div class="col-sm-6">
-                            <input name="file" type="file" class="form-control" id="file" required>
+                            <input name="file" type="file" class="form-control" id="file">
                         </div>
                     </div>
                     <div class="form-group">
@@ -54,6 +54,19 @@
                                 <label>
                                     <input name="check" type="checkbox"> Check it:
                                 </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-6">
+                            <div class="radio">
+                                <label><input type="radio" name="optradio" value="1" required>Option 1</label>
+                            </div>
+                            <div class="radio">
+                                <label><input type="radio" name="optradio" value="2">Option 2</label>
+                            </div>
+                            <div class="radio disabled">
+                                <label><input type="radio" name="optradio" value="3" disabled>Option 3</label>
                             </div>
                         </div>
                     </div>
@@ -69,12 +82,13 @@
     </div>
 </div>
 
-<script src="../dist/jedi-validate.js"></script>
+<script src="../src/jedi-validate.es6"></script>
 
 <script>
     var formWrapper = document.querySelector('#form');
 
     new JediValidate(formWrapper, {
+        sendType: 'json',
         states: {
             error: 'has-error',
             valid: 'has-success',

@@ -99,34 +99,43 @@ var JediValidate = function () {
 
             this.nodes.inputs.forEach(function (input) {
                 var name = input.name;
-                _this.inputs[name] = input;
 
-                var field = input.parentNode;
-
-                do {
-                    if (field.classList.contains(_this.options.containers.parent)) {
-                        _this.fields[name] = field;
-                        break;
+                if (_this.inputs[name]) {
+                    if (Array.isArray(_this.inputs[name])) {
+                        _this.inputs[name].push(input);
+                    } else {
+                        _this.inputs[name] = [_this.inputs[name], input];
                     }
-                } while (field = field.parentNode);
-
-                if (!_this.fields[name]) {
-                    throw 'Have no parent field';
-                }
-
-                _this.fields[name].classList.add(_this.options.states.pristine);
-
-                var messageElement = _this.fields[name].querySelector('.' + _this.options.containers.message);
-
-                if (messageElement) {
-                    _this.messages[name] = messageElement;
                 } else {
-                    _this.messages[name] = document.createElement("div");
-                    _this.messages[name].classList.add(_this.options.containers.message);
-                    _this.fields[name].appendChild(_this.messages[name]);
-                }
+                    _this.inputs[name] = input;
 
-                _this._defineRules(name);
+                    var field = input.parentNode;
+
+                    do {
+                        if (field.classList.contains(_this.options.containers.parent)) {
+                            _this.fields[name] = field;
+                            break;
+                        }
+                    } while (field = field.parentNode);
+
+                    if (!_this.fields[name]) {
+                        throw 'Have no parent field';
+                    }
+
+                    _this.fields[name].classList.add(_this.options.states.pristine);
+
+                    var messageElement = _this.fields[name].querySelector('.' + _this.options.containers.message);
+
+                    if (messageElement) {
+                        _this.messages[name] = messageElement;
+                    } else {
+                        _this.messages[name] = document.createElement("div");
+                        _this.messages[name].classList.add(_this.options.containers.message);
+                        _this.fields[name].appendChild(_this.messages[name]);
+                    }
+
+                    _this._defineRules(name);
+                }
 
                 input.addEventListener('change', function () {
                     _this.fields[name].classList.remove(_this.options.states.dirty);
@@ -148,10 +157,9 @@ var JediValidate = function () {
             var xhr = new XMLHttpRequest();
 
             if (this.options.sendType === 'serialize') {
-
-                this.nodes.inputs.forEach(function (input) {
-                    data += input.name + '=' + encodeURIComponent(JediValidate.getInputValue(input)) + '&';
-                });
+                for (var name in this.inputs) {
+                    data += name + '=' + encodeURIComponent(JediValidate.getInputValue(this.inputs[name])) + '&';
+                }
 
                 data = data.slice(0, -1);
             } else if (this.options.sendType === 'formData') {
@@ -159,9 +167,9 @@ var JediValidate = function () {
             } else if (this.options.sendType === 'json') {
                 data = {};
 
-                this.nodes.inputs.forEach(function (input) {
-                    data[input.name] = JediValidate.getInputValue(input);
-                });
+                for (var _name in this.inputs) {
+                    data = mergeDeep(data, JediValidate.parseInputName(_name, JediValidate.getInputValue(this.inputs[_name])));
+                }
 
                 data = JSON.stringify(data);
             }
@@ -173,8 +181,6 @@ var JediValidate = function () {
             } else if (this.options.sendType === 'json') {
                 xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
             }
-
-            console.dir(this.options);
 
             xhr.onreadystatechange = function () {
                 if (xhr.readyState == 4) {
@@ -199,8 +205,8 @@ var JediValidate = function () {
                                 _this2.nodes.baseMessage.innerHTML = '';
                             }
 
-                            for (var name in response.validationErrors) {
-                                _this2._markError(name, response.validationErrors[name]);
+                            for (var _name2 in response.validationErrors) {
+                                _this2._markError(_name2, response.validationErrors[_name2]);
                             }
                         } else {
                             _this2.options.callbacks.success(response);
@@ -419,8 +425,50 @@ var JediValidate = function () {
             return '';
         }
     }, {
+        key: 'parseInputName',
+        value: function parseInputName(name, value) {
+            var re = /(\[(\w*)\]|\w*)/gi;
+            var matches;
+            var path = [];
+
+            while ((matches = re.exec(name)) !== null) {
+                if (matches.index === re.lastIndex) {
+                    re.lastIndex++;
+                }
+
+                if (matches[2]) {
+                    path.push(matches[2]);
+                } else {
+                    path.push(matches[1]);
+                }
+            }
+
+            return JediValidate.createObject(path, value);
+        }
+    }, {
+        key: 'createObject',
+        value: function createObject(path, value) {
+            var segment = path[0];
+
+            if (segment.length === 0) {
+                return value;
+            } else if (segment === '[]') {
+                return [JediValidate.createObject(path.slice(1), value)];
+            } else {
+                var object = {};
+
+                object[segment] = JediValidate.createObject(path.slice(1), value);
+
+                return object;
+            }
+        }
+    }, {
         key: 'getInputValue',
         value: function getInputValue(element) {
+            if (Array.isArray(element)) {
+                return JediValidate.getRadioGroupValue(element);
+            }
+
             var value = '';
             var type = element.type;
 

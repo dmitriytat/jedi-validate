@@ -71,7 +71,7 @@ class JediValidate {
 
         return options;
     }
-    
+
     static getRadioGroupValue(elements) {
         for (let element of elements) {
             var value = JediValidate.getInputValue(element);
@@ -84,7 +84,47 @@ class JediValidate {
         return '';
     }
 
+    static parseInputName(name, value) {
+        var re = /(\[(\w*)\]|\w*)/gi;
+        var matches;
+        var path = [];
+
+        while ((matches = re.exec(name)) !== null) {
+            if (matches.index === re.lastIndex) {
+                re.lastIndex++;
+            }
+
+            if (matches[2]) {
+                path.push(matches[2])
+            } else {
+                path.push(matches[1])
+            }
+        }
+
+        return JediValidate.createObject(path, value);
+    }
+
+    static createObject(path, value) {
+        var segment = path[0];
+
+        if (segment.length === 0) {
+            return value;
+        } else if (segment === '[]') {
+            return [JediValidate.createObject(path.slice(1), value)];
+        } else {
+            var object = {};
+
+            object[segment] = JediValidate.createObject(path.slice(1), value);
+
+            return object;
+        }
+    }
+
     static getInputValue(element) {
+        if (Array.isArray(element)) {
+            return JediValidate.getRadioGroupValue(element);
+        }
+
         let value = '';
         let {type} = element;
 
@@ -155,34 +195,43 @@ class JediValidate {
 
         this.nodes.inputs.forEach((input) => {
             const name = input.name;
-            this.inputs[name] = input;
 
-            let field = input.parentNode;
-
-            do {
-                if (field.classList.contains(this.options.containers.parent)) {
-                    this.fields[name] = field;
-                    break;
+            if (this.inputs[name]) {
+                if (Array.isArray(this.inputs[name])) {
+                    this.inputs[name].push(input);
+                } else {
+                    this.inputs[name] = [this.inputs[name], input];
                 }
-            } while (field = field.parentNode);
-
-            if (!this.fields[name]) {
-                throw 'Have no parent field';
-            }
-
-            this.fields[name].classList.add(this.options.states.pristine);
-
-            var messageElement = this.fields[name].querySelector(`.${this.options.containers.message}`);
-
-            if (messageElement) {
-                this.messages[name] = messageElement;
             } else {
-                this.messages[name] = document.createElement("div");
-                this.messages[name].classList.add(this.options.containers.message);
-                this.fields[name].appendChild(this.messages[name]);
-            }
+                this.inputs[name] = input;
 
-            this._defineRules(name);
+                let field = input.parentNode;
+
+                do {
+                    if (field.classList.contains(this.options.containers.parent)) {
+                        this.fields[name] = field;
+                        break;
+                    }
+                } while (field = field.parentNode);
+
+                if (!this.fields[name]) {
+                    throw 'Have no parent field';
+                }
+
+                this.fields[name].classList.add(this.options.states.pristine);
+
+                var messageElement = this.fields[name].querySelector(`.${this.options.containers.message}`);
+
+                if (messageElement) {
+                    this.messages[name] = messageElement;
+                } else {
+                    this.messages[name] = document.createElement("div");
+                    this.messages[name].classList.add(this.options.containers.message);
+                    this.fields[name].appendChild(this.messages[name]);
+                }
+
+                this._defineRules(name);
+            }
 
             input.addEventListener('change', () => {
                 this.fields[name].classList.remove(this.options.states.dirty);
@@ -201,10 +250,9 @@ class JediValidate {
         const xhr = new XMLHttpRequest();
 
         if (this.options.sendType === 'serialize') {
-
-            this.nodes.inputs.forEach((input) => {
-                data += `${input.name}=${encodeURIComponent(JediValidate.getInputValue(input))}&`;
-            });
+            for (let name in this.inputs) {
+                data += `${name}=${encodeURIComponent(JediValidate.getInputValue(this.inputs[name]))}&`;
+            }
 
             data = data.slice(0, -1);
         } else if (this.options.sendType === 'formData') {
@@ -212,9 +260,9 @@ class JediValidate {
         } else if (this.options.sendType === 'json') {
             data = {};
 
-            this.nodes.inputs.forEach((input) => {
-                data[input.name] = JediValidate.getInputValue(input);
-            });
+            for (let name in this.inputs) {
+                data = mergeDeep(data, JediValidate.parseInputName(name, JediValidate.getInputValue(this.inputs[name])));
+            }
 
             data = JSON.stringify(data);
         }
@@ -226,8 +274,6 @@ class JediValidate {
         } else if (this.options.sendType === 'json') {
             xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
         }
-
-        console.dir(this.options);
 
         xhr.onreadystatechange = () => {
             if (xhr.readyState == 4) {
