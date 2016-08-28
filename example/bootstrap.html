@@ -51,7 +51,7 @@
                         <label for="file" class="col-sm-2 control-label">File (html, css, txt):</label>
 
                         <div class="col-sm-6">
-                            <input name="file" type="file" class="form-control" id="file">
+                            <input name="file" type="file" class="form-control" id="file" multiple>
                         </div>
                     </div>
                     <div class="form-group">
@@ -94,7 +94,7 @@
     var formWrapper = document.querySelector('#form');
 
     new JediValidate(formWrapper, {
-        sendType: 'json',
+        sendType: 'formData',
         states: {
             error: 'has-error',
             valid: 'has-success',

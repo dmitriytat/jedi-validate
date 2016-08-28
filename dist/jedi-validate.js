@@ -226,14 +226,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	            } else if (this.options.sendType === 'json') {
 	                data = {};
 	
-	                console.log(data);
-	
 	                for (var index in this.nodes.inputs) {
 	                    var input = this.nodes.inputs[index];
 	
 	                    data = (0, _deepmerge2.default)(data, JediValidate.parseInputName(input.name, JediValidate.getInputValue(input)));
-	
-	                    console.log(data);
 	                }
 	
 	                data = JSON.stringify(data);
@@ -286,7 +282,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                            }
 	                        }
 	                    } else {
-	                        console.warn(options.method + ' ' + options.url + ' ' + xhr.status + ' (' + xhr.statusText + ')');
+	                        console.warn(_this2.options.ajax.method + ' ' + _this2.options.ajax.url + ' ' + xhr.status + ' (' + xhr.statusText + ')');
 	
 	                        _this2.nodes.baseMessage.innerHTML = 'Can not send form!'; // todo: language extension
 	                        _this2.root.classList.add(_this2.options.formStatePrefix + _this2.options.states.error);
@@ -562,11 +558,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	}, 'Пожалуйста, введите корректный адрес электронной почты');
 	
 	JediValidate.addMethod('filesize', function (value, element, size) {
-	    return !element.files[0] || element.files[0].size <= size;
+	    return Array.prototype.slice.call(element.files).reduce(function (r, file) {
+	        return file.size < size && r;
+	    }, true);
 	}, 'Попробуйте загрузить файл поменьше');
 	
 	JediValidate.addMethod('extension', function (value, element, extensions) {
-	    return !element.files[0] || extensions.indexOf(element.files[0].name.split('.').pop()) > -1;
+	    return Array.prototype.slice.call(element.files).reduce(function (r, file) {
+	        return extensions.indexOf(file.name.split('.').pop()) !== -1 && r;
+	    }, true);
 	}, 'Пожалуйста, выберите файл с правильным расширением');
 	
 	JediValidate.addMethod('tel', function (value) {

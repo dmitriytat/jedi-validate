@@ -321,7 +321,7 @@ class JediValidate {
                         }
                     }
                 } else {
-                    console.warn(options.method + ' ' + options.url + ' ' + xhr.status + ' (' + xhr.statusText + ')');
+                    console.warn(this.options.ajax.method + ' ' + this.options.ajax.url + ' ' + xhr.status + ' (' + xhr.statusText + ')');
 
                     this.nodes.baseMessage.innerHTML = 'Can not send form!'; // todo: language extension
                     this.root.classList.add(this.options.formStatePrefix + this.options.states.error);
@@ -469,11 +469,11 @@ JediValidate.addMethod('email', function (value) {
 }, 'Пожалуйста, введите корректный адрес электронной почты');
 
 JediValidate.addMethod('filesize', function (value, element, size) {
-    return !element.files[0] || element.files[0].size <= size;
+    return Array.prototype.slice.call(element.files).reduce((r, file) => file.size < size && r, true);
 }, 'Попробуйте загрузить файл поменьше');
 
 JediValidate.addMethod('extension', function (value, element, extensions) {
-    return !element.files[0] || extensions.indexOf(element.files[0].name.split('.').pop()) > -1;
+    return Array.prototype.slice.call(element.files).reduce((r, file) => extensions.indexOf(file.name.split('.').pop()) !== -1 && r, true);
 }, 'Пожалуйста, выберите файл с правильным расширением');
 
 JediValidate.addMethod('tel', function (value) {
