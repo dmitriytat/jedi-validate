@@ -1,3 +1,5 @@
+import deepmerge from 'deepmerge';
+
 class JediValidate {
     constructor(root, options = {}) {
         const defaultOptions = {
@@ -20,6 +22,7 @@ class JediValidate {
                 pristine: 'pristine',
                 dirty: 'dirty'
             },
+            formStatePrefix: 'jedi-',
             callbacks: {
                 success: function () {
                 },
@@ -32,7 +35,7 @@ class JediValidate {
 
         this.root = root;
 
-        this.options = mergeDeep(defaultOptions, options);
+        this.options = deepmerge(defaultOptions, options);
 
         this.fields = {};
         this.inputs = {};
@@ -43,9 +46,9 @@ class JediValidate {
 
         const formOptions = JediValidate.getFormOptions(this.nodes.form);
 
-        this.options = mergeDeep(this.options, defaultOptions);
-        this.options = mergeDeep(this.options, formOptions);
-        this.options = mergeDeep(this.options, options);
+        this.options = deepmerge(this.options, defaultOptions);
+        this.options = deepmerge(this.options, formOptions);
+        this.options = deepmerge(this.options, options);
 
         this._ready();
     }
@@ -73,7 +76,9 @@ class JediValidate {
     }
 
     static getRadioGroupValue(elements) {
-        for (let element of elements) {
+        for (let index in elements) {
+            let element = elements[index];
+
             var value = JediValidate.getInputValue(element);
 
             if (value !== '') {
@@ -260,8 +265,10 @@ class JediValidate {
         } else if (this.options.sendType === 'json') {
             data = {};
 
-            for (let name in this.inputs) {
-                data = mergeDeep(data, JediValidate.parseInputName(name, JediValidate.getInputValue(this.inputs[name])));
+            for (let index in this.nodes.inputs) {
+                const input = this.nodes.inputs[index];
+
+                data = deepmerge(data, JediValidate.parseInputName(input.name, JediValidate.getInputValue(input)));
             }
 
             data = JSON.stringify(data);
@@ -291,8 +298,8 @@ class JediValidate {
 
                         if (response.validationErrors.base) {
                             this.nodes.baseMessage.innerHTML = response.validationErrors.base.join(', ');
-                            this.root.classList.add(this.options.states.error);
-                            this.root.classList.remove(this.options.states.valid);
+                            this.root.classList.add(this.options.formStatePrefix + this.options.states.error);
+                            this.root.classList.remove(this.options.formStatePrefix + this.options.states.valid);
                             delete response.validationErrors.base;
                         } else {
                             this.nodes.baseMessage.innerHTML = '';
@@ -317,8 +324,8 @@ class JediValidate {
                     console.warn(options.method + ' ' + options.url + ' ' + xhr.status + ' (' + xhr.statusText + ')');
 
                     this.nodes.baseMessage.innerHTML = 'Can not send form!'; // todo: language extension
-                    this.root.classList.add(this.options.states.error);
-                    this.root.classList.remove(this.options.states.valid);
+                    this.root.classList.add(this.options.formStatePrefix + this.options.states.error);
+                    this.root.classList.remove(this.options.formStatePrefix + this.options.states.valid);
                 }
             }
         };
@@ -333,8 +340,10 @@ class JediValidate {
 
         const rules = ['required', 'email', 'tel', 'url'];
 
-        for (let rule of rules) {
-            if (input.hasAttribute(rule) || input.classList.contains(rule)) {
+        for (let ruleName in rules) {
+            const rule = rules[ruleName];
+
+            if (input.hasAttribute(rule) || input.type === rule || input.classList.contains(rule)) {
                 this.rules[name][rule] = true;
             }
         }
@@ -343,7 +352,8 @@ class JediValidate {
             this.rules[name].regexp = new RegExp(input.getAttribute('pattern'));
         }
 
-        this.rules[name] = mergeDeep(this.rules[name], this.options.rules[name]);
+        if (this.options.rules[name])
+            this.rules[name] = deepmerge(this.rules[name], this.options.rules[name]);
 
         for (let rule in this.rules[name]) {
             if (this.rules[name][rule]) {
@@ -372,7 +382,7 @@ class JediValidate {
         const isEmpty = !JediValidate.methods.required.func(JediValidate.getInputValue(this.inputs[name]), this.inputs[name]);
 
         if (isEmpty && rules.required) {
-            errors.push(this._getErrorMessage(name));
+            errors.push(this._getErrorMessage(name, 'required'));
         } else if (!isEmpty) {
             for (let method in rules) {
                 const params = rules[method];
@@ -382,7 +392,7 @@ class JediValidate {
                         var valid = JediValidate.methods[method].func(JediValidate.getInputValue(this.inputs[name]), this.inputs[name], params);
 
                         if (!valid) {
-                            errors.push(this._getErrorMessage(name));
+                            errors.push(this._getErrorMessage(name, method));
                         }
                     } else {
                         errors.push('Method "' + method + '" not found');
@@ -422,13 +432,13 @@ class JediValidate {
         this.messages[name].innerHTML = '';
     }
 
-    _getErrorMessage(name) {
+    _getErrorMessage(name, method) {
         let message = '';
 
-        if (this.options.messages[name] && this.options.messages[name].required) {
-            message = this.options.messages[name].required;
+        if (this.options.messages[name] && this.options.messages[name][method]) {
+            message = this.options.messages[name][method];
         } else {
-            message = JediValidate.methods.required.message;
+            message = JediValidate.methods[method].message;
         }
 
         return message;
@@ -459,11 +469,11 @@ JediValidate.addMethod('email', function (value) {
 }, 'Пожалуйста, введите корректный адрес электронной почты');
 
 JediValidate.addMethod('filesize', function (value, element, size) {
-    return !element.get(0).files[0] || element.get(0).files[0].size <= size;
+    return !element.files[0] || element.files[0].size <= size;
 }, 'Попробуйте загрузить файл поменьше');
 
 JediValidate.addMethod('extension', function (value, element, extensions) {
-    return !element.get(0).files[0] || extensions.indexOf(element.get(0).files[0].name.split('.').pop()) > -1;
+    return !element.files[0] || extensions.indexOf(element.files[0].name.split('.').pop()) > -1;
 }, 'Пожалуйста, выберите файл с правильным расширением');
 
 JediValidate.addMethod('tel', function (value) {
@@ -474,23 +484,4 @@ JediValidate.addMethod('url', function (value) {
     return /[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi.test(value);
 }, 'Не корректный url');
 
-function isObject(item) {
-    return (item && typeof item === 'object' && !Array.isArray(item) && item !== null);
-}
-
-function mergeDeep(target, source) {
-    let output = Object.assign({}, target);
-    if (isObject(target) && isObject(source)) {
-        Object.keys(source).forEach(key => {
-            if (isObject(source[key])) {
-                if (!(key in target))
-                    Object.assign(output, {[key]: source[key]});
-                else
-                    output[key] = mergeDeep(target[key], source[key]);
-            } else {
-                Object.assign(output, {[key]: source[key]});
-            }
-        });
-    }
-    return output;
-}
+module.exports = JediValidate;

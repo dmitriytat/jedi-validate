@@ -3,12 +3,12 @@
 
 <head>
     <meta charset="utf-8">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mocha/2.1.0/mocha.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mocha/2.1.0/mocha.js"></script>
+    <link rel="stylesheet" href="../node_modules/mocha/mocha.css">
+    <script src="../node_modules/mocha/mocha.js"></script>
     <script>
         mocha.setup('bdd');
     </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/chai/2.0.0/chai.js"></script>
+    <script src="../node_modules/chai/chai.js"></script>
     <script>
         var assert = chai.assert;
     </script>
@@ -77,7 +77,7 @@
     <div class="base-error alert alert-danger" role="alert" style="display: none"></div>
 </div>
 
-<script src="../dist/jedi-validate.js"></script>
+<script src="../dist/jedi-validate.min.js"></script>
 <script src="./test.js"></script>
 <script>
     mocha.run();

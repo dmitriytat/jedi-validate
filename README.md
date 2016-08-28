@@ -184,19 +184,14 @@ Use messages object to set your own error messages by input name.
 ```javascript
     messages: {
         phone: {
-            regex: "Invalid phone number"
+            regexp: "Invalid phone number"
         },
         file: {
-            filesize: "File too big"
+            filesize: "File is too big"
         }
     },
 ```
 
-## dependencies
-
-* It has no dependencies at all.
-
 ## Known problems
 
 * Can not send several files.
-* Send radio group problem.

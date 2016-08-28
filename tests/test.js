@@ -45,7 +45,6 @@ describe('JediValidate', function () {
         var form = document.querySelector('#myForm');
 
         it('Check FormData', function () {
-            console.dir(JediValidate.getFormOptions(form))
             assert.deepEqual(JediValidate.getFormOptions(form), {
                 ajax: {
                     url: './ajax.php',
