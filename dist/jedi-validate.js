@@ -150,6 +150,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	                if (_this.options.ajax && _this.options.ajax.url) {
 	                    event.preventDefault();
 	                } else {
+	                    _this.options.callbacks.success(errors, event);
+	
 	                    return;
 	                }
 	

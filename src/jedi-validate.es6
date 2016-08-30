@@ -100,9 +100,9 @@ class JediValidate {
             }
 
             if (matches[2]) {
-                path.push(matches[2])
+                path.push(matches[2]);
             } else {
-                path.push(matches[1])
+                path.push(matches[1]);
             }
         }
 
@@ -151,7 +151,7 @@ class JediValidate {
             }
 
             if (value.length === 0) {
-                value = ''
+                value = '';
             }
 
             return value;
@@ -172,8 +172,8 @@ class JediValidate {
         this.nodes = {
             form: this.root.querySelector('form'),
             inputs: this.root.querySelectorAll('[name]'),
-            baseMessage: this.root.querySelector(`.${this.options.containers.baseMessage}`),
-        }
+            baseMessage: this.root.querySelector(`.${this.options.containers.baseMessage}`)
+        };
     }
 
     _ready() {
@@ -192,6 +192,8 @@ class JediValidate {
             if (this.options.ajax && this.options.ajax.url) {
                 event.preventDefault();
             } else {
+                this.options.callbacks.success(errors, event);
+
                 return;
             }
 
@@ -353,7 +355,7 @@ class JediValidate {
         }
 
         return data;
-    };
+    }
 
     _defineRules(name) {
         const input = this.inputs[name];
@@ -464,7 +466,7 @@ class JediValidate {
         }
 
         return message;
-    };
+    }
 }
 
 JediValidate.methods = {};
