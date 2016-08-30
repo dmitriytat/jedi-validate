@@ -188,7 +188,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    if (messageElement) {
 	                        _this.messages[name] = messageElement;
 	                    } else {
-	                        _this.messages[name] = document.createElement("div");
+	                        _this.messages[name] = document.createElement('div');
 	                        _this.messages[name].classList.add(_this.options.containers.message);
 	                        _this.fields[name].appendChild(_this.messages[name]);
 	                    }
@@ -222,7 +222,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	                data = data.slice(0, -1);
 	            } else if (this.options.sendType === 'formData') {
-	                data = new FormData(this.nodes.form);
+	                data = new FormData();
+	
+	                for (var _name in this.inputs) {
+	                    if (this.inputs[_name].type && this.inputs[_name].type === 'file') {
+	                        if (this.inputs[_name].hasAttribute('multiple')) {
+	                            for (var i = 0; i < this.inputs[_name].files.length; i++) {
+	                                data.append(_name + '[]', this.inputs[_name].files[i]);
+	                            }
+	                        } else {
+	                            data.append(_name, this.inputs[_name].files[0]);
+	                        }
+	                    } else {
+	                        data.append(_name, JediValidate.getInputValue(this.inputs[_name]));
+	                    }
+	                }
 	            } else if (this.options.sendType === 'json') {
 	                data = {};
 	
@@ -266,8 +280,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	                                _this2.nodes.baseMessage.innerHTML = '';
 	                            }
 	
-	                            for (var _name in response.validationErrors) {
-	                                _this2._markError(_name, response.validationErrors[_name]);
+	                            for (var _name2 in response.validationErrors) {
+	                                _this2._markError(_name2, response.validationErrors[_name2]);
 	                            }
 	                        } else {
 	                            _this2.options.callbacks.success(response);

@@ -3,10 +3,22 @@ $filePath = dirname(__FILE__) . "/upload/" . basename($_FILES["file"]["name"]);
 
 $fileErrors = array();
 
-if ($_FILES["file"]["error"] > 0) {
-    $fileErrors[] = $_FILES["file"]["error"];
-} elseif (!move_uploaded_file($_FILES["file"]["tmp_name"], $filePath)) {
-    $fileErrors[] = "File upload error";
+$count = count($_FILES['file']['name']);
+
+if ($count > 1) {
+    for ($i = 0; $i < $count; $i++) {
+        if ($_FILES["file"]["error"][$i] > 0) {
+            $fileErrors[] = $_FILES["file"]["error"][$i];
+        } elseif (!move_uploaded_file($_FILES["file"]["tmp_name"][$i], $filePath)) {
+            $fileErrors[] = "File upload error";
+        }
+    }
+} else {
+    if ($_FILES["file"]["error"] > 0) {
+        $fileErrors[] = $_FILES["file"]["error"];
+    } elseif (!move_uploaded_file($_FILES["file"]["tmp_name"], $filePath)) {
+        $fileErrors[] = "File upload error";
+    }
 }
 
 $randomError = "Error " . rand(0, 1000);

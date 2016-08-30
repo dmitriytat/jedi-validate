@@ -230,7 +230,7 @@ class JediValidate {
                 if (messageElement) {
                     this.messages[name] = messageElement;
                 } else {
-                    this.messages[name] = document.createElement("div");
+                    this.messages[name] = document.createElement('div');
                     this.messages[name].classList.add(this.options.containers.message);
                     this.fields[name].appendChild(this.messages[name]);
                 }
@@ -261,7 +261,22 @@ class JediValidate {
 
             data = data.slice(0, -1);
         } else if (this.options.sendType === 'formData') {
-            data = new FormData(this.nodes.form);
+            data = new FormData();
+
+            for (let name in this.inputs) {
+                if (this.inputs[name].type && this.inputs[name].type === 'file') {
+                    if (this.inputs[name].hasAttribute('multiple')) {
+                        for (let i = 0; i < this.inputs[name].files.length; i++) {
+                            data.append(name + '[]', this.inputs[name].files[i]);
+                        }
+                    } else {
+                        data.append(name, this.inputs[name].files[0]);
+                    }
+                } else {
+                    data.append(name, JediValidate.getInputValue(this.inputs[name]));
+                }
+            }
+
         } else if (this.options.sendType === 'json') {
             data = {};
 
