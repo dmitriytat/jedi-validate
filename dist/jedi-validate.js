@@ -76,9 +76,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	            ajax: {
 	                url: null,
 	                enctype: 'application/x-www-form-urlencoded',
+	                sendType: 'serialize', // 'formData', 'json'
 	                method: 'GET'
 	            },
-	            sendType: 'serialize', // 'formData', 'json'
 	            rules: {},
 	            messages: {},
 	            containers: {
@@ -147,13 +147,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    return;
 	                }
 	
-	                if (_this.options.ajax) {
+	                if (_this.options.ajax && _this.options.ajax.url) {
 	                    event.preventDefault();
 	                } else {
 	                    return;
 	                }
 	
-	                _this._send();
+	                var data = _this.getData();
+	
+	                _this._send((0, _deepmerge2.default)(_this.options.ajax, { data: data }));
 	            });
 	
 	            this.nodes.inputs.forEach(function (input) {
@@ -212,8 +214,70 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value: function _send(options) {
 	            var _this2 = this;
 	
-	            var data = '';
 	            var xhr = new XMLHttpRequest();
+	
+	            xhr.open(options.method, options.url + (options.method.toUpperCase() === 'GET' ? '?' + options.data : ''), true); // todo concat url and params
+	
+	            if (options.sendType === 'serialize') {
+	                xhr.setRequestHeader('Content-type', options.enctype);
+	            } else if (options.sendType === 'json') {
+	                xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+	            }
+	
+	            xhr.onreadystatechange = function () {
+	                if (xhr.readyState == 4) {
+	                    if (xhr.status == 200) {
+	                        var response = {};
+	
+	                        try {
+	                            response = JSON.parse(xhr.responseText);
+	                        } catch (e) {
+	                            response.validationErrors = { base: ['JSON parsing error'] }; // todo: language extension
+	                        }
+	
+	                        if (response.validationErrors) {
+	                            _this2.options.callbacks.error(response.validationErrors);
+	
+	                            if (response.validationErrors.base) {
+	                                _this2.nodes.baseMessage.innerHTML = response.validationErrors.base.join(', ');
+	                                _this2.root.classList.add(_this2.options.formStatePrefix + _this2.options.states.error);
+	                                _this2.root.classList.remove(_this2.options.formStatePrefix + _this2.options.states.valid);
+	                                delete response.validationErrors.base;
+	                            } else {
+	                                _this2.nodes.baseMessage.innerHTML = '';
+	                            }
+	
+	                            for (var name in response.validationErrors) {
+	                                _this2._markError(name, response.validationErrors[name]);
+	                            }
+	                        } else {
+	                            _this2.options.callbacks.success(response);
+	
+	                            if (_this2.options.redirect && response.redirect) {
+	                                window.location.href = response.redirect;
+	                                return;
+	                            }
+	
+	                            if (_this2.options.clean) {
+	                                _this2.nodes.form.reset();
+	                            }
+	                        }
+	                    } else {
+	                        console.warn(options.method + ' ' + options.url + ' ' + xhr.status + ' (' + xhr.statusText + ')');
+	
+	                        _this2.nodes.baseMessage.innerHTML = 'Can not send form!'; // todo: language extension
+	                        _this2.root.classList.add(_this2.options.formStatePrefix + _this2.options.states.error);
+	                        _this2.root.classList.remove(_this2.options.formStatePrefix + _this2.options.states.valid);
+	                    }
+	                }
+	            };
+	
+	            xhr.send(options.method.toUpperCase() === 'POST' ? options.data : '');
+	        }
+	    }, {
+	        key: 'getData',
+	        value: function getData() {
+	            var data = '';
 	
 	            if (this.options.sendType === 'serialize') {
 	                for (var name in this.inputs) {
@@ -249,63 +313,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                data = JSON.stringify(data);
 	            }
 	
-	            xhr.open(this.options.ajax.method, this.options.ajax.url + (this.options.ajax.method.toUpperCase() === 'GET' ? '?' + data : ''), true); // todo concat url and params
-	
-	            if (this.options.sendType === 'serialize') {
-	                xhr.setRequestHeader('Content-type', this.options.ajax.enctype);
-	            } else if (this.options.sendType === 'json') {
-	                xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
-	            }
-	
-	            xhr.onreadystatechange = function () {
-	                if (xhr.readyState == 4) {
-	                    if (xhr.status == 200) {
-	                        var response = {};
-	
-	                        try {
-	                            response = JSON.parse(xhr.responseText);
-	                        } catch (e) {
-	                            response.validationErrors = { base: ['JSON parsing error'] }; // todo: language extension
-	                        }
-	
-	                        if (response.validationErrors) {
-	                            _this2.options.callbacks.error(response.validationErrors);
-	
-	                            if (response.validationErrors.base) {
-	                                _this2.nodes.baseMessage.innerHTML = response.validationErrors.base.join(', ');
-	                                _this2.root.classList.add(_this2.options.formStatePrefix + _this2.options.states.error);
-	                                _this2.root.classList.remove(_this2.options.formStatePrefix + _this2.options.states.valid);
-	                                delete response.validationErrors.base;
-	                            } else {
-	                                _this2.nodes.baseMessage.innerHTML = '';
-	                            }
-	
-	                            for (var _name2 in response.validationErrors) {
-	                                _this2._markError(_name2, response.validationErrors[_name2]);
-	                            }
-	                        } else {
-	                            _this2.options.callbacks.success(response);
-	
-	                            if (_this2.options.redirect && response.redirect) {
-	                                window.location.href = response.redirect;
-	                                return;
-	                            }
-	
-	                            if (_this2.options.clean) {
-	                                _this2.nodes.form.reset();
-	                            }
-	                        }
-	                    } else {
-	                        console.warn(_this2.options.ajax.method + ' ' + _this2.options.ajax.url + ' ' + xhr.status + ' (' + xhr.statusText + ')');
-	
-	                        _this2.nodes.baseMessage.innerHTML = 'Can not send form!'; // todo: language extension
-	                        _this2.root.classList.add(_this2.options.formStatePrefix + _this2.options.states.error);
-	                        _this2.root.classList.remove(_this2.options.formStatePrefix + _this2.options.states.valid);
-	                    }
-	                }
-	            };
-	
-	            xhr.send(this.options.ajax.method.toUpperCase() === 'POST' ? data : '');
+	            return data;
 	        }
 	    }, {
 	        key: '_defineRules',
@@ -441,7 +449,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	
 	            if (options.ajax.enctype === 'multipart/form-data') {
-	                options.sendType = 'formData';
+	                options.ajax.sendType = 'formData';
 	            }
 	
 	            return options;

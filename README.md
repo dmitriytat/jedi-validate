@@ -31,9 +31,9 @@ Options have 3 levels.
         ajax: {
             url: null,
             enctype: 'application/x-www-form-urlencoded',
+            sendType: 'serialize', // 'formData', 'json'
             method: 'GET'
         },
-        sendType: 'serialize', // 'formData', 'json'
         rules: {},
         messages: {},
         containers: {
@@ -191,7 +191,3 @@ Use messages object to set your own error messages by input name.
         }
     },
 ```
-
-## Known problems
-
-* Can not send several files.

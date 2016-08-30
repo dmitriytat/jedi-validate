@@ -6,9 +6,9 @@ class JediValidate {
             ajax: {
                 url: null,
                 enctype: 'application/x-www-form-urlencoded',
+                sendType: 'serialize', // 'formData', 'json'
                 method: 'GET'
             },
-            sendType: 'serialize', // 'formData', 'json'
             rules: {},
             messages: {},
             containers: {
@@ -69,7 +69,7 @@ class JediValidate {
         }
 
         if (options.ajax.enctype === 'multipart/form-data') {
-            options.sendType = 'formData';
+            options.ajax.sendType = 'formData';
         }
 
         return options;
@@ -189,13 +189,15 @@ class JediValidate {
                 return;
             }
 
-            if (this.options.ajax) {
+            if (this.options.ajax && this.options.ajax.url) {
                 event.preventDefault();
             } else {
                 return;
             }
 
-            this._send();
+            const data = this.getData();
+
+            this._send(deepmerge(this.options.ajax, {data: data}));
         });
 
         this.nodes.inputs.forEach((input) => {
@@ -251,49 +253,13 @@ class JediValidate {
     }
 
     _send(options) {
-        let data = '';
         const xhr = new XMLHttpRequest();
 
-        if (this.options.sendType === 'serialize') {
-            for (let name in this.inputs) {
-                data += `${name}=${encodeURIComponent(JediValidate.getInputValue(this.inputs[name]))}&`;
-            }
+        xhr.open(options.method, options.url + (options.method.toUpperCase() === 'GET' ? ('?' + options.data) : ''), true); // todo concat url and params
 
-            data = data.slice(0, -1);
-        } else if (this.options.sendType === 'formData') {
-            data = new FormData();
-
-            for (let name in this.inputs) {
-                if (this.inputs[name].type && this.inputs[name].type === 'file') {
-                    if (this.inputs[name].hasAttribute('multiple')) {
-                        for (let i = 0; i < this.inputs[name].files.length; i++) {
-                            data.append(name + '[]', this.inputs[name].files[i]);
-                        }
-                    } else {
-                        data.append(name, this.inputs[name].files[0]);
-                    }
-                } else {
-                    data.append(name, JediValidate.getInputValue(this.inputs[name]));
-                }
-            }
-
-        } else if (this.options.sendType === 'json') {
-            data = {};
-
-            for (let index in this.nodes.inputs) {
-                const input = this.nodes.inputs[index];
-
-                data = deepmerge(data, JediValidate.parseInputName(input.name, JediValidate.getInputValue(input)));
-            }
-
-            data = JSON.stringify(data);
-        }
-
-        xhr.open(this.options.ajax.method, this.options.ajax.url + (this.options.ajax.method.toUpperCase() === 'GET' ? ('?' + data) : ''), true); // todo concat url and params
-
-        if (this.options.sendType === 'serialize') {
-            xhr.setRequestHeader('Content-type', this.options.ajax.enctype);
-        } else if (this.options.sendType === 'json') {
+        if (options.sendType === 'serialize') {
+            xhr.setRequestHeader('Content-type', options.enctype);
+        } else if (options.sendType === 'json') {
             xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
         }
 
@@ -336,7 +302,7 @@ class JediValidate {
                         }
                     }
                 } else {
-                    console.warn(this.options.ajax.method + ' ' + this.options.ajax.url + ' ' + xhr.status + ' (' + xhr.statusText + ')');
+                    console.warn(options.method + ' ' + options.url + ' ' + xhr.status + ' (' + xhr.statusText + ')');
 
                     this.nodes.baseMessage.innerHTML = 'Can not send form!'; // todo: language extension
                     this.root.classList.add(this.options.formStatePrefix + this.options.states.error);
@@ -345,8 +311,49 @@ class JediValidate {
             }
         };
 
-        xhr.send(this.options.ajax.method.toUpperCase() === 'POST' ? data : '');
+        xhr.send(options.method.toUpperCase() === 'POST' ? options.data : '');
     }
+
+    getData() {
+        let data = '';
+
+        if (this.options.sendType === 'serialize') {
+            for (let name in this.inputs) {
+                data += `${name}=${encodeURIComponent(JediValidate.getInputValue(this.inputs[name]))}&`;
+            }
+
+            data = data.slice(0, -1);
+        } else if (this.options.sendType === 'formData') {
+            data = new FormData();
+
+            for (let name in this.inputs) {
+                if (this.inputs[name].type && this.inputs[name].type === 'file') {
+                    if (this.inputs[name].hasAttribute('multiple')) {
+                        for (let i = 0; i < this.inputs[name].files.length; i++) {
+                            data.append(name + '[]', this.inputs[name].files[i]);
+                        }
+                    } else {
+                        data.append(name, this.inputs[name].files[0]);
+                    }
+                } else {
+                    data.append(name, JediValidate.getInputValue(this.inputs[name]));
+                }
+            }
+
+        } else if (this.options.sendType === 'json') {
+            data = {};
+
+            for (let index in this.nodes.inputs) {
+                const input = this.nodes.inputs[index];
+
+                data = deepmerge(data, JediValidate.parseInputName(input.name, JediValidate.getInputValue(input)));
+            }
+
+            data = JSON.stringify(data);
+        }
+
+        return data;
+    };
 
     _defineRules(name) {
         const input = this.inputs[name];
