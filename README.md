@@ -5,27 +5,34 @@ Lightweight form validation component.
 
 ## How can I use it?
 
-This is a JS class, and you can instance it with DOM element and options object.
+This is a JS class, and you can create a new instance by passing in a DOM element and an options object.
 
 ```javascript
     new JediValidate(formWrapper, options);
 ```
 
-By default form will be sent via ajax with parameters which was setted in html.
+By default, the form will be sent via ajax with the parameters which were set in HTML.
 
 ## Why should I use it?
 
-Because it provide strict json format for interaction. You can send form as common serialize, as json object, or as FormData. But server answer always have one structure. It is easy to implement. 
+Because it provides a strict json format for interaction. You can send a form in many different ways:
+
+* serialized
+* as a JSON object
+* as FormData.
+
+But server answer always have one structure. It is easy to implement. 
 
 ## Options
 
-Options have 3 levels.
+There are three types of option:
 
 * Default component options;
-* Form attributes like action or method;
+* Form attributes such as action or method;
 * Initialization options.
 
 ### Default options
+
 ```javascript
     {
         ajax: {
@@ -59,33 +66,31 @@ Options have 3 levels.
 ```
 
 ### ajax
-
-Via ajax option we can say how to send out form.
-It can be ```null``` if we do not want to send form.
-Or it can be an object with send options;
+The 'Ajax' property contains information on how you want the form to be sent.
+It can be ```null``` if you do not want to send the formm or it can be an object with send options.
 
 #### url
 default: ```null```
-But it will be changed by action form attribute or init options.
+This can be set from the form's 'action' attribute, or in the init options.
 
 #### enctype
 default: ```'application/x-www-form-urlencoded'```
-But it can be changed by enctype form attribute, or init options, or sendType.
+This can be changed by setting the 'enctype' form attribute, sendType, or in the init options.
 
 #### method
 default: ```'GET'```
-But it can be changed by method form attribute, or init options.
+This can be changed by the 'method' form attribute, or in the init options.
 
 ### sendType
 default: ```'serialize'```
 
-Now you can use 3 types of send data. It can be:
+You can encode and send the data in three different ways. Valid options are:
  
 * ```'formData'``` - send form as FormData. ```'Content-type'``` to ```'multipart/form-data'```
 * ```'json'``` - send form as JSON object. Set ```'Content-type'``` to ```'application/json; charset=utf-8'```
 * ```'serialize'``` - send form as regular request. Set ```'Content-type'``` to ```'application/x-www-form-urlencoded'```
 
-if you use formData, you can send file.
+Files can only be sent using 'formData' encoding.
 
 #### serialize
 
@@ -116,11 +121,12 @@ Content-Disposition: form-data; name="email"
 ```
 
 ### rules
-Rules used for defining input validation by name;
+
+Rules used to valid input. Each form element will be matched by the 'name' attribute with a corresponding rule, if one exists. If no rule exists, then no validation will occur.
 
 #### Basic validation rules:
 
-By default rules are not defined. But it can be setted in html by attributes (or classes) and in init options.
+Rules are not defined by default, but they can be set via attributes or classes in HTML, or in the init options.
 
 > - required :  boolean
 > - regexp : RegExp
@@ -130,22 +136,22 @@ By default rules are not defined. But it can be setted in html by attributes (or
 > - filesize: number
 > - extension: string
 
-We can use these attributes:
-> - type - email, tel и url regular regexp for each type.
+These attributes can be used
+> - type - email, tel or url (regexp will be used for each type).
 > - pattern - regexp with attribute value.
 > - required - check input for empty value.
 
-Like this:
+Example:
 
 ```html
     <input id="name" type="text" name="name" required class="required">
     <input id="email" type="email" name="email" class="required">
 ```
 
-* type="email" or class="email" for validate as email.
-* required or class="required" for validate as required field.
+* type="email" or class="email" to validate as email.
+* required or class="required" to validate as a required field.
 
-#### You can set youe own rules by ```addMethod```
+#### You can set your own rules with ```addMethod```
 
 ```
 JediValidate.addMethod('methodName', function (value, element, options) {
@@ -153,9 +159,9 @@ JediValidate.addMethod('methodName', function (value, element, options) {
 }, 'Error message');
 ```
 
-### You can use it
+### Usage
 
-Use initialization options in JS, like this.
+Add rules as part of your options object when initializing:
 
 ```javascript
     new JediValidate(formWrapper, {
@@ -179,7 +185,7 @@ Use initialization options in JS, like this.
 
 ## Error messages
 
-Use messages object to set your own error messages by input name.
+You can define your own error messages in case validation fails. In case a form element fails validation, then the message corresponding to the element's 'name' attribute will apply.
 
 ```javascript
     messages: {
