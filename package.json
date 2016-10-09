@@ -5,6 +5,7 @@
   "main": "./dist/jedi-validate.js",
   "scripts": {
     "test": "npm run test-browser",
+    "dev": "webpack-dev-server --hot --inline --progress --colors --watch",
     "build": "webpack --progress --colors --watch",
     "test-browser": "mocha-phantomjs ./tests/test.html"
   },

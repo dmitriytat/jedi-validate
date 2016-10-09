@@ -49,9 +49,9 @@ describe('JediValidate', function () {
                 ajax: {
                     url: './ajax.php',
                     method: 'POST',
-                    enctype: 'multipart/form-data'
-                },
-                sendType: 'formData'
+                    enctype: 'multipart/form-data',
+                    sendType: 'formData'
+                }
             });
         });
 
