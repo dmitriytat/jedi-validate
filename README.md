@@ -1,9 +1,9 @@
 # Jedi Validate
-Lightweight form validation component.
+A lightweight form validation component.
 
 [![NPM](https://nodei.co/npm/jedi-validate.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/jedi-validate/)
 
-## How can I use it?
+## How Can I Use It?
 
 This is a JS class, and you can create a new instance by passing in a DOM element and an options object.
 
@@ -13,7 +13,7 @@ This is a JS class, and you can create a new instance by passing in a DOM elemen
 
 By default, the form will be sent via ajax with the parameters which were set in HTML.
 
-## Why should I use it?
+## Why Should I Use It?
 
 Because it provides a strict json format for interaction. You can send a form in many different ways:
 
@@ -66,20 +66,22 @@ There are three types of option:
 ```
 
 ### ajax
-The 'Ajax' property contains information on how you want the form to be sent.
-It can be ```null``` if you do not want to send the formm or it can be an object with send options.
+
+Via the ajax option we define how to send the form.
+It can be ```null``` if we do not want the form to be sent.
+Or it can be an object with the following options;
 
 #### url
 default: ```null```
-This can be set from the form's 'action' attribute, or in the init options.
+Can be overridden by the `action` form attribute or init options.
 
 #### enctype
 default: ```'application/x-www-form-urlencoded'```
-This can be changed by setting the 'enctype' form attribute, sendType, or in the init options.
+Can be overridden by the `enctype` form attribute, init options, or `sendType`.
 
 #### method
 default: ```'GET'```
-This can be changed by the 'method' form attribute, or in the init options.
+Can be overridden by the `method` form attribute or init options.
 
 ### sendType
 default: ```'serialize'```
@@ -87,8 +89,8 @@ default: ```'serialize'```
 You can encode and send the data in three different ways. Valid options are:
  
 * ```'formData'``` - send form as FormData. ```'Content-type'``` to ```'multipart/form-data'```
-* ```'json'``` - send form as JSON object. Set ```'Content-type'``` to ```'application/json; charset=utf-8'```
-* ```'serialize'``` - send form as regular request. Set ```'Content-type'``` to ```'application/x-www-form-urlencoded'```
+* ```'json'``` - send form as a JSON object. Set ```'Content-type'``` to ```'application/json; charset=utf-8'```
+* ```'serialize'``` - send form as a regular request. Set ```'Content-type'``` to ```'application/x-www-form-urlencoded'```
 
 Files can only be sent using 'formData' encoding.
 
@@ -124,7 +126,7 @@ Content-Disposition: form-data; name="email"
 
 Rules used to valid input. Each form element will be matched by the 'name' attribute with a corresponding rule, if one exists. If no rule exists, then no validation will occur.
 
-#### Basic validation rules:
+#### Basic Validation Rules:
 
 Rules are not defined by default, but they can be set via attributes or classes in HTML, or in the init options.
 
@@ -151,7 +153,9 @@ Example:
 * type="email" or class="email" to validate as email.
 * required or class="required" to validate as a required field.
 
-#### You can set your own rules with ```addMethod```
+#### Custom Validation Rules
+
+You can set your own rules using the ```addMethod``` function:
 
 ```
 JediValidate.addMethod('methodName', function (value, element, options) {
@@ -159,7 +163,7 @@ JediValidate.addMethod('methodName', function (value, element, options) {
 }, 'Error message');
 ```
 
-### Usage
+### Initialization Options Example
 
 Add rules as part of your options object when initializing:
 
@@ -183,7 +187,7 @@ Add rules as part of your options object when initializing:
     });
 ```
 
-## Error messages
+## Error Messages
 
 You can define your own error messages in case validation fails. In case a form element fails validation, then the message corresponding to the element's 'name' attribute will apply.
 
