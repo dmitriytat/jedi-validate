@@ -36,7 +36,14 @@ describe('JediValidate', function () {
             assert.equal(JediValidate.getRadioGroupValue(radioGroup), 'second');
         });
 
-        it('Get select value', function () {
+	it('Get radio not checked value', function () {
+               radioInput1.checked = false;
+              radioInput2.checked = false;
+		 assert.equal(JediValidate.getInputValue(radioInput1), '');
+		 assert.equal(JediValidate.getInputValue(radioInput2), '');
+        });
+  
+	it('Get select value', function () {
             assert.equal(JediValidate.getInputValue(select), 'second');
         });
     });
