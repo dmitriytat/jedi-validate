@@ -1,6 +1,6 @@
 {
   "name": "jedi-validate",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Lightweight form validation component",
   "main": "./dist/jedi-validate.js",
   "scripts": {

@@ -1,6 +1,6 @@
 const dictionary = require('./jedi-validate-i18n-data.json');
 
-let currentLang = "ru";
+let currentLang = "en";
 
 export function setLanguage(id) {
     currentLang = id;

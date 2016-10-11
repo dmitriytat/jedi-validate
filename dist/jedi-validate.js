@@ -680,7 +680,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = translate;
 	var dictionary = __webpack_require__(3);
 	
-	var currentLang = "ru";
+	var currentLang = "en";
 	
 	function setLanguage(id) {
 	    currentLang = id;

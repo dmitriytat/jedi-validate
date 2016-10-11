@@ -197,3 +197,7 @@ You can define your own error messages in case validation fails. In case a form 
         }
     },
 ```
+
+# Changelist
+
+- 1.0.4 add simple language support
