@@ -1,4 +1,5 @@
 import deepmerge from 'deepmerge';
+import lang from './i18n/jedi-validate-i18n';
 
 class JediValidate {
     constructor(root, options = {}) {
@@ -482,11 +483,11 @@ JediValidate.addMethod = function (rule, func, message) {
 
 JediValidate.addMethod('required', function (value) {
     return (value && value.trim() !== '');
-}, 'Это поле необходимо заполнить');
+}, lang("This field is requied"));
 
 JediValidate.addMethod('regexp', function (value, element, regexp) {
     return regexp.test(value);
-}, 'Пожалуйста, введите корректное значение');
+}, lang());
 
 JediValidate.addMethod('email', function (value) {
     return /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i.test(value);
