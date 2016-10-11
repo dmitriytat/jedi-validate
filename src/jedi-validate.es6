@@ -1,5 +1,5 @@
 import deepmerge from 'deepmerge';
-import lang from './i18n/jedi-validate-i18n';
+import translate from './i18n/jedi-validate-i18n.es6';
 
 class JediValidate {
     constructor(root, options = {}) {
@@ -483,30 +483,30 @@ JediValidate.addMethod = function (rule, func, message) {
 
 JediValidate.addMethod('required', function (value) {
     return (value && value.trim() !== '');
-}, lang("This field is requied"));
+}, translate('This field is required'));
 
 JediValidate.addMethod('regexp', function (value, element, regexp) {
     return regexp.test(value);
-}, lang());
+}, translate('Please, provide correct value'));
 
 JediValidate.addMethod('email', function (value) {
     return /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i.test(value);
-}, 'Пожалуйста, введите корректный адрес электронной почты');
+}, translate('This email is incorrect'));
 
 JediValidate.addMethod('filesize', function (value, element, size) {
     return Array.prototype.slice.call(element.files).reduce((r, file) => file.size < size && r, true);
-}, 'Попробуйте загрузить файл поменьше');
+}, translate('This file is too large'));
 
 JediValidate.addMethod('extension', function (value, element, extensions) {
     return Array.prototype.slice.call(element.files).reduce((r, file) => extensions.indexOf(file.name.split('.').pop()) !== -1 && r, true);
-}, 'Пожалуйста, выберите файл с правильным расширением');
+}, translate('This extension is not supported'));
 
 JediValidate.addMethod('tel', function (value) {
     return /^([\+]+)*[0-9\x20\x28\x29\-]{5,20}$/.test(value);
-}, 'Не корректный номер телефона');
+}, translate('This phone number is incorrect'));
 
 JediValidate.addMethod('url', function (value) {
     return /[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi.test(value);
-}, 'Не корректный url');
+}, translate('Wrong url'));
 
 module.exports = JediValidate;

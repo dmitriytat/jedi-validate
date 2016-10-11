@@ -62,6 +62,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _deepmerge2 = _interopRequireDefault(_deepmerge);
 	
+	var _jediValidateI18n = __webpack_require__(2);
+	
+	var _jediValidateI18n2 = _interopRequireDefault(_jediValidateI18n);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -570,38 +574,38 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	JediValidate.addMethod('required', function (value) {
 	    return value && value.trim() !== '';
-	}, 'Это поле необходимо заполнить');
+	}, (0, _jediValidateI18n2.default)('This field is required'));
 	
 	JediValidate.addMethod('regexp', function (value, element, regexp) {
 	    return regexp.test(value);
-	}, 'Пожалуйста, введите корректное значение');
+	}, (0, _jediValidateI18n2.default)('Please, provide correct value'));
 	
 	JediValidate.addMethod('email', function (value) {
 	    return (/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i.test(value)
 	    );
-	}, 'Пожалуйста, введите корректный адрес электронной почты');
+	}, (0, _jediValidateI18n2.default)('This email is incorrect'));
 	
 	JediValidate.addMethod('filesize', function (value, element, size) {
 	    return Array.prototype.slice.call(element.files).reduce(function (r, file) {
 	        return file.size < size && r;
 	    }, true);
-	}, 'Попробуйте загрузить файл поменьше');
+	}, (0, _jediValidateI18n2.default)('This file is too large'));
 	
 	JediValidate.addMethod('extension', function (value, element, extensions) {
 	    return Array.prototype.slice.call(element.files).reduce(function (r, file) {
 	        return extensions.indexOf(file.name.split('.').pop()) !== -1 && r;
 	    }, true);
-	}, 'Пожалуйста, выберите файл с правильным расширением');
+	}, (0, _jediValidateI18n2.default)('This extension is not supported'));
 	
 	JediValidate.addMethod('tel', function (value) {
 	    return (/^([\+]+)*[0-9\x20\x28\x29\-]{5,20}$/.test(value)
 	    );
-	}, 'Не корректный номер телефона');
+	}, (0, _jediValidateI18n2.default)('This phone number is incorrect'));
 	
 	JediValidate.addMethod('url', function (value) {
 	    return (/[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi.test(value)
 	    );
-	}, 'Не корректный url');
+	}, (0, _jediValidateI18n2.default)('Wrong url'));
 	
 	module.exports = JediValidate;
 
@@ -662,6 +666,47 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	}));
 
+
+/***/ },
+/* 2 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.setLanguage = setLanguage;
+	exports.default = translate;
+	var dictionary = __webpack_require__(3);
+	
+	var currentLang = "ru";
+	
+	function setLanguage(id) {
+	    currentLang = id;
+	}
+	
+	function translate(text) {
+	    var lang = arguments.length <= 1 || arguments[1] === undefined ? currentLang : arguments[1];
+	
+	    return dictionary[lang] && dictionary[lang][text] || text;
+	}
+
+/***/ },
+/* 3 */
+/***/ function(module, exports) {
+
+	module.exports = {
+		"ru": {
+			"This field is required": "Это поле необходимо заполнить",
+			"Please, provide correct value": "Пожалуйста, введите корректное значение",
+			"This email is incorrect": "Пожалуйста, введите корректный адрес электронной почты",
+			"This file is too large": "Попробуйте загрузить файл поменьше",
+			"This extension is not supported": "Пожалуйста, выберите файл с правильным расширением",
+			"This phone number is incorrect": "Не корректный номер телефона",
+			"Wrong url": "Не корректный url"
+		}
+	};
 
 /***/ }
 /******/ ])
