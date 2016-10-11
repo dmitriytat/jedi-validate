@@ -1,0 +1,11 @@
+{
+  "ru": {
+    "This field is requied": "Это поле необходимо заполнить",
+    "Please, provide correct value": "Пожалуйста, введите корректное значение",
+    "This email is incorrect": "Пожалуйста, введите корректный адрес электронной почты",
+    "This file is too large" : "Попробуйте загрузить файл поменьше",
+    "This extension is not supported" : "Пожалуйста, выберите файл с правильным расширением",
+    "This phone number is incorrect" : "Не корректный номер телефона",
+    "Wrong url": "Не корректный url"
+  }
+}
