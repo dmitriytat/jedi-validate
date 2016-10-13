@@ -21,7 +21,7 @@ Because it provides a strict json format for interaction. You can send a form in
 * as a JSON object
 * as FormData.
 
-But server answer always have one structure. It is easy to implement. 
+But server answer always has one structure. It is easier to implement. 
 
 ## Options
 
@@ -67,7 +67,7 @@ There are three types of option:
 
 ### ajax
 
-Via the ajax option we define how to send the form.
+We use the ajax option we define how to send the form.
 It can be ```null``` if we do not want the form to be sent.
 Or it can be an object with the following options:
 
@@ -124,7 +124,7 @@ Content-Disposition: form-data; name="email"
 
 ### rules
 
-Rules used to valid input. Each form element will be matched by the 'name' attribute with a corresponding rule, if one exists. If no rule exists, then no validation will occur.
+Rules used to validate input. Each form element will be matched by the 'name' attribute with a corresponding rule, if one exists. If no rule exists, then no validation will occur.
 
 #### Basic Validation Rules:
 
