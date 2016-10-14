@@ -1,7 +1,23 @@
 # Jedi Validate
-A lightweight form validation component.
 
 [![NPM](https://nodei.co/npm/jedi-validate.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/jedi-validate/)
+
+* [Introduction](#intro)
+* [Installation and Usage](#install)
+* [Options](#options) 
+  * [Default Options](#default) 
+  * [Ajax Parameters](#ajax)
+  * [Data Encoding Options](#encoding)
+* [Validation Rules](#rules)
+* [Error Message](#error) 
+* [Changelog](#changelog)
+
+
+<h1>
+    <a name="intro"></a>
+    Introduction
+</h1>
+Jedi Validate is a lightweight form validation component.
 
 ## How Can I Use It?
 
@@ -23,15 +39,51 @@ Because it provides a strict json format for interaction. You can send a form in
 
 But server answer always has one structure. It is easier to implement. 
 
-## Options
+<h2>
+    <a name="install"></a>
+    Build and Test
+</h2>
+If you would like to build the source code, run tests, or contribute, then first fork or clone this repo onto your local machine. Ensure NodeJS is installed and in turn npm. Check in a terminal with `node -v` and `npm -v`.
 
-There are three types of option:
+To install project dependencies first run,
 
-* Default component options;
-* Form attributes such as action or method;
-* Initialization options.
+```
+npm install
+```
+### Build
+To bund the source and watch for changes in the terminal run,
 
-### Default options
+```
+npm run build
+```
+
+### Build and Serve
+To bundle the source and serve it to `localhost:8080` run,
+
+```
+npm run dev
+```
+This will open a webpack local server where you can navigate to the desired directory or resource. The test page is located in **`example/bootstrap.html`**
+
+### Running Tests
+The tests are not yet complete, and runtime errors will occur when attempting to run the tests in the console or through the test browser.
+
+<h1>
+    <a name="options"></a>
+    Options
+</h1>
+
+There are three types of options:
+
+* Default component options
+* Form attributes such as action or method
+* Initialization options
+
+<h2>
+   <a name="default"></a>
+   Default Options
+</h2>
+
 
 ```javascript
     {
@@ -65,11 +117,14 @@ There are three types of option:
     }
 ```
 
-### ajax
+<h2> 
+  <a name="ajax"></a>
+  ajax
+</h2>
 
-We use the ajax option we define how to send the form.
-It can be ```null``` if we do not want the form to be sent.
-Or it can be an object with the following options:
+Under the ajax option we define how to send the form.
+It can be ```null``` if we do not want the form to be sent,
+or it can be an object with the following options:
 
 #### url
 default: ```null```
@@ -83,7 +138,8 @@ Can be overridden by the `enctype` form attribute, init options, or `sendType`.
 default: ```'GET'```
 Can be overridden by the `method` form attribute or init options.
 
-### sendType
+<a name="encoding"></a>
+#### sendType
 default: ```'serialize'```
 
 You can encode and send the data in three different ways. Valid options are:
@@ -122,11 +178,14 @@ Content-Disposition: form-data; name="email"
     {"name":"111","phone":"222222222","email":"wow@wow.com","file":"index.html"}
 ```
 
-### rules
+<h1>
+  <a name="rules"></a>
+  Validation Rules
+</h1>
 
 Rules used to validate input. Each form element will be matched by the 'name' attribute with a corresponding rule, if one exists. If no rule exists, then no validation will occur.
 
-#### Basic Validation Rules:
+#### Basic Rules:
 
 Rules are not defined by default, but they can be set via attributes or classes in HTML, or in the init options.
 
@@ -139,9 +198,9 @@ Rules are not defined by default, but they can be set via attributes or classes 
 > - extension: string
 
 These attributes can be used
-> - type - email, tel or url (regexp will be used for each type).
-> - pattern - regexp with attribute value.
-> - required - check input for empty value.
+> - type - email, tel or url (regexp will be used for each type)
+> - pattern - regexp with attribute value
+> - required - check input for empty value
 
 Example:
 
@@ -150,8 +209,8 @@ Example:
     <input id="email" type="email" name="email" class="required">
 ```
 
-* type="email" or class="email" to validate as email.
-* required or class="required" to validate as a required field.
+* type="email" or class="email" to validate as email
+* required or class="required" to validate as a required field
 
 #### Custom Validation Rules
 
@@ -187,7 +246,10 @@ Add rules as part of your options object when initializing:
     });
 ```
 
-## Error Messages
+<h1>
+  <a name="error"></a>
+  Error Messages
+</h1>
 
 You can define your own error messages in case validation fails. In case a form element fails validation, then the message corresponding to the element's 'name' attribute will apply.
 
@@ -202,6 +264,8 @@ You can define your own error messages in case validation fails. In case a form 
     },
 ```
 
-# Changelist
-
+<h1>
+  <a name="changelog"></a>
+  Changelog
+</h1>
 - 1.0.4 add simple language support
