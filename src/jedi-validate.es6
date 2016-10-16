@@ -1,5 +1,6 @@
 import deepmerge from 'deepmerge';
-import translate from './i18n/jedi-validate-i18n.es6';
+import {translate, addTranslation, setLanguage} from './i18n/jedi-validate-i18n.es6';
+//import addTranslation from './i18n/jedi-validate-i18n.es6';
 
 class JediValidate {
     constructor(root, options = {}) {
@@ -31,7 +32,8 @@ class JediValidate {
                 }
             },
             clean: true,
-            redirect: true
+            redirect: true,
+            language: "en"
         };
 
         this.root = root;
@@ -50,6 +52,15 @@ class JediValidate {
         this.options = deepmerge(this.options, defaultOptions);
         this.options = deepmerge(this.options, formOptions);
         this.options = deepmerge(this.options, options);
+        setLanguage(options.language);
+
+        for (var language in options.translations) {            
+            for (var translation in options.translations[language]) {
+                addTranslation(translation, options.translations[language][translation], language);
+            }
+        }
+
+        this._initMethods();
 
         this._ready();
     }
@@ -167,6 +178,10 @@ class JediValidate {
         }
 
         return element.value;
+    }
+
+    static addToDictionary(sourceText, translatedText, language) {
+        addTranslation(sourceText, translatedText, language);
     }
 
     _cacheNodes() {
@@ -404,7 +419,7 @@ class JediValidate {
     checkInput(name) {
         const rules = this.rules[name];
         const errors = [];
-        const isEmpty = !JediValidate.methods.required.func(JediValidate.getInputValue(this.inputs[name]), this.inputs[name]);
+        const isEmpty = !this.methods.required.func(JediValidate.getInputValue(this.inputs[name]), this.inputs[name]);
 
         if (isEmpty && rules.required) {
             errors.push(this._getErrorMessage(name, 'required'));
@@ -413,8 +428,8 @@ class JediValidate {
                 const params = rules[method];
 
                 if (params) {
-                    if (JediValidate.methods[method]) {
-                        var valid = JediValidate.methods[method].func(JediValidate.getInputValue(this.inputs[name]), this.inputs[name], params);
+                    if (this.methods[method]) {
+                        var valid = this.methods[method].func(JediValidate.getInputValue(this.inputs[name]), this.inputs[name], params);
 
                         if (!valid) {
                             errors.push(this._getErrorMessage(name, method));
@@ -463,50 +478,54 @@ class JediValidate {
         if (this.options.messages[name] && this.options.messages[name][method]) {
             message = this.options.messages[name][method];
         } else {
-            message = JediValidate.methods[method].message;
+            message = this.methods[method].message;
         }
 
         return message;
     }
+
+    _addMethod(rule, func, message) {
+        this.methods[rule] = {
+            func: func,
+            message: message
+        };
+    }
+
+    _initMethods() {
+        this.methods = {};
+
+        // todo languages
+
+        this._addMethod('required', function (value) {
+            return (value && value.trim() !== '');
+        }, translate('This field is required'));
+
+        this._addMethod('regexp', function (value, element, regexp) {
+            return regexp.test(value);
+        }, translate('Please, provide correct value'));
+
+        this._addMethod('email', function (value) {
+            return /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i.test(value);
+        }, translate('This email is incorrect'));
+
+        this._addMethod('filesize', function (value, element, size) {
+            return Array.prototype.slice.call(element.files).reduce((r, file) => file.size < size && r, true);
+        }, translate('This file is too large'));
+
+        this._addMethod('extension', function (value, element, extensions) {
+            return Array.prototype.slice.call(element.files).reduce((r, file) => extensions.indexOf(file.name.split('.').pop()) !== -1 && r, true);
+        }, translate('This extension is not supported'));
+
+        this._addMethod('tel', function (value) {
+            return /^([\+]+)*[0-9\x20\x28\x29\-]{5,20}$/.test(value);
+        }, translate('This phone number is incorrect'));
+
+        this._addMethod('url', function (value) {
+            return /[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi.test(value);
+        }, translate('Wrong url'));
+    }
 }
 
-JediValidate.methods = {};
 
-JediValidate.addMethod = function (rule, func, message) {
-    JediValidate.methods[rule] = {
-        func: func,
-        message: message
-    };
-};
-
-// todo languages
-
-JediValidate.addMethod('required', function (value) {
-    return (value && value.trim() !== '');
-}, translate('This field is required'));
-
-JediValidate.addMethod('regexp', function (value, element, regexp) {
-    return regexp.test(value);
-}, translate('Please, provide correct value'));
-
-JediValidate.addMethod('email', function (value) {
-    return /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i.test(value);
-}, translate('This email is incorrect'));
-
-JediValidate.addMethod('filesize', function (value, element, size) {
-    return Array.prototype.slice.call(element.files).reduce((r, file) => file.size < size && r, true);
-}, translate('This file is too large'));
-
-JediValidate.addMethod('extension', function (value, element, extensions) {
-    return Array.prototype.slice.call(element.files).reduce((r, file) => extensions.indexOf(file.name.split('.').pop()) !== -1 && r, true);
-}, translate('This extension is not supported'));
-
-JediValidate.addMethod('tel', function (value) {
-    return /^([\+]+)*[0-9\x20\x28\x29\-]{5,20}$/.test(value);
-}, translate('This phone number is incorrect'));
-
-JediValidate.addMethod('url', function (value) {
-    return /[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi.test(value);
-}, translate('Wrong url'));
 
 module.exports = JediValidate;
