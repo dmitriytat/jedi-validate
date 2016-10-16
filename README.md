@@ -4,15 +4,15 @@
 
 * [Introduction](#intro)
 * [Installation and Usage](#install)
-* [Options](#options) 
-  * [Default Options](#default) 
+* [Options](#options)
+  * [Default Options](#default)
   * [Ajax Parameters](#ajax)
   * [Data Encoding Options](#encoding)
 * [Validation Rules](#rules)
-* [Error Message](#error) 
+* [Error Message](#error)
 * [Changelog](#changelog)
 
-
+![logo](http://oi68.tinypic.com/t7o1n9.jpg)
 <h1>
     <a name="intro"></a>
     Introduction
@@ -37,7 +37,7 @@ Because it provides a strict json format for interaction. You can send a form in
 * as a JSON object
 * as FormData.
 
-But server answer always has one structure. It is easier to implement. 
+But server answer always has one structure. It is easier to implement.
 
 <h2>
     <a name="install"></a>
@@ -117,7 +117,7 @@ There are three types of options:
     }
 ```
 
-<h2> 
+<h2>
   <a name="ajax"></a>
   ajax
 </h2>
@@ -143,7 +143,7 @@ Can be overridden by the `method` form attribute or init options.
 default: ```'serialize'```
 
 You can encode and send the data in three different ways. Valid options are:
- 
+
 * ```'formData'``` - send form as FormData. ```'Content-type'``` to ```'multipart/form-data'```
 * ```'json'``` - send form as a JSON object. Set ```'Content-type'``` to ```'application/json; charset=utf-8'```
 * ```'serialize'``` - send form as a regular request. Set ```'Content-type'``` to ```'application/x-www-form-urlencoded'```
