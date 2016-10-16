@@ -64,15 +64,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _jediValidateI18n = __webpack_require__(2);
 	
-	var _jediValidateI18n2 = _interopRequireDefault(_jediValidateI18n);
-	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
+	//import addTranslation from './i18n/jedi-validate-i18n.es6';
+	
 	var JediValidate = function () {
 	    function JediValidate(root) {
-	        var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+	        var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 	
 	        _classCallCheck(this, JediValidate);
 	
@@ -102,7 +102,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	                error: function error() {}
 	            },
 	            clean: true,
-	            redirect: true
+	            redirect: true,
+	            language: "en"
 	        };
 	
 	        this.root = root;
@@ -121,6 +122,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.options = (0, _deepmerge2.default)(this.options, defaultOptions);
 	        this.options = (0, _deepmerge2.default)(this.options, formOptions);
 	        this.options = (0, _deepmerge2.default)(this.options, options);
+	        (0, _jediValidateI18n.setLanguage)(options.language);
+	
+	        for (var language in options.translations) {
+	            for (var translation in options.translations[language]) {
+	                (0, _jediValidateI18n.addTranslation)(translation, options.translations[language][translation], language);
+	            }
+	        }
+	
+	        this._initMethods();
 	
 	        this._ready();
 	    }
@@ -370,7 +380,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value: function checkInput(name) {
 	            var rules = this.rules[name];
 	            var errors = [];
-	            var isEmpty = !JediValidate.methods.required.func(JediValidate.getInputValue(this.inputs[name]), this.inputs[name]);
+	            var isEmpty = !this.methods.required.func(JediValidate.getInputValue(this.inputs[name]), this.inputs[name]);
 	
 	            if (isEmpty && rules.required) {
 	                errors.push(this._getErrorMessage(name, 'required'));
@@ -379,8 +389,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    var params = rules[method];
 	
 	                    if (params) {
-	                        if (JediValidate.methods[method]) {
-	                            var valid = JediValidate.methods[method].func(JediValidate.getInputValue(this.inputs[name]), this.inputs[name], params);
+	                        if (this.methods[method]) {
+	                            var valid = this.methods[method].func(JediValidate.getInputValue(this.inputs[name]), this.inputs[name], params);
 	
 	                            if (!valid) {
 	                                errors.push(this._getErrorMessage(name, method));
@@ -432,10 +442,60 @@ return /******/ (function(modules) { // webpackBootstrap
 	            if (this.options.messages[name] && this.options.messages[name][method]) {
 	                message = this.options.messages[name][method];
 	            } else {
-	                message = JediValidate.methods[method].message;
+	                message = this.methods[method].message;
 	            }
 	
 	            return message;
+	        }
+	    }, {
+	        key: '_addMethod',
+	        value: function _addMethod(rule, func, message) {
+	            this.methods[rule] = {
+	                func: func,
+	                message: message
+	            };
+	        }
+	    }, {
+	        key: '_initMethods',
+	        value: function _initMethods() {
+	            this.methods = {};
+	
+	            // todo languages
+	
+	            this._addMethod('required', function (value) {
+	                return value && value.trim() !== '';
+	            }, (0, _jediValidateI18n.translate)('This field is required'));
+	
+	            this._addMethod('regexp', function (value, element, regexp) {
+	                return regexp.test(value);
+	            }, (0, _jediValidateI18n.translate)('Please, provide correct value'));
+	
+	            this._addMethod('email', function (value) {
+	                return (/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i.test(value)
+	                );
+	            }, (0, _jediValidateI18n.translate)('This email is incorrect'));
+	
+	            this._addMethod('filesize', function (value, element, size) {
+	                return Array.prototype.slice.call(element.files).reduce(function (r, file) {
+	                    return file.size < size && r;
+	                }, true);
+	            }, (0, _jediValidateI18n.translate)('This file is too large'));
+	
+	            this._addMethod('extension', function (value, element, extensions) {
+	                return Array.prototype.slice.call(element.files).reduce(function (r, file) {
+	                    return extensions.indexOf(file.name.split('.').pop()) !== -1 && r;
+	                }, true);
+	            }, (0, _jediValidateI18n.translate)('This extension is not supported'));
+	
+	            this._addMethod('tel', function (value) {
+	                return (/^([\+]+)*[0-9\x20\x28\x29\-]{5,20}$/.test(value)
+	                );
+	            }, (0, _jediValidateI18n.translate)('This phone number is incorrect'));
+	
+	            this._addMethod('url', function (value) {
+	                return (/[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi.test(value)
+	                );
+	            }, (0, _jediValidateI18n.translate)('Wrong url'));
 	        }
 	    }], [{
 	        key: 'getFormOptions',
@@ -556,56 +616,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            return element.value;
 	        }
+	    }, {
+	        key: 'addToDictionary',
+	        value: function addToDictionary(sourceText, translatedText, language) {
+	            (0, _jediValidateI18n.addTranslation)(sourceText, translatedText, language);
+	        }
 	    }]);
 	
 	    return JediValidate;
 	}();
-	
-	JediValidate.methods = {};
-	
-	JediValidate.addMethod = function (rule, func, message) {
-	    JediValidate.methods[rule] = {
-	        func: func,
-	        message: message
-	    };
-	};
-	
-	// todo languages
-	
-	JediValidate.addMethod('required', function (value) {
-	    return value && value.trim() !== '';
-	}, (0, _jediValidateI18n2.default)('This field is required'));
-	
-	JediValidate.addMethod('regexp', function (value, element, regexp) {
-	    return regexp.test(value);
-	}, (0, _jediValidateI18n2.default)('Please, provide correct value'));
-	
-	JediValidate.addMethod('email', function (value) {
-	    return (/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i.test(value)
-	    );
-	}, (0, _jediValidateI18n2.default)('This email is incorrect'));
-	
-	JediValidate.addMethod('filesize', function (value, element, size) {
-	    return Array.prototype.slice.call(element.files).reduce(function (r, file) {
-	        return file.size < size && r;
-	    }, true);
-	}, (0, _jediValidateI18n2.default)('This file is too large'));
-	
-	JediValidate.addMethod('extension', function (value, element, extensions) {
-	    return Array.prototype.slice.call(element.files).reduce(function (r, file) {
-	        return extensions.indexOf(file.name.split('.').pop()) !== -1 && r;
-	    }, true);
-	}, (0, _jediValidateI18n2.default)('This extension is not supported'));
-	
-	JediValidate.addMethod('tel', function (value) {
-	    return (/^([\+]+)*[0-9\x20\x28\x29\-]{5,20}$/.test(value)
-	    );
-	}, (0, _jediValidateI18n2.default)('This phone number is incorrect'));
-	
-	JediValidate.addMethod('url', function (value) {
-	    return (/[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi.test(value)
-	    );
-	}, (0, _jediValidateI18n2.default)('Wrong url'));
 	
 	module.exports = JediValidate;
 
@@ -677,7 +696,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	exports.setLanguage = setLanguage;
-	exports.default = translate;
+	exports.translate = translate;
+	exports.addTranslation = addTranslation;
 	var dictionary = __webpack_require__(3);
 	
 	var currentLang = "en";
@@ -687,9 +707,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	
 	function translate(text) {
-	    var lang = arguments.length <= 1 || arguments[1] === undefined ? currentLang : arguments[1];
+	    var lang = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : currentLang;
 	
 	    return dictionary[lang] && dictionary[lang][text] || text;
+	}
+	
+	function addTranslation(sourceText, translatedText) {
+	    var lang = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : currentLang;
+	
+	    if (dictionary[lang] === undefined) {
+	        dictionary[lang] = {};
+	    }
+	    dictionary[lang][sourceText] = translatedText;
 	}
 
 /***/ },
