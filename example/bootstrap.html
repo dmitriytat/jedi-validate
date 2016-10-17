@@ -1,96 +1,96 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <title></title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
-    <style>
-        #form {
-            margin: 0 auto;
-            width: 1000px;
-        }
-    </style>
+	<meta charset="UTF-8">
+	<title></title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
 </head>
+
 <body>
-<div class="container">
-    <div class="row">
-        <div class="col-lg-6">
-            <h1>Jedi Validate</h1>
-            <div id="form">
-                <form id="myForm" action="./ajax.php" method="post" class="form-horizontal">
-                    <div class="help-block base-error"></div>
-                    <div class="form-group">
-                        <label for="name" class="col-sm-2 control-label">Name:</label>
+	<div class="container">
+		<div class="row">
+			<div>
+				<div class="page-header">
+					<h1>Jedi Validate <small>Lightweight form validation component.</small></h1>
+				</div>
+				<div class="panel panel-primary">
+					<div class="panel-heading">User Details</div>
+					<div class="panel-body">
+						<form id="myForm" action="./ajax.php" method="post" class="form-horizontal">
+							<div class="help-block base-error"></div>
+							<div class="form-group">
+								<label for="name" class="col-sm-2 control-label">Name:</label>
 
-                        <div class="col-sm-6">
-                            <input name="name" type="text" class="form-control" id="name" placeholder="First Last" pattern="\w+\s.\w+" required>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="phone1" class="col-sm-2 control-label">Phone:</label>
+								<div class="col-sm-10">
+									<input name="name" type="text" class="form-control" id="name" placeholder="First Last" pattern="\w+\s.\w+" required>
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="phone1" class="col-sm-2 control-label">Phone:</label>
 
-                        <div class="col-sm-6">
-                            <input name="phone[0]" type="tel" class="form-control" id="phone1" placeholder="Phone" required>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="phone2" class="col-sm-2 control-label">Phone #2:</label>
+								<div class="col-sm-10">
+									<input name="phone[0]" type="tel" class="form-control" id="phone1" placeholder="Phone" required>
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="phone2" class="col-sm-2 control-label">Phone #2:</label>
 
-                        <div class="col-sm-6">
-                            <input name="phone[1]" type="tel" class="form-control" id="phone2" placeholder="Phone #2">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="email" class="col-sm-2 control-label">E-mail:</label>
+								<div class="col-sm-10">
+									<input name="phone[1]" type="tel" class="form-control" id="phone2" placeholder="Phone #2">
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="email" class="col-sm-2 control-label">E-mail:</label>
 
-                        <div class="col-sm-6">
-                            <input name="email" type="email" class="form-control" id="email" placeholder="E-mail" required>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="file" class="col-sm-2 control-label">File (html, css, txt):</label>
+								<div class="col-sm-10">
+									<input name="email" type="email" class="form-control" id="email" placeholder="E-mail" required>
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="file" class="col-sm-2 control-label">File (html, css, txt):</label>
 
-                        <div class="col-sm-6">
-                            <input name="file" type="file" class="form-control" id="file" multiple>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="col-sm-offset-2 col-sm-6">
-                            <div class="radio">
-                                <label><input type="radio" name="optradio" value="1" required checked>Option 1</label>
-                            </div>
-                            <div class="radio">
-                                <label><input type="radio" name="optradio" value="2">Option 2</label>
-                            </div>
-                            <div class="radio disabled">
-                                <label><input type="radio" name="optradio" value="3" disabled>Option 3</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="col-sm-offset-2 col-sm-6">
-                            <div class="checkbox">
-                                <label>
+								<div class="col-sm-10">
+									<input name="file" type="file" class="form-control" id="file" multiple>
+								</div>
+							</div>
+							<div class="form-group">
+								<div class="col-sm-offset-2 col-sm-10">
+									<div class="radio">
+										<label><input type="radio" name="optradio" value="1" required checked>Option 1</label>
+									</div>
+									<div class="radio">
+										<label><input type="radio" name="optradio" value="2">Option 2</label>
+									</div>
+									<div class="radio disabled">
+										<label><input type="radio" name="optradio" value="3" disabled>Option 3</label>
+									</div>
+								</div>
+							</div>
+							<div class="form-group">
+								<div class="col-sm-offset-2 col-sm-10">
+									<div class="checkbox">
+										<label>
                                     <input name="check" type="checkbox" required> Check it:
                                 </label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="col-sm-offset-2 col-sm-6">
-                            <button type="submit" class="btn btn-default">Send</button>
-                        </div>
-                    </div>
-                </form>
-                <div class="base-error alert alert-danger" role="alert" style="display: none"></div>
-            </div>
-        </div>
-    </div>
-</div>
+									</div>
+								</div>
+							</div>
+							<hr/>
+							<button type="submit" class="btn  btn-lg btn-success pull-right">Send</button>
 
-<script src="../dist/jedi-validate.min.js"></script>
+						</form>
+						<div class="base-error alert alert-danger" role="alert" style="display: none"></div>
 
-<script>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script src="../dist/jedi-validate.min.js"></script>
+
+	<script>
     var formWrapper = document.querySelector('#form');
 
     new JediValidate(formWrapper, {
@@ -128,4 +128,5 @@
     });
 </script>
 </body>
+
 </html>

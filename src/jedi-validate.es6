@@ -54,8 +54,8 @@ class JediValidate {
 
         setLanguage(options.language);
 
-        for (const language in options.translations) {
-            for (const translation in options.translations[language]) {
+        for (const language of options.translations) {
+            for (const translation of options.translations[language]) {
                 addTranslation(translation, options.translations[language][translation], language);
             }
         }
@@ -87,7 +87,7 @@ class JediValidate {
     }
 
     static getRadioGroupValue(elements) {
-        for (const index in elements) {
+        for (const index of elements) {
             const element = elements[index];
 
             const value = JediValidate.getInputValue(element);
@@ -104,10 +104,10 @@ class JediValidate {
         const re = /(\[(\w*)\]|\w*)/gi;
         let matches;
         const path = [];
-
-        while ((matches = re.exec(name)) !== null) {
+        matches = re.exec(name);
+        while (matches !== null) {
             if (matches.index === re.lastIndex) {
-                re.lastIndex++;
+                re.lastIndex += 1;
             }
 
             if (matches[2]) {
@@ -115,6 +115,8 @@ class JediValidate {
             } else {
                 path.push(matches[1]);
             }
+
+            matches = re.exec(name);
         }
 
         return JediValidate.createObject(path, value);
@@ -127,13 +129,12 @@ class JediValidate {
             return value;
         } else if (segment === '[]') {
             return [JediValidate.createObject(path.slice(1), value)];
-        } else {
-            const object = {};
-
-            object[segment] = JediValidate.createObject(path.slice(1), value);
-
-            return object;
         }
+
+        // Else
+        const object = {};
+        object[segment] = JediValidate.createObject(path.slice(1), value);
+        return object;
     }
 
     static getInputValue(element) {
@@ -153,27 +154,27 @@ class JediValidate {
         }
 
         if (type === 'select-multiple') {
-            value = [];
+            const valueArray = [];
 
-            for (let i = 0; i < element.options.length; i++) {
+            for (let i = 0; i < element.options.length; i += 1) {
                 if (element.options[i].selected) {
-                    value.push(element.options[i].value);
+                    valueArray.push(element.options[i].value);
                 }
             }
 
-            if (value.length === 0) {
-                value = '';
+            if (valueArray.length === 0) {
+                return '';
             }
 
-            return value;
+            return valueArray;
         }
 
         if (type === 'checkbox' || type === 'radio') {
-            if (element.checked)
-                { return element.value; }
-            else {
-                return '';
+            if (element.checked) {
+                return element.value;
             }
+
+            return '';
         }
 
         return element.value;
@@ -229,7 +230,7 @@ class JediValidate {
             } else {
                 this.inputs[name] = input;
 
-                let field = input.parentNode;
+                const field = input.parentNode;
 
                 do {
                     if (field.classList.contains(this.options.containers.parent)) {
@@ -239,7 +240,7 @@ class JediValidate {
                 } while (field === field.parentNode);
 
                 if (!this.fields[name]) {
-                    throw 'Have no parent field';
+                    throw new Error('Have no parent field');
                 }
 
                 this.fields[name].classList.add(this.options.states.pristine);
@@ -281,8 +282,8 @@ class JediValidate {
         }
 
         xhr.onreadystatechange = () => {
-            if (xhr.readyState == 4) {
-                if (xhr.status == 200) {
+            if (xhr.readyState === 4) {
+                if (xhr.status === 200) {
                     let response = {};
 
                     try {
@@ -296,14 +297,16 @@ class JediValidate {
 
                         if (response.validationErrors.base) {
                             this.nodes.baseMessage.innerHTML = response.validationErrors.base.join(', ');
-                            this.root.classList.add(this.options.formStatePrefix + this.options.states.error);
-                            this.root.classList.remove(this.options.formStatePrefix + this.options.states.valid);
+                            this.root.classList.add(this.options.formStatePrefix
+                                + this.options.states.error);
+                            this.root.classList.remove(this.options.formStatePrefix
+                                + this.options.states.valid);
                             delete response.validationErrors.base;
                         } else {
                             this.nodes.baseMessage.innerHTML = '';
                         }
 
-                        for (const name in response.validationErrors) {
+                        for (const name of response.validationErrors) {
                             this.markError(name, response.validationErrors[name]);
                         }
                     } else {
@@ -319,12 +322,14 @@ class JediValidate {
                         }
                     }
                 } else {
-                    /*eslint no-console: ["error", { allow: ["warn"] }] */
+                    /* eslint no-console: ["error", { allow: ["warn"] }] */
                     console.warn(`${options.method} ${options.url} ${xhr.status} (${xhr.statusText})`);
 
                     this.nodes.baseMessage.innerHTML = 'Can not send form!'; // todo: language extension
-                    this.root.classList.add(this.options.formStatePrefix + this.options.states.error);
-                    this.root.classList.remove(this.options.formStatePrefix + this.options.states.valid);
+                    this.root.classList.add(this.options.formStatePrefix
+                        + this.options.states.error);
+                    this.root.classList.remove(this.options.formStatePrefix
+                        + this.options.states.valid);
                 }
             }
         };
@@ -336,7 +341,7 @@ class JediValidate {
         let data = '';
 
         if (this.options.sendType === 'serialize') {
-            for (const name in this.inputs) {
+            for (const name of this.inputs) {
                 data += `${name}=${encodeURIComponent(JediValidate.getInputValue(this.inputs[name]))}&`;
             }
 
@@ -344,10 +349,10 @@ class JediValidate {
         } else if (this.options.sendType === 'formData') {
             data = new FormData();
 
-            for (const name in this.inputs) {
+            for (const name of this.inputs) {
                 if (this.inputs[name].type && this.inputs[name].type === 'file') {
                     if (this.inputs[name].hasAttribute('multiple')) {
-                        for (let i = 0; i < this.inputs[name].files.length; i++) {
+                        for (let i = 0; i < this.inputs[name].files.length; i += 1) {
                             data.append(`${name}[]`, this.inputs[name].files[i]);
                         }
                     } else {
@@ -360,10 +365,11 @@ class JediValidate {
         } else if (this.options.sendType === 'json') {
             data = {};
 
-            for (const index in this.nodes.inputs) {
+            for (const index of this.nodes.inputs) {
                 const input = this.nodes.inputs[index];
 
-                data = deepmerge(data, JediValidate.parseInputName(input.name, JediValidate.getInputValue(input)));
+                data = deepmerge(data, JediValidate.parseInputName(input.name,
+                    JediValidate.getInputValue(input)));
             }
 
             data = JSON.stringify(data);
@@ -379,7 +385,7 @@ class JediValidate {
 
         const rules = ['required', 'email', 'tel', 'url'];
 
-        for (const ruleName in rules) {
+        for (const ruleName of rules) {
             const rule = rules[ruleName];
 
             if (input.hasAttribute(rule) || input.type === rule || input.classList.contains(rule)) {
@@ -391,10 +397,11 @@ class JediValidate {
             this.rules[name].regexp = new RegExp(input.getAttribute('pattern'));
         }
 
-        if (this.options.rules[name])
-            { this.rules[name] = deepmerge(this.rules[name], this.options.rules[name]); }
+        if (this.options.rules[name]) {
+            this.rules[name] = deepmerge(this.rules[name], this.options.rules[name]);
+        }
 
-        for (const rule in this.rules[name]) {
+        for (const rule of this.rules[name]) {
             if (this.rules[name][rule]) {
                 this.fields[name].classList.add(rule);
             }
@@ -404,7 +411,7 @@ class JediValidate {
     checkForm() {
         const errors = {};
 
-        for (const name in this.rules) {
+        for (const name of this.rules) {
             const inputErrors = this.checkInput(name);
 
             if (inputErrors.length) {
@@ -418,17 +425,20 @@ class JediValidate {
     checkInput(name) {
         const rules = this.rules[name];
         const errors = [];
-        const isEmpty = !this.methods.required.func(JediValidate.getInputValue(this.inputs[name]), this.inputs[name]);
+        const isEmpty = !this.methods.required.func(JediValidate.getInputValue(this.inputs[name]),
+            this.inputs[name]);
 
         if (isEmpty && rules.required) {
             errors.push(this.getErrorMessage(name, 'required'));
         } else if (!isEmpty) {
-            for (const method in rules) {
+            for (const method of rules) {
                 const params = rules[method];
 
                 if (params) {
                     if (this.methods[method]) {
-                        const valid = this.methods[method].func(JediValidate.getInputValue(this.inputs[name]), this.inputs[name], params);
+                        const valid = this.methods[method].func(
+                            JediValidate.getInputValue(this.inputs[name]),
+                            this.inputs[name], params);
 
                         if (!valid) {
                             errors.push(this.getErrorMessage(name, method));
@@ -493,33 +503,21 @@ class JediValidate {
     initMethods() {
         this.methods = {};
 
-        this.addMethod('required', (value) => {
-            return (value && value.trim() !== '');
-        }, translate('This field is required'));
+        this.addMethod('required', value => (value && value.trim() !== ''), translate('This field is required'));
 
-        this.addMethod('regexp', (value, element, regexp) => {
-            return regexp.test(value);
-        }, translate('Please, provide correct value'));
+        this.addMethod('regexp', (value, element, regexp) => regexp.test(value), translate('Please, provide correct value'));
 
-        this.addMethod('email', (value) => {
-            return /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i.test(value);
-        }, translate('This email is incorrect'));
+        this.addMethod('email', value => /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i.test(value), translate('This email is incorrect'));
 
-        this.addMethod('filesize', (value, element, size) => {
-            return Array.prototype.slice.call(element.files).reduce((r, file) => file.size < size && r, true);
-        }, translate('This file is too large'));
+        this.addMethod('filesize', (value, element, size) => Array.prototype.slice.call(element.files).reduce((r, file) => file.size < size && r, true), translate('This file is too large'));
 
-        this.addMethod('extension', (value, element, extensions) => {
-            return Array.prototype.slice.call(element.files).reduce((r, file) => extensions.indexOf(file.name.split('.').pop()) !== -1 && r, true);
-        }, translate('This extension is not supported'));
+        this.addMethod('extension', (value, element, extensions) => Array.prototype.slice.call(element.files).reduce((r, file) => extensions.indexOf(file.name.split('.').pop()) !== -1 && r, true), translate('This extension is not supported'));
 
-        this.addMethod('tel', (value) => {
-            return /^([\+]+)*[0-9\x20\x28\x29\-]{5,20}$/.test(value);
-        }, translate('This phone number is incorrect'));
+        this.addMethod('tel', value => /^([\+]+)*[0-9\x20\x28\x29\-]{5,20}$/.test(value), translate('This phone number is incorrect'));
 
-        this.addMethod('url', (value) => {
-            return /[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi.test(value);
-        }, translate('Wrong url'));
+        let u = new RegExp('x'); // ugly hack to get over max-line length eslint rule
+        u = /[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi;
+        this.addMethod('url', value => u.test(value), translate('Wrong url'));
     }
 }
 
