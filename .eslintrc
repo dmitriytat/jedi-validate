@@ -9,6 +9,25 @@
     "indent": [
       "error",
       4
+    ],
+    "no-plusplus": [
+      "error",
+      {
+        "allowForLoopAfterthoughts": true
+      }
+    ],
+    "no-console": [
+      "error",
+      {
+        "allow": ["warn", "error"]
+      }
     ]
+  },
+  "globals": {
+    "module": true,
+    "window": true,
+    "XMLHttpRequest": true,
+    "document": true,
+    "FormData": true
   }
 }
