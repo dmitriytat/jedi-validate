@@ -493,33 +493,38 @@ class JediValidate {
 
         this.addMethod('required', value =>
             value && value.trim() !== '',
-            translate('This field is required'));
+            translate('This field is required')
+        );
 
         this.addMethod('regexp', (value, element, regexp) =>
             regexp.test(value),
-                translate('Please, provide correct value'));
+                translate('Please, provide correct value')
+        );
 
         this.addMethod('email', value =>
             /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i.test(value),
-            translate('This email is incorrect'));
+            translate('This email is incorrect')
+        );
 
         this.addMethod('filesize', (value, element, size) =>
-            Array.prototype.slice.call(element.files).reduce((r, file) =>
-                file.size < size && r, true),
-            translate('This file is too large'));
+            [...element.files].reduce((r, file) => file.size < size && r, true),
+            translate('This file is too large')
+        );
 
         this.addMethod('extension', (value, element, extensions) =>
-            Array.prototype.slice.call(element.files).reduce((r, file) =>
-                extensions.indexOf(file.name.split('.').pop()) !== -1 && r, true,
-            translate('This extension is not supported')));
+            [...element.files].reduce((r, file) => extensions.indexOf(file.name.split('.').pop()) !== -1 && r, true),
+            translate('This extension is not supported')
+        );
 
         this.addMethod('tel', value =>
             /^([\+]+)*[0-9\x20\x28\x29\-]{5,20}$/.test(value),
-            translate('This phone number is incorrect'));
+            translate('This phone number is incorrect')
+        );
 
         this.addMethod('url', value =>
-            /[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi.test(value) // eslint-disable-line max-len
-        , translate('Wrong url'));
+            /[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi.test(value), // eslint-disable-line max-len
+            translate('Wrong url')
+        );
     }
 }
 
