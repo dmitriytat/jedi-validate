@@ -13,8 +13,7 @@
             4
         ],
         "linebreak-style": [
-            "error",
-            "unix"
+            "error"
         ],
         "quotes": [
             "error",
@@ -24,5 +23,8 @@
             "error",
             "always"
         ]
+    },
+    "globals" : {
+        "module": true
     }
 }

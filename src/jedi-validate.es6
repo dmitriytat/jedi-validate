@@ -236,7 +236,7 @@ class JediValidate {
                         this.fields[name] = field;
                         break;
                     }
-                } while (field = field.parentNode);
+                } while (field === field.parentNode);
 
                 if (!this.fields[name]) {
                     throw 'Have no parent field';
@@ -319,6 +319,7 @@ class JediValidate {
                         }
                     }
                 } else {
+                    /*eslint no-console: ["error", { allow: ["warn"] }] */
                     console.warn(`${options.method} ${options.url} ${xhr.status} (${xhr.statusText})`);
 
                     this.nodes.baseMessage.innerHTML = 'Can not send form!'; // todo: language extension
