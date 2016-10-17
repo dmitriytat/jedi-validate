@@ -121,8 +121,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.options = (0, _deepmerge2.default)(this.options, formOptions);
 	        this.options = (0, _deepmerge2.default)(this.options, options);
 	
-	        (0, _jediValidateI18n.setLanguage)(options.language);
-	
 	        for (var language in options.translations) {
 	            for (var translation in options.translations[language]) {
 	                (0, _jediValidateI18n.addTranslation)(translation, options.translations[language][translation], language);
@@ -191,10 +189,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	                            _this.fields[name] = field;
 	                            break;
 	                        }
-	                    } while (field = field.parentNode);
+	                    } while (field === field.parentNode);
 	
 	                    if (!_this.fields[name]) {
-	                        throw 'Have no parent field';
+	                        throw new Error('Have no parent field');
 	                    }
 	
 	                    _this.fields[name].classList.add(_this.options.states.pristine);
@@ -239,8 +237,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	
 	            xhr.onreadystatechange = function () {
-	                if (xhr.readyState == 4) {
-	                    if (xhr.status == 200) {
+	                if (xhr.readyState === 4) {
+	                    if (xhr.status === 200) {
 	                        var response = {};
 	
 	                        try {
@@ -254,8 +252,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	                            if (response.validationErrors.base) {
 	                                _this2.nodes.baseMessage.innerHTML = response.validationErrors.base.join(', ');
-	                                _this2.root.classList.add(_this2.options.formStatePrefix + _this2.options.states.error);
-	                                _this2.root.classList.remove(_this2.options.formStatePrefix + _this2.options.states.valid);
+	                                _this2.root.classList.add(_this2.options.formStatePrefix + _this2.options.states.error); // eslint-disable-line max-len
+	                                _this2.root.classList.remove(_this2.options.formStatePrefix + _this2.options.states.valid); // eslint-disable-line max-len
 	                                delete response.validationErrors.base;
 	                            } else {
 	                                _this2.nodes.baseMessage.innerHTML = '';
@@ -280,8 +278,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	                        console.warn(options.method + ' ' + options.url + ' ' + xhr.status + ' (' + xhr.statusText + ')');
 	
 	                        _this2.nodes.baseMessage.innerHTML = 'Can not send form!'; // todo: language extension
-	                        _this2.root.classList.add(_this2.options.formStatePrefix + _this2.options.states.error);
-	                        _this2.root.classList.remove(_this2.options.formStatePrefix + _this2.options.states.valid);
+	                        _this2.root.classList.add(_this2.options.formStatePrefix + _this2.options.states.error); // eslint-disable-line max-len
+	                        _this2.root.classList.remove(_this2.options.formStatePrefix + _this2.options.states.valid); // eslint-disable-line max-len
 	                    }
 	                }
 	            };
@@ -321,7 +319,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                for (var index in this.nodes.inputs) {
 	                    var input = this.nodes.inputs[index];
 	
-	                    data = (0, _deepmerge2.default)(data, JediValidate.parseInputName(input.name, JediValidate.getInputValue(input)));
+	                    data = (0, _deepmerge2.default)(data, JediValidate.parseInputName(input.name, JediValidate.getInputValue(input))); // eslint-disable-line max-len
 	                }
 	
 	                data = JSON.stringify(data);
@@ -380,7 +378,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value: function checkInput(name) {
 	            var rules = this.rules[name];
 	            var errors = [];
-	            var isEmpty = !this.methods.required.func(JediValidate.getInputValue(this.inputs[name]), this.inputs[name]);
+	            var isEmpty = !this.methods.required.func(JediValidate.getInputValue(this.inputs[name]), this.inputs[name]); // eslint-disable-line max-len
 	
 	            if (isEmpty && rules.required) {
 	                errors.push(this.getErrorMessage(name, 'required'));
@@ -390,7 +388,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	                    if (params) {
 	                        if (this.methods[method]) {
-	                            var valid = this.methods[method].func(JediValidate.getInputValue(this.inputs[name]), this.inputs[name], params);
+	                            var valid = this.methods[method].func(JediValidate.getInputValue(this.inputs[name]), this.inputs[name], params); // eslint-disable-line max-len
 	
 	                            if (!valid) {
 	                                errors.push(this.getErrorMessage(name, method));
@@ -482,8 +480,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.addMethod('extension', function (value, element, extensions) {
 	                return Array.prototype.slice.call(element.files).reduce(function (r, file) {
 	                    return extensions.indexOf(file.name.split('.').pop()) !== -1 && r;
-	                }, true);
-	            }, (0, _jediValidateI18n.translate)('This extension is not supported'));
+	                }, true, (0, _jediValidateI18n.translate)('This extension is not supported'));
+	            });
 	
 	            this.addMethod('tel', function (value) {
 	                return (/^([\+]+)*[0-9\x20\x28\x29\-]{5,20}$/.test(value)
@@ -493,7 +491,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.addMethod('url', function (value) {
 	                return (/[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi.test(value)
 	                );
-	            }, (0, _jediValidateI18n.translate)('Wrong url'));
+	            } // eslint-disable-line max-len
+	            , (0, _jediValidateI18n.translate)('Wrong url'));
 	        }
 	    }], [{
 	        key: 'getFormOptions',
@@ -542,7 +541,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            while ((matches = re.exec(name)) !== null) {
 	                if (matches.index === re.lastIndex) {
-	                    re.lastIndex++;
+	                    re.lastIndex += 1;
 	                }
 	
 	                if (matches[2]) {
@@ -563,13 +562,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	                return value;
 	            } else if (segment === '[]') {
 	                return [JediValidate.createObject(path.slice(1), value)];
-	            } else {
-	                var object = {};
-	
-	                object[segment] = JediValidate.createObject(path.slice(1), value);
-	
-	                return object;
 	            }
+	
+	            var object = {};
+	
+	            object[segment] = JediValidate.createObject(path.slice(1), value);
+	
+	            return object;
 	        }
 	    }, {
 	        key: 'getInputValue',
@@ -607,11 +606,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	
 	            if (type === 'checkbox' || type === 'radio') {
-	                if (element.checked) {
-	                    return element.value;
-	                } else {
-	                    return '';
-	                }
+	                return element.checked ? element.value : '';
 	            }
 	
 	            return element.value;

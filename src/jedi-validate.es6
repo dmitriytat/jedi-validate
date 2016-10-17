@@ -1,5 +1,5 @@
 import deepmerge from 'deepmerge';
-import { translate, addTranslation, setLanguage } from './i18n/jedi-validate-i18n.es6';
+import { translate, addTranslation } from './i18n/jedi-validate-i18n.es6';
 
 class JediValidate {
     constructor(root, options = {}) {
@@ -52,7 +52,6 @@ class JediValidate {
         this.options = deepmerge(this.options, formOptions);
         this.options = deepmerge(this.options, options);
 
-        setLanguage(options.language);
 
         for (const language in options.translations) {
             for (const translation in options.translations[language]) {
@@ -107,7 +106,7 @@ class JediValidate {
 
         while ((matches = re.exec(name)) !== null) {
             if (matches.index === re.lastIndex) {
-                re.lastIndex++;
+                re.lastIndex += 1;
             }
 
             if (matches[2]) {
@@ -127,13 +126,13 @@ class JediValidate {
             return value;
         } else if (segment === '[]') {
             return [JediValidate.createObject(path.slice(1), value)];
-        } else {
-            const object = {};
-
-            object[segment] = JediValidate.createObject(path.slice(1), value);
-
-            return object;
         }
+
+        const object = {};
+
+        object[segment] = JediValidate.createObject(path.slice(1), value);
+
+        return object;
     }
 
     static getInputValue(element) {
@@ -169,11 +168,7 @@ class JediValidate {
         }
 
         if (type === 'checkbox' || type === 'radio') {
-            if (element.checked)
-                { return element.value; }
-            else {
-                return '';
-            }
+            return element.checked ? element.value : '';
         }
 
         return element.value;
@@ -239,7 +234,7 @@ class JediValidate {
                 } while (field = field.parentNode);
 
                 if (!this.fields[name]) {
-                    throw 'Have no parent field';
+                    throw new Error('Have no parent field');
                 }
 
                 this.fields[name].classList.add(this.options.states.pristine);
@@ -281,8 +276,8 @@ class JediValidate {
         }
 
         xhr.onreadystatechange = () => {
-            if (xhr.readyState == 4) {
-                if (xhr.status == 200) {
+            if (xhr.readyState === 4) {
+                if (xhr.status === 200) {
                     let response = {};
 
                     try {
@@ -296,8 +291,8 @@ class JediValidate {
 
                         if (response.validationErrors.base) {
                             this.nodes.baseMessage.innerHTML = response.validationErrors.base.join(', ');
-                            this.root.classList.add(this.options.formStatePrefix + this.options.states.error);
-                            this.root.classList.remove(this.options.formStatePrefix + this.options.states.valid);
+                            this.root.classList.add(this.options.formStatePrefix + this.options.states.error); // eslint-disable-line max-len
+                            this.root.classList.remove(this.options.formStatePrefix + this.options.states.valid); // eslint-disable-line max-len
                             delete response.validationErrors.base;
                         } else {
                             this.nodes.baseMessage.innerHTML = '';
@@ -322,8 +317,8 @@ class JediValidate {
                     console.warn(`${options.method} ${options.url} ${xhr.status} (${xhr.statusText})`);
 
                     this.nodes.baseMessage.innerHTML = 'Can not send form!'; // todo: language extension
-                    this.root.classList.add(this.options.formStatePrefix + this.options.states.error);
-                    this.root.classList.remove(this.options.formStatePrefix + this.options.states.valid);
+                    this.root.classList.add(this.options.formStatePrefix + this.options.states.error); // eslint-disable-line max-len
+                    this.root.classList.remove(this.options.formStatePrefix + this.options.states.valid); // eslint-disable-line max-len
                 }
             }
         };
@@ -362,7 +357,7 @@ class JediValidate {
             for (const index in this.nodes.inputs) {
                 const input = this.nodes.inputs[index];
 
-                data = deepmerge(data, JediValidate.parseInputName(input.name, JediValidate.getInputValue(input)));
+                data = deepmerge(data, JediValidate.parseInputName(input.name, JediValidate.getInputValue(input))); // eslint-disable-line max-len
             }
 
             data = JSON.stringify(data);
@@ -390,8 +385,9 @@ class JediValidate {
             this.rules[name].regexp = new RegExp(input.getAttribute('pattern'));
         }
 
-        if (this.options.rules[name])
-            { this.rules[name] = deepmerge(this.rules[name], this.options.rules[name]); }
+        if (this.options.rules[name]) {
+            this.rules[name] = deepmerge(this.rules[name], this.options.rules[name]);
+        }
 
         for (const rule in this.rules[name]) {
             if (this.rules[name][rule]) {
@@ -417,7 +413,7 @@ class JediValidate {
     checkInput(name) {
         const rules = this.rules[name];
         const errors = [];
-        const isEmpty = !this.methods.required.func(JediValidate.getInputValue(this.inputs[name]), this.inputs[name]);
+        const isEmpty = !this.methods.required.func(JediValidate.getInputValue(this.inputs[name]), this.inputs[name]); // eslint-disable-line max-len
 
         if (isEmpty && rules.required) {
             errors.push(this.getErrorMessage(name, 'required'));
@@ -427,7 +423,7 @@ class JediValidate {
 
                 if (params) {
                     if (this.methods[method]) {
-                        const valid = this.methods[method].func(JediValidate.getInputValue(this.inputs[name]), this.inputs[name], params);
+                        const valid = this.methods[method].func(JediValidate.getInputValue(this.inputs[name]), this.inputs[name], params); // eslint-disable-line max-len
 
                         if (!valid) {
                             errors.push(this.getErrorMessage(name, method));
@@ -492,33 +488,35 @@ class JediValidate {
     initMethods() {
         this.methods = {};
 
-        this.addMethod('required', (value) => {
-            return (value && value.trim() !== '');
-        }, translate('This field is required'));
+        this.addMethod('required', value =>
+            value && value.trim() !== '',
+            translate('This field is required'));
 
-        this.addMethod('regexp', (value, element, regexp) => {
-            return regexp.test(value);
-        }, translate('Please, provide correct value'));
+        this.addMethod('regexp', (value, element, regexp) =>
+            regexp.test(value),
+                translate('Please, provide correct value'));
 
-        this.addMethod('email', (value) => {
-            return /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i.test(value);
-        }, translate('This email is incorrect'));
+        this.addMethod('email', value =>
+            /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i.test(value),
+            translate('This email is incorrect'));
 
-        this.addMethod('filesize', (value, element, size) => {
-            return Array.prototype.slice.call(element.files).reduce((r, file) => file.size < size && r, true);
-        }, translate('This file is too large'));
+        this.addMethod('filesize', (value, element, size) =>
+            Array.prototype.slice.call(element.files).reduce((r, file) =>
+                file.size < size && r, true),
+            translate('This file is too large'));
 
-        this.addMethod('extension', (value, element, extensions) => {
-            return Array.prototype.slice.call(element.files).reduce((r, file) => extensions.indexOf(file.name.split('.').pop()) !== -1 && r, true);
-        }, translate('This extension is not supported'));
+        this.addMethod('extension', (value, element, extensions) =>
+            Array.prototype.slice.call(element.files).reduce((r, file) =>
+                extensions.indexOf(file.name.split('.').pop()) !== -1 && r, true,
+            translate('This extension is not supported')));
 
-        this.addMethod('tel', (value) => {
-            return /^([\+]+)*[0-9\x20\x28\x29\-]{5,20}$/.test(value);
-        }, translate('This phone number is incorrect'));
+        this.addMethod('tel', value =>
+            /^([\+]+)*[0-9\x20\x28\x29\-]{5,20}$/.test(value),
+            translate('This phone number is incorrect'));
 
-        this.addMethod('url', (value) => {
-            return /[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi.test(value);
-        }, translate('Wrong url'));
+        this.addMethod('url', value =>
+            /[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi.test(value) // eslint-disable-line max-len
+        , translate('Wrong url'));
     }
 }
 
