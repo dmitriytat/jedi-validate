@@ -1,5 +1,5 @@
 import deepmerge from 'deepmerge';
-import { translate, addTranslation } from './i18n/jedi-validate-i18n.es6';
+import { translate, addTranslation, setLanguage } from './i18n/jedi-validate-i18n.es6';
 
 class JediValidate {
     constructor(root, options = {}) {
@@ -52,6 +52,7 @@ class JediValidate {
         this.options = deepmerge(this.options, formOptions);
         this.options = deepmerge(this.options, options);
 
+        setLanguage(options.language);
 
         for (const language in options.translations) {
             for (const translation in options.translations[language]) {
@@ -104,7 +105,8 @@ class JediValidate {
         let matches;
         const path = [];
 
-        while ((matches = re.exec(name)) !== null) {
+        matches = re.exec(name);
+        while (matches !== null) {
             if (matches.index === re.lastIndex) {
                 re.lastIndex += 1;
             }
@@ -114,6 +116,8 @@ class JediValidate {
             } else {
                 path.push(matches[1]);
             }
+
+            matches = re.exec(name);
         }
 
         return JediValidate.createObject(path, value);
@@ -128,10 +132,9 @@ class JediValidate {
             return [JediValidate.createObject(path.slice(1), value)];
         }
 
+        // Else
         const object = {};
-
         object[segment] = JediValidate.createObject(path.slice(1), value);
-
         return object;
     }
 
@@ -152,19 +155,19 @@ class JediValidate {
         }
 
         if (type === 'select-multiple') {
-            value = [];
+            const valueArray = [];
 
-            for (let i = 0; i < element.options.length; i++) {
+            for (let i = 0; i < element.options.length; i += 1) {
                 if (element.options[i].selected) {
-                    value.push(element.options[i].value);
+                    valueArray.push(element.options[i].value);
                 }
             }
 
-            if (value.length === 0) {
-                value = '';
+            if (valueArray.length === 0) {
+                return '';
             }
 
-            return value;
+            return valueArray;
         }
 
         if (type === 'checkbox' || type === 'radio') {
@@ -341,7 +344,7 @@ class JediValidate {
             for (const name in this.inputs) {
                 if (this.inputs[name].type && this.inputs[name].type === 'file') {
                     if (this.inputs[name].hasAttribute('multiple')) {
-                        for (let i = 0; i < this.inputs[name].files.length; i++) {
+                        for (let i = 0; i < this.inputs[name].files.length; i += 1) {
                             data.append(`${name}[]`, this.inputs[name].files[i]);
                         }
                     } else {

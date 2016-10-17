@@ -51,7 +51,7 @@ To install project dependencies first run,
 npm install
 ```
 ### Build
-To bund the source and watch for changes in the terminal run,
+To build the source and watch for changes in the terminal run,
 
 ```
 npm run build

@@ -8,8 +8,8 @@
     "dev": "rimraf ./dist && webpack-dev-server --hot --inline --progress --colors --watch",
     "build": "rimraf ./dist && webpack --progress --colors",
     "test-browser": "mocha-phantomjs ./tests/test.html",
-    "lint": "./node_modules/eslint/bin/eslint.js src/*",
-    "fix": "./node_modules/eslint/bin/eslint.js src/* --fix"
+    "lint": "eslint src/*",
+    "fix": "eslint src/* --fix"
   },
   "repository": {
     "type": "git",
@@ -40,7 +40,8 @@
     "json-loader": "^0.5.4",
     "mocha": "^3.0.2",
     "rimraf": "^2.5.4",
-    "webpack": "^1.13.2"
+    "webpack": "^1.13.2",
+    "webpack-dev-server": "^1.16.2"
   },
   "dependencies": {
     "deepmerge": "^1.2.0"
