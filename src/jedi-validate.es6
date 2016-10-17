@@ -1,6 +1,5 @@
 import deepmerge from 'deepmerge';
-import {translate, addTranslation, setLanguage} from './i18n/jedi-validate-i18n.es6';
-//import addTranslation from './i18n/jedi-validate-i18n.es6';
+import { translate, addTranslation, setLanguage } from './i18n/jedi-validate-i18n.es6';
 
 class JediValidate {
     constructor(root, options = {}) {
@@ -9,31 +8,31 @@ class JediValidate {
                 url: null,
                 enctype: 'application/x-www-form-urlencoded',
                 sendType: 'serialize', // 'formData', 'json'
-                method: 'GET'
+                method: 'GET',
             },
             rules: {},
             messages: {},
             containers: {
                 parent: 'form-group',
                 message: 'help-block',
-                baseMessage: 'base-error'
+                baseMessage: 'base-error',
             },
             states: {
                 error: 'error',
                 valid: 'valid',
                 pristine: 'pristine',
-                dirty: 'dirty'
+                dirty: 'dirty',
             },
             formStatePrefix: 'jedi-',
             callbacks: {
-                success: function () {
+                success() {
                 },
-                error: function () {
-                }
+                error() {
+                },
             },
             clean: true,
             redirect: true,
-            language: "en"
+            language: 'en',
         };
 
         this.root = root;
@@ -45,28 +44,28 @@ class JediValidate {
         this.messages = {};
         this.rules = {};
 
-        this._cacheNodes();
+        this.cacheNodes();
 
         const formOptions = JediValidate.getFormOptions(this.nodes.form);
 
         this.options = deepmerge(this.options, defaultOptions);
         this.options = deepmerge(this.options, formOptions);
         this.options = deepmerge(this.options, options);
+
         setLanguage(options.language);
 
-        for (var language in options.translations) {            
-            for (var translation in options.translations[language]) {
+        for (const language in options.translations) {
+            for (const translation in options.translations[language]) {
                 addTranslation(translation, options.translations[language][translation], language);
             }
         }
 
-        this._initMethods();
-
-        this._ready();
+        this.initMethods();
+        this.ready();
     }
 
     static getFormOptions(form) {
-        const options = {ajax: {}};
+        const options = { ajax: {} };
 
         if (form.getAttribute('method')) {
             options.ajax.method = form.getAttribute('method');
@@ -88,10 +87,10 @@ class JediValidate {
     }
 
     static getRadioGroupValue(elements) {
-        for (let index in elements) {
-            let element = elements[index];
+        for (const index in elements) {
+            const element = elements[index];
 
-            var value = JediValidate.getInputValue(element);
+            const value = JediValidate.getInputValue(element);
 
             if (value !== '') {
                 return value;
@@ -102,9 +101,9 @@ class JediValidate {
     }
 
     static parseInputName(name, value) {
-        var re = /(\[(\w*)\]|\w*)/gi;
-        var matches;
-        var path = [];
+        const re = /(\[(\w*)\]|\w*)/gi;
+        let matches;
+        const path = [];
 
         while ((matches = re.exec(name)) !== null) {
             if (matches.index === re.lastIndex) {
@@ -122,14 +121,14 @@ class JediValidate {
     }
 
     static createObject(path, value) {
-        var segment = path[0];
+        const segment = path[0];
 
         if (segment.length === 0) {
             return value;
         } else if (segment === '[]') {
             return [JediValidate.createObject(path.slice(1), value)];
         } else {
-            var object = {};
+            const object = {};
 
             object[segment] = JediValidate.createObject(path.slice(1), value);
 
@@ -143,7 +142,7 @@ class JediValidate {
         }
 
         let value = '';
-        let {type} = element;
+        const { type } = element;
 
         if (type === 'select-one') {
             if (element.options.length) {
@@ -171,7 +170,7 @@ class JediValidate {
 
         if (type === 'checkbox' || type === 'radio') {
             if (element.checked)
-                return element.value;
+                { return element.value; }
             else {
                 return '';
             }
@@ -184,19 +183,19 @@ class JediValidate {
         addTranslation(sourceText, translatedText, language);
     }
 
-    _cacheNodes() {
+    cacheNodes() {
         this.nodes = {
             form: this.root.querySelector('form'),
             inputs: this.root.querySelectorAll('[name]'),
-            baseMessage: this.root.querySelector(`.${this.options.containers.baseMessage}`)
+            baseMessage: this.root.querySelector(`.${this.options.containers.baseMessage}`),
         };
     }
 
-    _ready() {
+    ready() {
         this.nodes.form.setAttribute('novalidate', 'novalidate');
 
         this.nodes.form.addEventListener('submit', (event) => {
-            var errors = this.checkForm();
+            const errors = this.checkForm();
 
             if (Object.keys(errors).length !== 0) {
                 this.options.callbacks.error(errors);
@@ -215,7 +214,7 @@ class JediValidate {
 
             const data = this.getData();
 
-            this._send(deepmerge(this.options.ajax, {data: data}));
+            this.send(deepmerge(this.options.ajax, { data }));
         });
 
         this.nodes.inputs.forEach((input) => {
@@ -245,7 +244,7 @@ class JediValidate {
 
                 this.fields[name].classList.add(this.options.states.pristine);
 
-                var messageElement = this.fields[name].querySelector(`.${this.options.containers.message}`);
+                const messageElement = this.fields[name].querySelector(`.${this.options.containers.message}`);
 
                 if (messageElement) {
                     this.messages[name] = messageElement;
@@ -255,7 +254,7 @@ class JediValidate {
                     this.fields[name].appendChild(this.messages[name]);
                 }
 
-                this._defineRules(name);
+                this.defineRules(name);
             }
 
             input.addEventListener('change', () => {
@@ -270,10 +269,10 @@ class JediValidate {
         });
     }
 
-    _send(options) {
+    send(options) {
         const xhr = new XMLHttpRequest();
 
-        xhr.open(options.method, options.url + (options.method.toUpperCase() === 'GET' ? ('?' + options.data) : ''), true); // todo concat url and params
+        xhr.open(options.method, options.url + (options.method.toUpperCase() === 'GET' ? (`?${options.data}`) : ''), true); // todo concat url and params
 
         if (options.sendType === 'serialize') {
             xhr.setRequestHeader('Content-type', options.enctype);
@@ -289,7 +288,7 @@ class JediValidate {
                     try {
                         response = JSON.parse(xhr.responseText);
                     } catch (e) {
-                        response.validationErrors = {base: ['JSON parsing error']};  // todo: language extension
+                        response.validationErrors = { base: ['JSON parsing error'] };  // todo: language extension
                     }
 
                     if (response.validationErrors) {
@@ -304,8 +303,8 @@ class JediValidate {
                             this.nodes.baseMessage.innerHTML = '';
                         }
 
-                        for (let name in response.validationErrors) {
-                            this._markError(name, response.validationErrors[name]);
+                        for (const name in response.validationErrors) {
+                            this.markError(name, response.validationErrors[name]);
                         }
                     } else {
                         this.options.callbacks.success(response);
@@ -320,7 +319,7 @@ class JediValidate {
                         }
                     }
                 } else {
-                    console.warn(options.method + ' ' + options.url + ' ' + xhr.status + ' (' + xhr.statusText + ')');
+                    console.warn(`${options.method} ${options.url} ${xhr.status} (${xhr.statusText})`);
 
                     this.nodes.baseMessage.innerHTML = 'Can not send form!'; // todo: language extension
                     this.root.classList.add(this.options.formStatePrefix + this.options.states.error);
@@ -336,7 +335,7 @@ class JediValidate {
         let data = '';
 
         if (this.options.sendType === 'serialize') {
-            for (let name in this.inputs) {
+            for (const name in this.inputs) {
                 data += `${name}=${encodeURIComponent(JediValidate.getInputValue(this.inputs[name]))}&`;
             }
 
@@ -344,11 +343,11 @@ class JediValidate {
         } else if (this.options.sendType === 'formData') {
             data = new FormData();
 
-            for (let name in this.inputs) {
+            for (const name in this.inputs) {
                 if (this.inputs[name].type && this.inputs[name].type === 'file') {
                     if (this.inputs[name].hasAttribute('multiple')) {
                         for (let i = 0; i < this.inputs[name].files.length; i++) {
-                            data.append(name + '[]', this.inputs[name].files[i]);
+                            data.append(`${name}[]`, this.inputs[name].files[i]);
                         }
                     } else {
                         data.append(name, this.inputs[name].files[0]);
@@ -357,11 +356,10 @@ class JediValidate {
                     data.append(name, JediValidate.getInputValue(this.inputs[name]));
                 }
             }
-
         } else if (this.options.sendType === 'json') {
             data = {};
 
-            for (let index in this.nodes.inputs) {
+            for (const index in this.nodes.inputs) {
                 const input = this.nodes.inputs[index];
 
                 data = deepmerge(data, JediValidate.parseInputName(input.name, JediValidate.getInputValue(input)));
@@ -373,14 +371,14 @@ class JediValidate {
         return data;
     }
 
-    _defineRules(name) {
+    defineRules(name) {
         const input = this.inputs[name];
 
         this.rules[name] = {};
 
         const rules = ['required', 'email', 'tel', 'url'];
 
-        for (let ruleName in rules) {
+        for (const ruleName in rules) {
             const rule = rules[ruleName];
 
             if (input.hasAttribute(rule) || input.type === rule || input.classList.contains(rule)) {
@@ -393,9 +391,9 @@ class JediValidate {
         }
 
         if (this.options.rules[name])
-            this.rules[name] = deepmerge(this.rules[name], this.options.rules[name]);
+            { this.rules[name] = deepmerge(this.rules[name], this.options.rules[name]); }
 
-        for (let rule in this.rules[name]) {
+        for (const rule in this.rules[name]) {
             if (this.rules[name][rule]) {
                 this.fields[name].classList.add(rule);
             }
@@ -403,10 +401,10 @@ class JediValidate {
     }
 
     checkForm() {
-        var errors = {};
+        const errors = {};
 
-        for (let name in this.rules) {
-            var inputErrors = this.checkInput(name);
+        for (const name in this.rules) {
+            const inputErrors = this.checkInput(name);
 
             if (inputErrors.length) {
                 errors[name] = inputErrors;
@@ -422,35 +420,35 @@ class JediValidate {
         const isEmpty = !this.methods.required.func(JediValidate.getInputValue(this.inputs[name]), this.inputs[name]);
 
         if (isEmpty && rules.required) {
-            errors.push(this._getErrorMessage(name, 'required'));
+            errors.push(this.getErrorMessage(name, 'required'));
         } else if (!isEmpty) {
-            for (let method in rules) {
+            for (const method in rules) {
                 const params = rules[method];
 
                 if (params) {
                     if (this.methods[method]) {
-                        var valid = this.methods[method].func(JediValidate.getInputValue(this.inputs[name]), this.inputs[name], params);
+                        const valid = this.methods[method].func(JediValidate.getInputValue(this.inputs[name]), this.inputs[name], params);
 
                         if (!valid) {
-                            errors.push(this._getErrorMessage(name, method));
+                            errors.push(this.getErrorMessage(name, method));
                         }
                     } else {
-                        errors.push('Method "' + method + '" not found');
+                        errors.push(`Method "${method}" not found`);
                     }
                 }
             }
         }
 
         if (errors.length) {
-            this._markError(name, errors);
+            this.markError(name, errors);
         } else {
-            this._markValid(name);
+            this.markValid(name);
         }
 
         return errors;
     }
 
-    _markError(name, errors) {
+    markError(name, errors) {
         if (!this.fields[name] || !this.messages[name]) {
             return;
         }
@@ -461,7 +459,7 @@ class JediValidate {
         this.messages[name].innerHTML = errors.join(', ');
     }
 
-    _markValid(name) {
+    markValid(name) {
         if (!this.fields[name] || !this.messages[name]) {
             return;
         }
@@ -472,7 +470,7 @@ class JediValidate {
         this.messages[name].innerHTML = '';
     }
 
-    _getErrorMessage(name, method) {
+    getErrorMessage(name, method) {
         let message = '';
 
         if (this.options.messages[name] && this.options.messages[name][method]) {
@@ -484,48 +482,44 @@ class JediValidate {
         return message;
     }
 
-    _addMethod(rule, func, message) {
+    addMethod(rule, func, message) {
         this.methods[rule] = {
-            func: func,
-            message: message
+            func,
+            message,
         };
     }
 
-    _initMethods() {
+    initMethods() {
         this.methods = {};
 
-        // todo languages
-
-        this._addMethod('required', function (value) {
+        this.addMethod('required', (value) => {
             return (value && value.trim() !== '');
         }, translate('This field is required'));
 
-        this._addMethod('regexp', function (value, element, regexp) {
+        this.addMethod('regexp', (value, element, regexp) => {
             return regexp.test(value);
         }, translate('Please, provide correct value'));
 
-        this._addMethod('email', function (value) {
+        this.addMethod('email', (value) => {
             return /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i.test(value);
         }, translate('This email is incorrect'));
 
-        this._addMethod('filesize', function (value, element, size) {
+        this.addMethod('filesize', (value, element, size) => {
             return Array.prototype.slice.call(element.files).reduce((r, file) => file.size < size && r, true);
         }, translate('This file is too large'));
 
-        this._addMethod('extension', function (value, element, extensions) {
+        this.addMethod('extension', (value, element, extensions) => {
             return Array.prototype.slice.call(element.files).reduce((r, file) => extensions.indexOf(file.name.split('.').pop()) !== -1 && r, true);
         }, translate('This extension is not supported'));
 
-        this._addMethod('tel', function (value) {
+        this.addMethod('tel', (value) => {
             return /^([\+]+)*[0-9\x20\x28\x29\-]{5,20}$/.test(value);
         }, translate('This phone number is incorrect'));
 
-        this._addMethod('url', function (value) {
+        this.addMethod('url', (value) => {
             return /[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi.test(value);
         }, translate('Wrong url'));
     }
 }
-
-
 
 module.exports = JediValidate;

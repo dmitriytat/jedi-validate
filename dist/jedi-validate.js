@@ -44,7 +44,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.c = installedModules;
 /******/
 /******/ 	// __webpack_public_path__
-/******/ 	__webpack_require__.p = "";
+/******/ 	__webpack_require__.p = "/dist/";
 /******/
 /******/ 	// Load entry module and return exports
 /******/ 	return __webpack_require__(0);
@@ -67,8 +67,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	//import addTranslation from './i18n/jedi-validate-i18n.es6';
 	
 	var JediValidate = function () {
 	    function JediValidate(root) {
@@ -103,7 +101,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            },
 	            clean: true,
 	            redirect: true,
-	            language: "en"
+	            language: 'en'
 	        };
 	
 	        this.root = root;
@@ -115,13 +113,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.messages = {};
 	        this.rules = {};
 	
-	        this._cacheNodes();
+	        this.cacheNodes();
 	
 	        var formOptions = JediValidate.getFormOptions(this.nodes.form);
 	
 	        this.options = (0, _deepmerge2.default)(this.options, defaultOptions);
 	        this.options = (0, _deepmerge2.default)(this.options, formOptions);
 	        this.options = (0, _deepmerge2.default)(this.options, options);
+	
 	        (0, _jediValidateI18n.setLanguage)(options.language);
 	
 	        for (var language in options.translations) {
@@ -130,14 +129,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	        }
 	
-	        this._initMethods();
-	
-	        this._ready();
+	        this.initMethods();
+	        this.ready();
 	    }
 	
 	    _createClass(JediValidate, [{
-	        key: '_cacheNodes',
-	        value: function _cacheNodes() {
+	        key: 'cacheNodes',
+	        value: function cacheNodes() {
 	            this.nodes = {
 	                form: this.root.querySelector('form'),
 	                inputs: this.root.querySelectorAll('[name]'),
@@ -145,8 +143,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            };
 	        }
 	    }, {
-	        key: '_ready',
-	        value: function _ready() {
+	        key: 'ready',
+	        value: function ready() {
 	            var _this = this;
 	
 	            this.nodes.form.setAttribute('novalidate', 'novalidate');
@@ -171,7 +169,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	                var data = _this.getData();
 	
-	                _this._send((0, _deepmerge2.default)(_this.options.ajax, { data: data }));
+	                _this.send((0, _deepmerge2.default)(_this.options.ajax, { data: data }));
 	            });
 	
 	            this.nodes.inputs.forEach(function (input) {
@@ -211,7 +209,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                        _this.fields[name].appendChild(_this.messages[name]);
 	                    }
 	
-	                    _this._defineRules(name);
+	                    _this.defineRules(name);
 	                }
 	
 	                input.addEventListener('change', function () {
@@ -226,8 +224,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            });
 	        }
 	    }, {
-	        key: '_send',
-	        value: function _send(options) {
+	        key: 'send',
+	        value: function send(options) {
 	            var _this2 = this;
 	
 	            var xhr = new XMLHttpRequest();
@@ -264,7 +262,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                            }
 	
 	                            for (var name in response.validationErrors) {
-	                                _this2._markError(name, response.validationErrors[name]);
+	                                _this2.markError(name, response.validationErrors[name]);
 	                            }
 	                        } else {
 	                            _this2.options.callbacks.success(response);
@@ -332,8 +330,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return data;
 	        }
 	    }, {
-	        key: '_defineRules',
-	        value: function _defineRules(name) {
+	        key: 'defineRules',
+	        value: function defineRules(name) {
 	            var input = this.inputs[name];
 	
 	            this.rules[name] = {};
@@ -352,7 +350,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	                this.rules[name].regexp = new RegExp(input.getAttribute('pattern'));
 	            }
 	
-	            if (this.options.rules[name]) this.rules[name] = (0, _deepmerge2.default)(this.rules[name], this.options.rules[name]);
+	            if (this.options.rules[name]) {
+	                this.rules[name] = (0, _deepmerge2.default)(this.rules[name], this.options.rules[name]);
+	            }
 	
 	            for (var _rule in this.rules[name]) {
 	                if (this.rules[name][_rule]) {
@@ -383,7 +383,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var isEmpty = !this.methods.required.func(JediValidate.getInputValue(this.inputs[name]), this.inputs[name]);
 	
 	            if (isEmpty && rules.required) {
-	                errors.push(this._getErrorMessage(name, 'required'));
+	                errors.push(this.getErrorMessage(name, 'required'));
 	            } else if (!isEmpty) {
 	                for (var method in rules) {
 	                    var params = rules[method];
@@ -393,7 +393,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                            var valid = this.methods[method].func(JediValidate.getInputValue(this.inputs[name]), this.inputs[name], params);
 	
 	                            if (!valid) {
-	                                errors.push(this._getErrorMessage(name, method));
+	                                errors.push(this.getErrorMessage(name, method));
 	                            }
 	                        } else {
 	                            errors.push('Method "' + method + '" not found');
@@ -403,16 +403,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	
 	            if (errors.length) {
-	                this._markError(name, errors);
+	                this.markError(name, errors);
 	            } else {
-	                this._markValid(name);
+	                this.markValid(name);
 	            }
 	
 	            return errors;
 	        }
 	    }, {
-	        key: '_markError',
-	        value: function _markError(name, errors) {
+	        key: 'markError',
+	        value: function markError(name, errors) {
 	            if (!this.fields[name] || !this.messages[name]) {
 	                return;
 	            }
@@ -423,8 +423,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.messages[name].innerHTML = errors.join(', ');
 	        }
 	    }, {
-	        key: '_markValid',
-	        value: function _markValid(name) {
+	        key: 'markValid',
+	        value: function markValid(name) {
 	            if (!this.fields[name] || !this.messages[name]) {
 	                return;
 	            }
@@ -435,8 +435,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.messages[name].innerHTML = '';
 	        }
 	    }, {
-	        key: '_getErrorMessage',
-	        value: function _getErrorMessage(name, method) {
+	        key: 'getErrorMessage',
+	        value: function getErrorMessage(name, method) {
 	            var message = '';
 	
 	            if (this.options.messages[name] && this.options.messages[name][method]) {
@@ -448,51 +448,49 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return message;
 	        }
 	    }, {
-	        key: '_addMethod',
-	        value: function _addMethod(rule, func, message) {
+	        key: 'addMethod',
+	        value: function addMethod(rule, func, message) {
 	            this.methods[rule] = {
 	                func: func,
 	                message: message
 	            };
 	        }
 	    }, {
-	        key: '_initMethods',
-	        value: function _initMethods() {
+	        key: 'initMethods',
+	        value: function initMethods() {
 	            this.methods = {};
 	
-	            // todo languages
-	
-	            this._addMethod('required', function (value) {
+	            this.addMethod('required', function (value) {
 	                return value && value.trim() !== '';
 	            }, (0, _jediValidateI18n.translate)('This field is required'));
 	
-	            this._addMethod('regexp', function (value, element, regexp) {
+	            this.addMethod('regexp', function (value, element, regexp) {
 	                return regexp.test(value);
 	            }, (0, _jediValidateI18n.translate)('Please, provide correct value'));
 	
-	            this._addMethod('email', function (value) {
+	            this.addMethod('email', function (value) {
 	                return (/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i.test(value)
 	                );
 	            }, (0, _jediValidateI18n.translate)('This email is incorrect'));
 	
-	            this._addMethod('filesize', function (value, element, size) {
+	            this.addMethod('filesize', function (value, element, size) {
 	                return Array.prototype.slice.call(element.files).reduce(function (r, file) {
 	                    return file.size < size && r;
 	                }, true);
 	            }, (0, _jediValidateI18n.translate)('This file is too large'));
 	
-	            this._addMethod('extension', function (value, element, extensions) {
+	            this.addMethod('extension', function (value, element, extensions) {
 	                return Array.prototype.slice.call(element.files).reduce(function (r, file) {
 	                    return extensions.indexOf(file.name.split('.').pop()) !== -1 && r;
 	                }, true);
 	            }, (0, _jediValidateI18n.translate)('This extension is not supported'));
 	
-	            this._addMethod('tel', function (value) {
+	            this.addMethod('tel', function (value) {
 	                return (/^([\+]+)*[0-9\x20\x28\x29\-]{5,20}$/.test(value)
 	                );
 	            }, (0, _jediValidateI18n.translate)('This phone number is incorrect'));
 	
-	            this._addMethod('url', function (value) {
+	            this.addMethod('url', function (value) {
 	                return (/[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi.test(value)
 	                );
 	            }, (0, _jediValidateI18n.translate)('Wrong url'));
@@ -539,7 +537,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'parseInputName',
 	        value: function parseInputName(name, value) {
 	            var re = /(\[(\w*)\]|\w*)/gi;
-	            var matches;
+	            var matches = void 0;
 	            var path = [];
 	
 	            while ((matches = re.exec(name)) !== null) {
@@ -609,7 +607,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	
 	            if (type === 'checkbox' || type === 'radio') {
-	                if (element.checked) return element.value;else {
+	                if (element.checked) {
+	                    return element.value;
+	                } else {
 	                    return '';
 	                }
 	            }
@@ -642,46 +642,67 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	}(this, function () {
 	
-	return function deepmerge(target, src) {
-	    var array = Array.isArray(src);
-	    var dst = array && [] || {};
+	function isMergeableObject(val) {
+	    var nonNullObject = val && typeof val === 'object'
+	
+	    return nonNullObject
+	        && Object.prototype.toString.call(val) !== '[object RegExp]'
+	        && Object.prototype.toString.call(val) !== '[object Date]'
+	}
+	
+	function emptyTarget(val) {
+	    return Array.isArray(val) ? [] : {}
+	}
+	
+	function cloneIfNecessary(value, optionsArgument) {
+	    var clone = optionsArgument && optionsArgument.clone === true
+	    return (clone && isMergeableObject(value)) ? deepmerge(emptyTarget(value), value, optionsArgument) : value
+	}
+	
+	function defaultArrayMerge(target, source, optionsArgument) {
+	    var destination = target.slice()
+	    source.forEach(function(e, i) {
+	        if (typeof destination[i] === 'undefined') {
+	            destination[i] = cloneIfNecessary(e, optionsArgument)
+	        } else if (isMergeableObject(e)) {
+	            destination[i] = deepmerge(target[i], e, optionsArgument)
+	        } else if (target.indexOf(e) === -1) {
+	            destination.push(cloneIfNecessary(e, optionsArgument))
+	        }
+	    })
+	    return destination
+	}
+	
+	function mergeObject(target, source, optionsArgument) {
+	    var destination = {}
+	    if (isMergeableObject(target)) {
+	        Object.keys(target).forEach(function (key) {
+	            destination[key] = cloneIfNecessary(target[key], optionsArgument)
+	        })
+	    }
+	    Object.keys(source).forEach(function (key) {
+	        if (!isMergeableObject(source[key]) || !target[key]) {
+	            destination[key] = cloneIfNecessary(source[key], optionsArgument)
+	        } else {
+	            destination[key] = deepmerge(target[key], source[key], optionsArgument)
+	        }
+	    })
+	    return destination
+	}
+	
+	function deepmerge(target, source, optionsArgument) {
+	    var array = Array.isArray(source);
+	    var options = optionsArgument || { arrayMerge: defaultArrayMerge }
+	    var arrayMerge = options.arrayMerge || defaultArrayMerge
 	
 	    if (array) {
-	        target = target || [];
-	        dst = dst.concat(target);
-	        src.forEach(function(e, i) {
-	            if (typeof dst[i] === 'undefined') {
-	                dst[i] = e;
-	            } else if (typeof e === 'object') {
-	                dst[i] = deepmerge(target[i], e);
-	            } else {
-	                if (target.indexOf(e) === -1) {
-	                    dst.push(e);
-	                }
-	            }
-	        });
+	        return Array.isArray(target) ? arrayMerge(target, source, optionsArgument) : cloneIfNecessary(source, optionsArgument)
 	    } else {
-	        if (target && typeof target === 'object') {
-	            Object.keys(target).forEach(function (key) {
-	                dst[key] = target[key];
-	            })
-	        }
-	        Object.keys(src).forEach(function (key) {
-	            if (typeof src[key] !== 'object' || !src[key]) {
-	                dst[key] = src[key];
-	            }
-	            else {
-	                if (!target[key]) {
-	                    dst[key] = src[key];
-	                } else {
-	                    dst[key] = deepmerge(target[key], src[key]);
-	                }
-	            }
-	        });
+	        return mergeObject(target, source, optionsArgument)
 	    }
-	
-	    return dst;
 	}
+	
+	return deepmerge
 	
 	}));
 
@@ -690,7 +711,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 2 */
 /***/ function(module, exports, __webpack_require__) {
 
-	"use strict";
+	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
@@ -700,7 +721,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.addTranslation = addTranslation;
 	var dictionary = __webpack_require__(3);
 	
-	var currentLang = "en";
+	var currentLang = 'en';
 	
 	function setLanguage(id) {
 	    currentLang = id;
