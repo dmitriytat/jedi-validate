@@ -155,7 +155,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	                var errors = _this.checkForm();
 	
 	                if (Object.keys(errors).length !== 0) {
-	                    _this.options.callbacks.error(errors);
+	                    try {
+	                        _this.options.callbacks.error(errors);
+	                    } catch (e) {
+	                        console.error(e);
+	                    }
 	
 	                    event.preventDefault();
 	                    return;
@@ -164,7 +168,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	                if (_this.options.ajax && _this.options.ajax.url) {
 	                    event.preventDefault();
 	                } else {
-	                    _this.options.callbacks.success(errors, event);
+	                    try {
+	                        _this.options.callbacks.success(errors, event);
+	                    } catch (e) {
+	                        console.error(e);
+	                    }
 	
 	                    return;
 	                }
@@ -252,7 +260,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	                        }
 	
 	                        if (response.validationErrors) {
-	                            _this2.options.callbacks.error(response.validationErrors);
+	                            try {
+	                                _this2.options.callbacks.error(response.validationErrors);
+	                            } catch (e) {
+	                                console.error(e);
+	                            }
 	
 	                            if (response.validationErrors.base) {
 	                                _this2.nodes.baseMessage.innerHTML = response.validationErrors.base.join(', ');
@@ -267,7 +279,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	                                _this2.markError(name, response.validationErrors[name]);
 	                            }
 	                        } else {
-	                            _this2.options.callbacks.success(response);
+	                            try {
+	                                _this2.options.callbacks.success(response);
+	                            } catch (e) {
+	                                console.error(e);
+	                            }
 	
 	                            if (_this2.options.redirect && response.redirect) {
 	                                window.location.href = response.redirect;
@@ -295,13 +311,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value: function getData() {
 	            var data = '';
 	
-	            if (this.options.sendType === 'serialize') {
+	            if (this.options.ajax.sendType === 'serialize') {
 	                for (var name in this.inputs) {
 	                    data += name + '=' + encodeURIComponent(JediValidate.getInputValue(this.inputs[name])) + '&';
 	                }
 	
 	                data = data.slice(0, -1);
-	            } else if (this.options.sendType === 'formData') {
+	            } else if (this.options.ajax.sendType === 'formData') {
 	                data = new FormData();
 	
 	                for (var _name in this.inputs) {
@@ -317,7 +333,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                        data.append(_name, JediValidate.getInputValue(this.inputs[_name]));
 	                    }
 	                }
-	            } else if (this.options.sendType === 'json') {
+	            } else if (this.options.ajax.sendType === 'json') {
 	                data = {};
 	
 	                for (var index in this.nodes.inputs) {

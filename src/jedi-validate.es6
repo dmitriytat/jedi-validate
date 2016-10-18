@@ -196,7 +196,11 @@ class JediValidate {
             const errors = this.checkForm();
 
             if (Object.keys(errors).length !== 0) {
-                this.options.callbacks.error(errors);
+                try {
+                    this.options.callbacks.error(errors);
+                } catch (e) {
+                    console.error(e);
+                }
 
                 event.preventDefault();
                 return;
@@ -205,7 +209,11 @@ class JediValidate {
             if (this.options.ajax && this.options.ajax.url) {
                 event.preventDefault();
             } else {
-                this.options.callbacks.success(errors, event);
+                try {
+                    this.options.callbacks.success(errors, event);
+                } catch (e) {
+                    console.error(e);
+                }
 
                 return;
             }
@@ -290,7 +298,11 @@ class JediValidate {
                     }
 
                     if (response.validationErrors) {
-                        this.options.callbacks.error(response.validationErrors);
+                        try {
+                            this.options.callbacks.error(response.validationErrors);
+                        } catch (e) {
+                            console.error(e);
+                        }
 
                         if (response.validationErrors.base) {
                             this.nodes.baseMessage.innerHTML = response.validationErrors.base.join(', ');
@@ -305,7 +317,11 @@ class JediValidate {
                             this.markError(name, response.validationErrors[name]);
                         }
                     } else {
-                        this.options.callbacks.success(response);
+                        try {
+                            this.options.callbacks.success(response);
+                        } catch (e) {
+                            console.error(e);
+                        }
 
                         if (this.options.redirect && response.redirect) {
                             window.location.href = response.redirect;
@@ -332,13 +348,13 @@ class JediValidate {
     getData() {
         let data = '';
 
-        if (this.options.sendType === 'serialize') {
+        if (this.options.ajax.sendType === 'serialize') {
             for (const name in this.inputs) {
                 data += `${name}=${encodeURIComponent(JediValidate.getInputValue(this.inputs[name]))}&`;
             }
 
             data = data.slice(0, -1);
-        } else if (this.options.sendType === 'formData') {
+        } else if (this.options.ajax.sendType === 'formData') {
             data = new FormData();
 
             for (const name in this.inputs) {
@@ -354,7 +370,7 @@ class JediValidate {
                     data.append(name, JediValidate.getInputValue(this.inputs[name]));
                 }
             }
-        } else if (this.options.sendType === 'json') {
+        } else if (this.options.ajax.sendType === 'json') {
             data = {};
 
             for (const index in this.nodes.inputs) {

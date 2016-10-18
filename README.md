@@ -268,5 +268,6 @@ You can define your own error messages in case validation fails. In case a form 
   <a name="changelog"></a>
   Changelog
 </h1>
+- 1.0.6 fix bug with sending
 - 1.0.5 add enhanced language support
 - 1.0.4 add simple language support
