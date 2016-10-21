@@ -31,8 +31,7 @@ export function getInputValue(input) {
     case 'select-one':
         return input.options.length ? input.options[input.selectedIndex].value : '';
     case 'select-multiple':
-        const valueArray = input.options.filter(option => option.selected).map(option => option.value);
-        return valueArray.length ? valueArray : '';
+        return input.options.filter(option => option.selected).map(option => option.value);
     case 'checkbox':
     case 'radio':
         return input.checked ? input.value : '';

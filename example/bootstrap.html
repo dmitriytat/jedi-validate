@@ -94,7 +94,9 @@
     var formWrapper = document.querySelector('#form');
 
     new JediValidate(formWrapper, {
-        sendType: 'formData',
+        ajax: {
+			sendType: 'formData',
+		},
         states: {
             error: 'has-error',
             valid: 'has-success',
