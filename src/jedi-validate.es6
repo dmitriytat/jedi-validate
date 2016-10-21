@@ -1,4 +1,5 @@
 import deepmerge from 'deepmerge';
+import { getData, getInputData, getInputValue, getRadioGroupValue, createObject } from './lib/get-data.es6';
 import { translate, addTranslation, setLanguage } from './i18n/jedi-validate-i18n.es6';
 
 class JediValidate {
@@ -86,97 +87,6 @@ class JediValidate {
         return options;
     }
 
-    static getRadioGroupValue(elements) {
-        for (const index in elements) {
-            const element = elements[index];
-
-            const value = JediValidate.getInputValue(element);
-
-            if (value !== '') {
-                return value;
-            }
-        }
-
-        return '';
-    }
-
-    static parseInputName(name, value) {
-        const re = /(\[(\w*)\]|\w*)/gi;
-        let matches;
-        const path = [];
-
-        matches = re.exec(name);
-        while (matches !== null) {
-            if (matches.index === re.lastIndex) {
-                re.lastIndex += 1;
-            }
-
-            if (matches[2]) {
-                path.push(matches[2]);
-            } else {
-                path.push(matches[1]);
-            }
-
-            matches = re.exec(name);
-        }
-
-        return JediValidate.createObject(path, value);
-    }
-
-    static createObject(path, value) {
-        const segment = path[0];
-
-        if (segment.length === 0) {
-            return value;
-        } else if (segment === '[]') {
-            return [JediValidate.createObject(path.slice(1), value)];
-        }
-
-        // Else
-        const object = {};
-        object[segment] = JediValidate.createObject(path.slice(1), value);
-        return object;
-    }
-
-    static getInputValue(element) {
-        if (Array.isArray(element)) {
-            return JediValidate.getRadioGroupValue(element);
-        }
-
-        let value = '';
-        const { type } = element;
-
-        if (type === 'select-one') {
-            if (element.options.length) {
-                value = element.options[element.selectedIndex].value;
-            }
-
-            return value;
-        }
-
-        if (type === 'select-multiple') {
-            const valueArray = [];
-
-            for (let i = 0; i < element.options.length; i += 1) {
-                if (element.options[i].selected) {
-                    valueArray.push(element.options[i].value);
-                }
-            }
-
-            if (valueArray.length === 0) {
-                return '';
-            }
-
-            return valueArray;
-        }
-
-        if (type === 'checkbox' || type === 'radio') {
-            return element.checked ? element.value : '';
-        }
-
-        return element.value;
-    }
-
     static addToDictionary(sourceText, translatedText, language) {
         addTranslation(sourceText, translatedText, language);
     }
@@ -218,7 +128,7 @@ class JediValidate {
                 return;
             }
 
-            const data = this.getData();
+            const data = getData(this.nodes.inputs);
 
             this.send(deepmerge(this.options.ajax, { data }));
         });
@@ -343,46 +253,6 @@ class JediValidate {
         };
 
         xhr.send(options.method.toUpperCase() === 'POST' ? options.data : '');
-    }
-
-    getData() {
-        let data = '';
-
-        if (this.options.ajax.sendType === 'serialize') {
-            for (const name in this.inputs) {
-                data += `${name}=${encodeURIComponent(JediValidate.getInputValue(this.inputs[name]))}&`;
-            }
-
-            data = data.slice(0, -1);
-        } else if (this.options.ajax.sendType === 'formData') {
-            data = new FormData();
-
-            for (const name in this.inputs) {
-                if (this.inputs[name].type && this.inputs[name].type === 'file') {
-                    if (this.inputs[name].hasAttribute('multiple')) {
-                        for (let i = 0; i < this.inputs[name].files.length; i += 1) {
-                            data.append(`${name}[]`, this.inputs[name].files[i]);
-                        }
-                    } else {
-                        data.append(name, this.inputs[name].files[0]);
-                    }
-                } else {
-                    data.append(name, JediValidate.getInputValue(this.inputs[name]));
-                }
-            }
-        } else if (this.options.ajax.sendType === 'json') {
-            data = {};
-
-            for (const index in this.nodes.inputs) {
-                const input = this.nodes.inputs[index];
-
-                data = deepmerge(data, JediValidate.parseInputName(input.name, JediValidate.getInputValue(input))); // eslint-disable-line max-len
-            }
-
-            data = JSON.stringify(data);
-        }
-
-        return data;
     }
 
     defineRules(name) {
@@ -543,5 +413,12 @@ class JediValidate {
         );
     }
 }
+
+// fixme (now for test pass)
+JediValidate.getData = getData;
+JediValidate.getInputData = getInputData;
+JediValidate.getInputValue = getInputValue;
+JediValidate.getRadioGroupValue = getRadioGroupValue;
+JediValidate.createObject = createObject;
 
 module.exports = JediValidate;
