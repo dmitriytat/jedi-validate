@@ -88,13 +88,15 @@
 		</div>
 	</div>
 
-	<script src="../dist/jedi-validate.min.js"></script>
+	<script src="../dist/jedi-validate.js"></script>
 
 	<script>
     var formWrapper = document.querySelector('#form');
 
     new JediValidate(formWrapper, {
-        sendType: 'formData',
+        ajax: {
+			sendType: 'formData',
+		},
         states: {
             error: 'has-error',
             valid: 'has-success',

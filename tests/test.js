@@ -76,23 +76,23 @@ describe('JediValidate', function () {
         var value = 'value';
 
         it('Simple Name', function () {
-            assert.deepEqual(JediValidate.parseInputName(simpleName, value), { name: value });
+            assert.deepEqual(JediValidate.getInputData({ value: value, name: simpleName }), { name: value });
         });
 
         it('Array Name', function () {
-            assert.deepEqual(JediValidate.parseInputName(arrayName, value), { name: [value] });
+            assert.deepEqual(JediValidate.getInputData({ value: value, name: arrayName }), { name: [value] });
         });
 
         it('Object Name', function () {
-            assert.deepEqual(JediValidate.parseInputName(objectName, value), { name: { a: value } });
+            assert.deepEqual(JediValidate.getInputData({ value: value, name: objectName }), { name: { a: value } });
         });
 
         it('Object Array Name', function () {
-            assert.deepEqual(JediValidate.parseInputName(objectArrayName, value), { name: { a: [value] } });
+            assert.deepEqual(JediValidate.getInputData({ value: value, name: objectArrayName }), { name: { a: [value] } });
         });
 
         it('Array Object Name', function () {
-            assert.deepEqual(JediValidate.parseInputName(arrayObjectName, value), { name: [{ a: value }] });
+            assert.deepEqual(JediValidate.getInputData({ value: value, name: arrayObjectName }), { name: [{ a: value }] });
         });
     });
 });
