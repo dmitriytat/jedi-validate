@@ -182,102 +182,48 @@ class JediValidate {
     }
 
     send(options) {
-        const xhr = new XMLHttpRequest();
+        ajax.then(response => {
+            if (response.validationErrors) {
+                try {
+                    this.options.callbacks.error(response.validationErrors);
+                } catch (e) {
+                    console.error(e);
+                }
 
-        xhr.open(options.method, options.url + (options.method.toUpperCase() === 'GET' ? (`?${options.data}`) : ''), true); // todo concat url and params
-
-        if (options.sendType === 'serialize') {
-            xhr.setRequestHeader('Content-type', options.enctype);
-        } else if (options.sendType === 'json') {
-            xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
-        }
-
-        xhr.onreadystatechange = () => {
-            if (xhr.readyState === 4) {
-                if (xhr.status === 200) {
-                    let response = {};
-
-                    try {
-                        response = JSON.parse(xhr.responseText);
-                    } catch (e) {
-                        response.validationErrors = { base: ['JSON parsing error'] };  // todo: language extension
-                    }
-
-                    if (response.validationErrors) {
-                        try {
-                            this.options.callbacks.error(response.validationErrors);
-                        } catch (e) {
-                            console.error(e);
-                        }
-
-                        if (response.validationErrors.base) {
-                            this.nodes.baseMessage.innerHTML = response.validationErrors.base.join(', ');
-                            this.root.classList.add(this.options.formStatePrefix + this.options.states.error); // eslint-disable-line max-len
-                            this.root.classList.remove(this.options.formStatePrefix + this.options.states.valid); // eslint-disable-line max-len
-                            delete response.validationErrors.base;
-                        } else {
-                            this.nodes.baseMessage.innerHTML = '';
-                        }
-
-                        Object.keys(response.validationErrors).forEach((name) => {
-                            this.markError(name, response.validationErrors[name]);
-                        });
-                    } else {
-                        try {
-                            this.options.callbacks.success(response);
-                        } catch (e) {
-                            console.error(e);
-                        }
-
-                        if (this.options.redirect && response.redirect) {
-                            window.location.href = response.redirect;
-                            return;
-                        }
-
-                        if (this.options.clean) {
-                            this.nodes.form.reset();
-                        }
-                    }
-                } else {
-                    console.warn(`${options.method} ${options.url} ${xhr.status} (${xhr.statusText})`);
-
-                    this.nodes.baseMessage.innerHTML = 'Can not send form!'; // todo: language extension
+                if (response.validationErrors.base) {
+                    this.nodes.baseMessage.innerHTML = response.validationErrors.base.join(', ');
                     this.root.classList.add(this.options.formStatePrefix + this.options.states.error); // eslint-disable-line max-len
                     this.root.classList.remove(this.options.formStatePrefix + this.options.states.valid); // eslint-disable-line max-len
+                    delete response.validationErrors.base;
+                } else {
+                    this.nodes.baseMessage.innerHTML = '';
+                }
+
+                Object.keys(response.validationErrors).forEach((name) => {
+                    this.markError(name, response.validationErrors[name]);
+                });
+            } else {
+                try {
+                    this.options.callbacks.success(response);
+                } catch (e) {
+                    console.error(e);
+                }
+
+                if (this.options.redirect && response.redirect) {
+                    window.location.href = response.redirect;
+                    return;
+                }
+
+                if (this.options.clean) {
+                    this.nodes.form.reset();
                 }
             }
-        };
+        }).catch(({ method, url, status, statusText }) => {
+            console.warn(`${method} ${url} ${status} (${statusText})`);
 
-        xhr.send(options.method.toUpperCase() === 'POST' ? options.data : '');
-    }
-
-    defineRules(name) {
-        const input = this.inputs[name];
-
-        this.rules[name] = {};
-
-        const rules = ['required', 'email', 'tel', 'url'];
-
-        Object.keys(rules).forEach((ruleName) => {
-            const rule = rules[ruleName];
-
-            if (input.hasAttribute(rule) || input.type === rule || input.classList.contains(rule)) {
-                this.rules[name][rule] = true;
-            }
-        });
-
-        if (input.hasAttribute('pattern')) {
-            this.rules[name].regexp = new RegExp(input.getAttribute('pattern'));
-        }
-
-        if (this.options.rules[name]) {
-            this.rules[name] = deepmerge(this.rules[name], this.options.rules[name]);
-        }
-
-        Object.keys(this.rules[name]).forEach((rule) => {
-            if (this.rules[name][rule]) {
-                this.fields[name].classList.add(rule);
-            }
+            this.nodes.baseMessage.innerHTML = 'Can not send form!'; // todo: language extension
+            this.root.classList.add(this.options.formStatePrefix + this.options.states.error); // eslint-disable-line max-len
+            this.root.classList.remove(this.options.formStatePrefix + this.options.states.valid); // eslint-disable-line max-len
         });
     }
 
