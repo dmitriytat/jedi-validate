@@ -1,23 +1,15 @@
 import deepmerge from 'deepmerge';
 
-const NAME = /(\[(\w*)\]|\w*)/gi;
-export function getInputData(input) {
-    const { name } = input;
-    const value = getInputValue(input);
-    const path = [];
+export function createObject(path, value) {
+    const segment = path[0];
 
-    let matches = NAME.exec(name);
-    while (matches !== null) {
-        if (matches.index === NAME.lastIndex) {
-            NAME.lastIndex += 1;
-        }
-
-        path.push(matches[2] || matches[1]);
-
-        matches = NAME.exec(name);
+    if (segment.length === 0) {
+        return value;
+    } else if (segment === '[]') {
+        return [createObject(path.slice(1), value)];
     }
 
-    return createObject(path, value);
+    return { [segment]: createObject(path.slice(1), value) };
 }
 
 export function getInputValue(input) {
@@ -40,20 +32,28 @@ export function getInputValue(input) {
     }
 }
 
-export function getRadioGroupValue(elements) {
-    return [...elements].map(radio => getInputValue(radio)).filter(Boolean)[0];
-}
+const NAME = /(\[(\w*)\]|\w*)/gi;
+export function getInputData(input) {
+    const { name } = input;
+    const value = getInputValue(input);
+    const path = [];
 
-export function createObject(path, value) {
-    const segment = path[0];
+    let matches = NAME.exec(name);
+    while (matches !== null) {
+        if (matches.index === NAME.lastIndex) {
+            NAME.lastIndex += 1;
+        }
 
-    if (segment.length === 0) {
-        return value;
-    } else if (segment === '[]') {
-        return [createObject(path.slice(1), value)];
+        path.push(matches[2] || matches[1]);
+
+        matches = NAME.exec(name);
     }
 
-    return { [segment]: createObject(path.slice(1), value) };
+    return createObject(path, value);
+}
+
+export function getRadioGroupValue(elements) {
+    return [...elements].map(radio => getInputValue(radio)).filter(Boolean)[0];
 }
 
 export function getData(inputs) {

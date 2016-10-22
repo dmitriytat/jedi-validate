@@ -55,11 +55,11 @@ class JediValidate {
 
         setLanguage(options.language);
 
-        for (const language in options.translations) {
-            for (const translation in options.translations[language]) {
+        Object.keys(options.translations).forEach((language) => {
+            Object.keys(options.translations[language]).forEach((translation) => {
                 addTranslation(translation, options.translations[language][translation], language);
-            }
-        }
+            });
+        });
 
         this.initMethods();
         this.ready();
@@ -111,30 +111,29 @@ class JediValidate {
 
     convertData(data, type) {
         switch (type) {
-            case 'serialize':
-                let convertedData = Object.keys(data)
+        case 'serialize':
+            const convertedData = Object.keys(data)
                     .reduce((query, name) => `${query}${this.getQueryPart(name, data[name])}`, '');
-
-                return convertedData.length ? convertedData.slice(0, -1) : '';
-            case 'formData': // todo rewrite, file issue
-                return Object.keys(data).reduce((formData, name) => {
-                    if (this.inputs[name] && this.inputs[name].type && this.inputs[name].type === 'file') {
-                        if (this.inputs[name].hasAttribute('multiple')) {
-                            for (let i = 0; i < this.inputs[name].files.length; i += 1) {
-                                formData.append(`${name}[]`, this.inputs[name].files[i]);
-                            }
-                        } else {
-                            formData.append(name, this.inputs[name].files[0]);
+            return convertedData.length ? convertedData.slice(0, -1) : '';
+        case 'formData': // todo rewrite, file issue
+            return Object.keys(data).reduce((formData, name) => {
+                if (this.inputs[name] && this.inputs[name].type && this.inputs[name].type === 'file') {
+                    if (this.inputs[name].hasAttribute('multiple')) {
+                        for (let i = 0; i < this.inputs[name].files.length; i += 1) {
+                            formData.append(`${name}[]`, this.inputs[name].files[i]);
                         }
                     } else {
-                        formData.append(name, getInputValue(this.inputs[name]));
+                        formData.append(name, this.inputs[name].files[0]);
                     }
+                } else {
+                    formData.append(name, getInputValue(this.inputs[name]));
+                }
 
-                    return formData;
-                }, new FormData());
-            case 'json':
-            default:
-                return JSON.stringify(data);
+                return formData;
+            }, new FormData());
+        case 'json':
+        default:
+            return JSON.stringify(data);
         }
     }
 
@@ -147,7 +146,7 @@ class JediValidate {
 
             if (errors && Object.keys(errors).length !== 0) {
                 Object.keys(errors).forEach(name => this.markField(name, errors[name]));
-                
+
                 try {
                     this.options.callbacks.error(errors);
                 } catch (e) {
@@ -171,7 +170,7 @@ class JediValidate {
             }
 
             // fix get opt data
-            this.send(deepmerge(this.options.ajax, { data: this.convertData(data, this.options.ajax.sendType) }));
+            this.send(deepmerge(this.options.ajax, { data: this.convertData(data, this.options.ajax.sendType) })); // eslint-disable-line max-len
         });
 
         this.nodes.inputs.forEach((input) => {
@@ -264,9 +263,9 @@ class JediValidate {
                             this.nodes.baseMessage.innerHTML = '';
                         }
 
-                        for (const name in response.validationErrors) {
+                        Object.keys(response.validationErrors).forEach((name) => {
                             this.markError(name, response.validationErrors[name]);
-                        }
+                        });
                     } else {
                         try {
                             this.options.callbacks.success(response);
@@ -303,13 +302,13 @@ class JediValidate {
 
         const rules = ['required', 'email', 'tel', 'url'];
 
-        for (const ruleName in rules) {
+        Object.keys(rules).forEach((ruleName) => {
             const rule = rules[ruleName];
 
             if (input.hasAttribute(rule) || input.type === rule || input.classList.contains(rule)) {
                 this.rules[name][rule] = true;
             }
-        }
+        });
 
         if (input.hasAttribute('pattern')) {
             this.rules[name].regexp = new RegExp(input.getAttribute('pattern'));
@@ -319,11 +318,16 @@ class JediValidate {
             this.rules[name] = deepmerge(this.rules[name], this.options.rules[name]);
         }
 
-        for (const rule in this.rules[name]) {
+        Object.keys(this.rules[name]).forEach((rule) => {
             if (this.rules[name][rule]) {
                 this.fields[name].classList.add(rule);
             }
-        }
+        });
+        // for (const rule in this.rules[name]) {
+        //     if (this.rules[name][rule]) {
+        //         this.fields[name].classList.add(rule);
+        //     }
+        // }
     }
 
     validateData(rules, data, inputs) {
@@ -331,7 +335,7 @@ class JediValidate {
             const inputErrors = this.checkField(rules, data[name], inputs[name]);
 
             if (inputErrors.length) {
-                obj[name] = inputErrors;
+                return Object.assign({}, obj, { name: inputErrors });
             }
 
             return obj;
@@ -349,25 +353,25 @@ class JediValidate {
         }
 
         if (!isEmpty) {
-            Object.keys(rules).reduce((errors, method) => {
+            Object.keys(rules).reduce((rulesErrors, method) => {
                 const params = rules[method];
-                if (!params) return errors;
+                if (!params) return rulesErrors;
 
                 if (this.methods[method]) {
                     const valid = this.methods[method].func(data, input, params);
 
                     if (!valid) {
-                        errors.push(this.getErrorMessage(name, method));
+                        rulesErrors.push(this.getErrorMessage(name, method));
                     }
                 } else {
-                    errors.push(`Method "${method}" not found`);
+                    rulesErrors.push(`Method "${method}" not found`);
                 }
             }, []);
         }
 
         return errors;
     }
-    
+
     markField(name, errors) {
         if (errors && errors.length) {
             this.markError(name, errors);
@@ -384,7 +388,7 @@ class JediValidate {
         if (isEmpty && rules.required) {
             errors.push(this.getErrorMessage(name, 'required'));
         } else if (!isEmpty) {
-            for (const method in rules) {
+            Object.keys(rules).forEach((method) => {
                 const params = rules[method];
 
                 if (params) {
@@ -398,7 +402,7 @@ class JediValidate {
                         errors.push(`Method "${method}" not found`);
                     }
                 }
-            }
+            });
         }
 
         if (errors.length) {
