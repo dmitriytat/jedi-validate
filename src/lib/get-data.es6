@@ -59,3 +59,41 @@ export function getRadioGroupValue(elements) {
 export function getData(inputs) {
     return [...inputs].reduce((data, input) => deepmerge(data, getInputData(input)), {});
 }
+
+export function convertData(data, type, inputs) { // todo think about inputs
+    switch (type) {
+        case 'serialize':
+            const convertedData = Object.keys(data)
+                .reduce((query, name) => `${query}${getQueryPart(name, data[name])}`, '');
+            return convertedData.length ? convertedData.slice(0, -1) : '';
+        case 'formData': // todo rewrite, file issue
+            return Object.keys(data).reduce((formData, name) => {
+                if (inputs[name] && inputs[name].type && inputs[name].type === 'file') {
+                    if (inputs[name].hasAttribute('multiple')) {
+                        for (let i = 0; i < inputs[name].files.length; i += 1) {
+                            formData.append(`${name}[]`, inputs[name].files[i]);
+                        }
+                    } else {
+                        formData.append(name, inputs[name].files[0]);
+                    }
+                } else {
+                    formData.append(name, getInputValue(inputs[name]));
+                }
+
+                return formData;
+            }, new FormData());
+        case 'json':
+        default:
+            return JSON.stringify(data);
+    }
+}
+
+export function getQueryPart(name, data) {
+    if (Array.isArray(data)) {
+        return data.reduce((part, index) => part + getQueryPart(`${name}[${index}]`, data[index]), '');
+    } else if (typeof data === 'object') {
+        return Object.keys(data).reduce((part, index) => part + getQueryPart(`${name}[${index}]`, data[index]), '');
+    }
+
+    return `${name}=${encodeURIComponent(data)}&`;
+}
