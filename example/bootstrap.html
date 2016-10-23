@@ -4,7 +4,8 @@
 <head>
 	<meta charset="UTF-8">
 	<title></title>
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+	<link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css" />
+	<link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap-theme.min.css" />
 </head>
 
 <body>
@@ -88,14 +89,16 @@
 		</div>
 	</div>
 
-	<script src="../dist/jedi-validate.js"></script>
+	<script src="http://localhost:8080/dist/jedi-validate.js"></script>
 
 	<script>
     var formWrapper = document.querySelector('#form');
 
     new JediValidate(formWrapper, {
         ajax: {
-			sendType: 'formData',
+			url: '/example/ajax.json',
+			sendType: 'serialize',
+			method: 'get',
 		},
         states: {
             error: 'has-error',

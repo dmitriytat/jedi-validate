@@ -1,16 +1,13 @@
-export function validateData(rules, methods, data, inputs) {
-    return Object.keys(rules).reduce((obj, name) => {
-        const errors = validateField(rules, methods, data[name], inputs[name]);
-        return errors.length ? Object.assign({}, obj, { [name]: errors }) : obj;
-    }, {});
-}
+import { getValueByName } from './get-data.es6';
 
-export function validateField(rules, methods, data, input) {
+export function validateField(rules, methods, value, input, getErrorMessage) { // fixme getErrorMessage is bad
+    if (!input) return [];
+
     const { name } = input;
-    const isEmpty = !methods.required.func(data, input);
+    const isEmpty = !methods.required.func(value, input);
 
     if (isEmpty && rules.required) {
-        return [this.getErrorMessage(name, 'required')]; // todo think about it
+        return [getErrorMessage(name, 'required')]; // todo think about it
     }
 
     if (isEmpty) {
@@ -22,10 +19,10 @@ export function validateField(rules, methods, data, input) {
         if (!params) return errors;
 
         if (methods[method]) {
-            const valid = methods[method].func(data, input, params);
+            const valid = methods[method].func(value, input, params);
 
             if (!valid) {
-                errors.push(this.getErrorMessage(name, method)); // todo think about it   
+                errors.push(getErrorMessage(name, method)); // todo think about it
             }
         } else {
             errors.push(`Method "${method}" not found`);
@@ -33,4 +30,15 @@ export function validateField(rules, methods, data, input) {
 
         return errors;
     }, []);
+}
+
+export function validateData(rules, methods, data, inputs, getErrorMessage) { // fixme getErrorMessage is bad
+    return Object.keys(rules).reduce((obj, name) => {
+        const value = getValueByName(name, data);
+        const errors = validateField(rules[name], methods, value, inputs[name], getErrorMessage);
+        return {
+            ...obj,
+            [name]: errors.length ? errors : undefined,
+        };
+    }, {});
 }

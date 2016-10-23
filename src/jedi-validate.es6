@@ -1,8 +1,9 @@
 import deepmerge from 'deepmerge';
-import { getData, getInputData, getInputValue, getRadioGroupValue, createObject, convertData } from './lib/get-data.es6';
+import { getData, getInputData, getInputValue, getRadioGroupValue, createObject, convertData, getValueByName } from './lib/get-data.es6';
 import { translate, addTranslation, setLanguage } from './i18n/jedi-validate-i18n.es6';
-import { getFormOptions } from './lib/get-options.es6';
-import { validateData } from './lib/validate-data.es6';
+import { getFormOptions, getInputRules } from './lib/get-options.es6';
+import { validateData, validateField } from './lib/validate-data.es6';
+import { ajax } from './lib/ajax.es6';
 
 class JediValidate {
     constructor(root, options = {}) {
@@ -34,6 +35,7 @@ class JediValidate {
             clean: true,
             redirect: true,
             language: 'en',
+            translations: {},
         };
 
         this.root = root;
@@ -43,15 +45,17 @@ class JediValidate {
         this.fields = {};
         this.inputs = {};
         this.messages = {};
-        this.rules = {};
+        this.data = {};
 
-        this.cacheNodes();
+        this.nodes = this.cacheNodes(this.root, this.options);
 
         const formOptions = getFormOptions(this.nodes.form);
 
         this.options = deepmerge(this.options, defaultOptions);
         this.options = deepmerge(this.options, formOptions);
         this.options = deepmerge(this.options, options);
+
+        this.rules = {...this.options.rules};
 
         setLanguage(this.options.language);
 
@@ -69,11 +73,17 @@ class JediValidate {
         addTranslation(sourceText, translatedText, language);
     }
 
-    cacheNodes() {
-        this.nodes = {
-            form: this.root.querySelector('form'),
-            inputs: this.root.querySelectorAll('[name]'),
-            baseMessage: this.root.querySelector(`.${this.options.containers.baseMessage}`),
+    /**
+     * Return object with working elements
+     * @param root Root element for search
+     * @param options Object with selectors
+     * @returns {{form: Element, inputs: NodeList, baseMessage: Element}}
+     */
+    cacheNodes(root, options) {
+        return {
+            form: root.querySelector('form'),
+            inputs: root.querySelectorAll('[name]'),
+            baseMessage: root.querySelector(`.${options.containers.baseMessage}`),
         };
     }
     
@@ -81,10 +91,10 @@ class JediValidate {
         this.nodes.form.setAttribute('novalidate', 'novalidate');
 
         this.nodes.form.addEventListener('submit', (event) => {
-            const data = getData(this.nodes.inputs);
-            const errors = validateData(this.options.rules, this.methods, data, this.nodes.inputs);
+            this.data = getData(this.inputs);
+            const errors = validateData(this.rules, this.methods, this.data, this.inputs, this.getErrorMessage.bind(this)); // fixme getErrorMessage
 
-            if (errors && Object.keys(errors).length !== 0) {
+            if (errors && Object.keys(errors).filter(name => errors[name]).length !== 0) {
                 Object.keys(errors).forEach(name =>
                     this.markField(this.fields[name], this.messages[name], this.options.states, errors[name]));
 
@@ -112,8 +122,8 @@ class JediValidate {
 
             // fix get opt data
             this.send({
-                ajax: this.options.ajax,
-                data: convertData(data, this.options.ajax.sendType, this.inputs),     
+                ...this.options.ajax,
+                data: convertData(this.data, this.options.ajax.sendType, this.inputs),
             });
         });
 
@@ -124,7 +134,9 @@ class JediValidate {
                 if (Array.isArray(this.inputs[name])) {
                     this.inputs[name].push(input);
                 } else {
-                    this.inputs[name] = [this.inputs[name], input];
+                    const groupInput = [this.inputs[name], input];
+                    groupInput.name = name;
+                    this.inputs[name] = groupInput;
                 }
             } else {
                 this.inputs[name] = input;
@@ -155,12 +167,10 @@ class JediValidate {
                     this.messages[name].classList.add(this.options.containers.message);
                     this.fields[name].appendChild(this.messages[name]);
                 }
-                
+
+                this.rules[name] = this.rules[name] || {};
                 const inputRules = getInputRules(input);
-                
-                if (this.options.rules[name]) {
-                    this.rules[name] = deepmerge(this.rules[name], { [name]: inputRules });
-                }
+                this.rules[name] = deepmerge(this.rules[name], inputRules);
 
                 Object.keys(this.rules[name]).forEach((rule) => {
                     if (this.rules[name][rule]) {
@@ -169,9 +179,20 @@ class JediValidate {
                 });
             }
 
+            // todo think about
             input.addEventListener('change', () => {
                 this.fields[name].classList.remove(this.options.states.dirty);
-                this.checkInput(name);
+
+                const inputData = getInputData(input);
+                const value = getValueByName(name, inputData);
+
+                this.data = {
+                    ...this.data,
+                    ...inputData,
+                };
+
+                const errors = validateField(this.rules[name], this.methods, value, input, this.getErrorMessage.bind(this)); // fixme getErrorMessage
+                this.markField(this.fields[name], this.messages[name], this.options.states, errors);
             });
 
             input.addEventListener('input', () => {
@@ -182,7 +203,7 @@ class JediValidate {
     }
 
     send(options) {
-        ajax.then(response => {
+        ajax(options).then(response => {
             if (response.validationErrors) {
                 try {
                     this.options.callbacks.error(response.validationErrors);
@@ -199,9 +220,9 @@ class JediValidate {
                     this.nodes.baseMessage.innerHTML = '';
                 }
 
-                Object.keys(response.validationErrors).forEach((name) => {
-                    this.markError(name, response.validationErrors[name]);
-                });
+                Object.keys(response.validationErrors).forEach(name =>
+                    this.markField(this.fields[name], this.messages[name], this.options.states, response.validationErrors[name])
+                );
             } else {
                 try {
                     this.options.callbacks.success(response);
@@ -227,6 +248,13 @@ class JediValidate {
         });
     }
 
+    /**
+     *
+     * @param field
+     * @param message
+     * @param states
+     * @param errors
+     */
     markField(field, message, states, errors) {
         if (errors && errors.length) {
             this.markError(field, message, states, errors);
@@ -234,7 +262,15 @@ class JediValidate {
             this.markValid(field, message, states);
         }
     }
-    
+
+    /**
+     *
+     * @param field
+     * @param message
+     * @param error
+     * @param valid
+     * @param errors
+     */
     markError(field, message, { error, valid }, errors) {
         if (!field || !message) {
             return;
@@ -315,12 +351,5 @@ class JediValidate {
         );
     }
 }
-
-// fixme (now for test pass)
-JediValidate.getData = getData;
-JediValidate.getInputData = getInputData;
-JediValidate.getInputValue = getInputValue;
-JediValidate.getRadioGroupValue = getRadioGroupValue;
-JediValidate.createObject = createObject;
 
 module.exports = JediValidate;

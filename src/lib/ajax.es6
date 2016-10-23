@@ -1,3 +1,4 @@
+// todo maybe it can be vendor library?
 export function ajax(options) {
     return new Promise((resolve, reject) => {
             const xhr = new XMLHttpRequest();

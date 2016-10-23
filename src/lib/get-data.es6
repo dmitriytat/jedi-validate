@@ -12,7 +12,22 @@ export function createObject(path, value) {
     return { [segment]: createObject(path.slice(1), value) };
 }
 
+export function getValueByName(name, data) {
+    const path = convertNameToPath(name);
+    return getValueByPath(path, data);
+}
+
+export function getValueByPath(path, data) {
+    return path.reduce((value, segment) => segment && value ? value[segment] : value, data || '');
+}
+
+export function getRadioGroupValue(elements) {
+    return [...elements].map(radio => getInputValue(radio)).filter(Boolean)[0];
+}
+
 export function getInputValue(input) {
+    if (!input) return undefined;
+
     const { type } = input;
 
     if (Array.isArray(input)) {
@@ -20,22 +35,20 @@ export function getInputValue(input) {
     }
 
     switch (type) {
-    case 'select-one':
-        return input.options.length ? input.options[input.selectedIndex].value : '';
-    case 'select-multiple':
-        return input.options.filter(option => option.selected).map(option => option.value);
-    case 'checkbox':
-    case 'radio':
-        return input.checked ? input.value : '';
-    default:
-        return input.value;
+        case 'select-one':
+            return input.options.length ? input.options[input.selectedIndex].value : '';
+        case 'select-multiple':
+            return input.options.filter(option => option.selected).map(option => option.value);
+        case 'checkbox':
+        case 'radio':
+            return input.checked ? input.value : '';
+        default:
+            return input.value;
     }
 }
 
 const NAME = /(\[(\w*)\]|\w*)/gi;
-export function getInputData(input) {
-    const { name } = input;
-    const value = getInputValue(input);
+export function convertNameToPath (name) {
     const path = [];
 
     let matches = NAME.exec(name);
@@ -49,15 +62,18 @@ export function getInputData(input) {
         matches = NAME.exec(name);
     }
 
+    return path;
+}
+
+export function getInputData(input) {
+    const value = getInputValue(input);
+    const path = convertNameToPath(input.name);
+
     return createObject(path, value);
 }
 
-export function getRadioGroupValue(elements) {
-    return [...elements].map(radio => getInputValue(radio)).filter(Boolean)[0];
-}
-
 export function getData(inputs) {
-    return [...inputs].reduce((data, input) => deepmerge(data, getInputData(input)), {});
+    return Object.keys(inputs).reduce((data, name) => deepmerge(data, getInputData(inputs[name])), {});
 }
 
 export function convertData(data, type, inputs) { // todo think about inputs
