@@ -5,7 +5,7 @@ module.exports = {
         'jedi-validate': './src/jedi-validate.es6',
         'jedi-validate.min': './src/jedi-validate.es6'
     },
-    devtool: '#inline-source-map',
+    devtool: 'source-map',
     output: {
         path: './dist',
         filename: '[name].js',
