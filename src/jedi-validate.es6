@@ -1,6 +1,9 @@
 import deepmerge from 'deepmerge';
-import { getData, getInputData, getInputValue, getRadioGroupValue, createObject } from './lib/get-data.es6';
+import { getData, getInputData, getInputValue, getRadioGroupValue, createObject, convertData, getValueByName } from './lib/get-data.es6';
 import { translate, addTranslation, setLanguage } from './i18n/jedi-validate-i18n.es6';
+import { getFormOptions, getInputRules } from './lib/get-options.es6';
+import { validateData, validateField } from './lib/validate-data.es6';
+import { ajax } from './lib/ajax.es6';
 
 class JediValidate {
     constructor(root, options = {}) {
@@ -26,14 +29,13 @@ class JediValidate {
             },
             formStatePrefix: 'jedi-',
             callbacks: {
-                success() {
-                },
-                error() {
-                },
+                success() {},
+                error() {},
             },
             clean: true,
             redirect: true,
             language: 'en',
+            translations: {},
         };
 
         this.root = root;
@@ -43,109 +45,58 @@ class JediValidate {
         this.fields = {};
         this.inputs = {};
         this.messages = {};
-        this.rules = {};
+        this.data = {};
 
-        this.cacheNodes();
+        this.nodes = this.cacheNodes(this.root, this.options);
 
-        const formOptions = JediValidate.getFormOptions(this.nodes.form);
+        const formOptions = getFormOptions(this.nodes.form);
 
         this.options = deepmerge(this.options, defaultOptions);
         this.options = deepmerge(this.options, formOptions);
         this.options = deepmerge(this.options, options);
 
-        setLanguage(options.language);
+        this.rules = {...this.options.rules};
 
-        Object.keys(options.translations).forEach((language) => {
-            Object.keys(options.translations[language]).forEach((translation) => {
-                addTranslation(translation, options.translations[language][translation], language);
+        setLanguage(this.options.language);
+
+        Object.keys(this.options.translations).forEach((language) => {
+            Object.keys(this.options.translations[language]).forEach((translation) => {
+                addTranslation(translation, this.options.translations[language][translation], language);
             });
         });
 
         this.initMethods();
         this.ready();
     }
-
-    static getFormOptions(form) {
-        const options = { ajax: {} };
-
-        if (form.getAttribute('method')) {
-            options.ajax.method = form.getAttribute('method');
-        }
-
-        if (form.getAttribute('action')) {
-            options.ajax.url = form.getAttribute('action');
-        }
-
-        if (form.getAttribute('enctype')) {
-            options.ajax.enctype = form.getAttribute('enctype');
-        }
-
-        if (options.ajax.enctype === 'multipart/form-data') {
-            options.ajax.sendType = 'formData';
-        }
-
-        return options;
-    }
-
+    
     static addToDictionary(sourceText, translatedText, language) {
         addTranslation(sourceText, translatedText, language);
     }
 
-    cacheNodes() {
-        this.nodes = {
-            form: this.root.querySelector('form'),
-            inputs: this.root.querySelectorAll('[name]'),
-            baseMessage: this.root.querySelector(`.${this.options.containers.baseMessage}`),
+    /**
+     * Return object with working elements
+     * @param root Root element for search
+     * @param options Object with selectors
+     * @returns {{form: Element, inputs: NodeList, baseMessage: Element}}
+     */
+    cacheNodes(root, options) {
+        return {
+            form: root.querySelector('form'),
+            inputs: root.querySelectorAll('[name]'),
+            baseMessage: root.querySelector(`.${options.containers.baseMessage}`),
         };
     }
-
-    getQueryPart(name, data) {
-        if (Array.isArray(data)) {
-            return data.reduce((part, index) => part + this.getQueryPart(`${name}[${index}]`, data[index]), '');
-        } else if (typeof data === 'object') {
-            return Object.keys(data).reduce((part, index) => part + this.getQueryPart(`${name}[${index}]`, data[index]), '');
-        }
-
-        return `${name}=${encodeURIComponent(data)}&`;
-    }
-
-    convertData(data, type) {
-        switch (type) {
-        case 'serialize':
-            const convertedData = Object.keys(data)
-                    .reduce((query, name) => `${query}${this.getQueryPart(name, data[name])}`, '');
-            return convertedData.length ? convertedData.slice(0, -1) : '';
-        case 'formData': // todo rewrite, file issue
-            return Object.keys(data).reduce((formData, name) => {
-                if (this.inputs[name] && this.inputs[name].type && this.inputs[name].type === 'file') {
-                    if (this.inputs[name].hasAttribute('multiple')) {
-                        for (let i = 0; i < this.inputs[name].files.length; i += 1) {
-                            formData.append(`${name}[]`, this.inputs[name].files[i]);
-                        }
-                    } else {
-                        formData.append(name, this.inputs[name].files[0]);
-                    }
-                } else {
-                    formData.append(name, getInputValue(this.inputs[name]));
-                }
-
-                return formData;
-            }, new FormData());
-        case 'json':
-        default:
-            return JSON.stringify(data);
-        }
-    }
-
+    
     ready() {
         this.nodes.form.setAttribute('novalidate', 'novalidate');
 
         this.nodes.form.addEventListener('submit', (event) => {
-            const data = getData(this.nodes.inputs);
-            const errors = this.validateData(this.options.rules, data, this.nodes.inputs);
+            this.data = getData(this.inputs);
+            const errors = validateData(this.rules, this.methods, this.data, this.inputs, this.getErrorMessage.bind(this)); // fixme getErrorMessage
 
-            if (errors && Object.keys(errors).length !== 0) {
-                Object.keys(errors).forEach(name => this.markField(name, errors[name]));
+            if (errors && Object.keys(errors).filter(name => errors[name]).length !== 0) {
+                Object.keys(errors).forEach(name =>
+                    this.markField(this.fields[name], this.messages[name], this.options.states, errors[name]));
 
                 try {
                     this.options.callbacks.error(errors);
@@ -157,7 +108,7 @@ class JediValidate {
                 return;
             }
 
-            if (this.options.ajax && this.options.ajax.url) {
+            if (this.options.ajax) { // todo check without (&& this.options.ajax.url)
                 event.preventDefault();
             } else {
                 try {
@@ -170,7 +121,10 @@ class JediValidate {
             }
 
             // fix get opt data
-            this.send(deepmerge(this.options.ajax, { data: this.convertData(data, this.options.ajax.sendType) })); // eslint-disable-line max-len
+            this.send({
+                ...this.options.ajax,
+                data: convertData(this.data, this.options.ajax.sendType, this.inputs),
+            });
         });
 
         this.nodes.inputs.forEach((input) => {
@@ -180,7 +134,9 @@ class JediValidate {
                 if (Array.isArray(this.inputs[name])) {
                     this.inputs[name].push(input);
                 } else {
-                    this.inputs[name] = [this.inputs[name], input];
+                    const groupInput = [this.inputs[name], input];
+                    groupInput.name = name;
+                    this.inputs[name] = groupInput;
                 }
             } else {
                 this.inputs[name] = input;
@@ -192,7 +148,9 @@ class JediValidate {
                         this.fields[name] = field;
                         break;
                     }
-                } while (field = field.parentNode);
+
+                    field = field.parentNode;
+                } while (field);
 
                 if (!this.fields[name]) {
                     throw new Error('Have no parent field');
@@ -210,12 +168,31 @@ class JediValidate {
                     this.fields[name].appendChild(this.messages[name]);
                 }
 
-                this.defineRules(name);
+                this.rules[name] = this.rules[name] || {};
+                const inputRules = getInputRules(input);
+                this.rules[name] = deepmerge(this.rules[name], inputRules);
+
+                Object.keys(this.rules[name]).forEach((rule) => {
+                    if (this.rules[name][rule]) {
+                        this.fields[name].classList.add(rule);
+                    }
+                });
             }
 
+            // todo think about
             input.addEventListener('change', () => {
                 this.fields[name].classList.remove(this.options.states.dirty);
-                this.checkInput(name);
+
+                const inputData = getInputData(input);
+                const value = getValueByName(name, inputData);
+
+                this.data = {
+                    ...this.data,
+                    ...inputData,
+                };
+
+                const errors = validateField(this.rules[name], this.methods, value, input, this.getErrorMessage.bind(this)); // fixme getErrorMessage
+                this.markField(this.fields[name], this.messages[name], this.options.states, errors);
             });
 
             input.addEventListener('input', () => {
@@ -226,217 +203,97 @@ class JediValidate {
     }
 
     send(options) {
-        const xhr = new XMLHttpRequest();
+        ajax(options).then(response => {
+            if (response.validationErrors) {
+                try {
+                    this.options.callbacks.error(response.validationErrors);
+                } catch (e) {
+                    console.error(e);
+                }
 
-        xhr.open(options.method, options.url + (options.method.toUpperCase() === 'GET' ? (`?${options.data}`) : ''), true); // todo concat url and params
-
-        if (options.sendType === 'serialize') {
-            xhr.setRequestHeader('Content-type', options.enctype);
-        } else if (options.sendType === 'json') {
-            xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
-        }
-
-        xhr.onreadystatechange = () => {
-            if (xhr.readyState === 4) {
-                if (xhr.status === 200) {
-                    let response = {};
-
-                    try {
-                        response = JSON.parse(xhr.responseText);
-                    } catch (e) {
-                        response.validationErrors = { base: ['JSON parsing error'] };  // todo: language extension
-                    }
-
-                    if (response.validationErrors) {
-                        try {
-                            this.options.callbacks.error(response.validationErrors);
-                        } catch (e) {
-                            console.error(e);
-                        }
-
-                        if (response.validationErrors.base) {
-                            this.nodes.baseMessage.innerHTML = response.validationErrors.base.join(', ');
-                            this.root.classList.add(this.options.formStatePrefix + this.options.states.error); // eslint-disable-line max-len
-                            this.root.classList.remove(this.options.formStatePrefix + this.options.states.valid); // eslint-disable-line max-len
-                            delete response.validationErrors.base;
-                        } else {
-                            this.nodes.baseMessage.innerHTML = '';
-                        }
-
-                        Object.keys(response.validationErrors).forEach((name) => {
-                            this.markError(name, response.validationErrors[name]);
-                        });
-                    } else {
-                        try {
-                            this.options.callbacks.success(response);
-                        } catch (e) {
-                            console.error(e);
-                        }
-
-                        if (this.options.redirect && response.redirect) {
-                            window.location.href = response.redirect;
-                            return;
-                        }
-
-                        if (this.options.clean) {
-                            this.nodes.form.reset();
-                        }
-                    }
-                } else {
-                    console.warn(`${options.method} ${options.url} ${xhr.status} (${xhr.statusText})`);
-
-                    this.nodes.baseMessage.innerHTML = 'Can not send form!'; // todo: language extension
+                if (response.validationErrors.base) {
+                    this.nodes.baseMessage.innerHTML = response.validationErrors.base.join(', ');
                     this.root.classList.add(this.options.formStatePrefix + this.options.states.error); // eslint-disable-line max-len
                     this.root.classList.remove(this.options.formStatePrefix + this.options.states.valid); // eslint-disable-line max-len
-                }
-            }
-        };
-
-        xhr.send(options.method.toUpperCase() === 'POST' ? options.data : '');
-    }
-
-    defineRules(name) {
-        const input = this.inputs[name];
-
-        this.rules[name] = {};
-
-        const rules = ['required', 'email', 'tel', 'url'];
-
-        Object.keys(rules).forEach((ruleName) => {
-            const rule = rules[ruleName];
-
-            if (input.hasAttribute(rule) || input.type === rule || input.classList.contains(rule)) {
-                this.rules[name][rule] = true;
-            }
-        });
-
-        if (input.hasAttribute('pattern')) {
-            this.rules[name].regexp = new RegExp(input.getAttribute('pattern'));
-        }
-
-        if (this.options.rules[name]) {
-            this.rules[name] = deepmerge(this.rules[name], this.options.rules[name]);
-        }
-
-        Object.keys(this.rules[name]).forEach((rule) => {
-            if (this.rules[name][rule]) {
-                this.fields[name].classList.add(rule);
-            }
-        });
-        // for (const rule in this.rules[name]) {
-        //     if (this.rules[name][rule]) {
-        //         this.fields[name].classList.add(rule);
-        //     }
-        // }
-    }
-
-    validateData(rules, data, inputs) {
-        const errors = Object.keys(rules).reduce((obj, name) => {
-            const inputErrors = this.checkField(rules, data[name], inputs[name]);
-
-            if (inputErrors.length) {
-                return Object.assign({}, obj, { name: inputErrors });
-            }
-
-            return obj;
-        }, {});
-
-        return Object.keys(errors).length !== 0 ? errors : null;
-    }
-
-    checkField(rules, data, input) {
-        const errors = [];
-        const isEmpty = !this.methods.required.func(data, input);
-
-        if (isEmpty && rules.required) {
-            errors.push(this.getErrorMessage(name, 'required'));
-        }
-
-        if (!isEmpty) {
-            Object.keys(rules).reduce((rulesErrors, method) => {
-                const params = rules[method];
-                if (!params) return rulesErrors;
-
-                if (this.methods[method]) {
-                    const valid = this.methods[method].func(data, input, params);
-
-                    if (!valid) {
-                        rulesErrors.push(this.getErrorMessage(name, method));
-                    }
+                    delete response.validationErrors.base;
                 } else {
-                    rulesErrors.push(`Method "${method}" not found`);
+                    this.nodes.baseMessage.innerHTML = '';
                 }
-            }, []);
-        }
 
-        return errors;
+                Object.keys(response.validationErrors).forEach(name =>
+                    this.markField(this.fields[name], this.messages[name], this.options.states, response.validationErrors[name])
+                );
+            } else {
+                try {
+                    this.options.callbacks.success(response);
+                } catch (e) {
+                    console.error(e);
+                }
+
+                if (this.options.redirect && response.redirect) {
+                    window.location.href = response.redirect;
+                    return;
+                }
+
+                if (this.options.clean) {
+                    this.nodes.form.reset();
+                }
+            }
+        }).catch(({ method, url, status, statusText }) => {
+            console.warn(`${method} ${url} ${status} (${statusText})`);
+
+            this.nodes.baseMessage.innerHTML = 'Can not send form!'; // todo: language extension
+            this.root.classList.add(this.options.formStatePrefix + this.options.states.error); // eslint-disable-line max-len
+            this.root.classList.remove(this.options.formStatePrefix + this.options.states.valid); // eslint-disable-line max-len
+        });
     }
 
-    markField(name, errors) {
+    /**
+     *
+     * @param field
+     * @param message
+     * @param states
+     * @param errors
+     */
+    markField(field, message, states, errors) {
         if (errors && errors.length) {
-            this.markError(name, errors);
+            this.markError(field, message, states, errors);
         } else {
-            this.markValid(name);
+            this.markValid(field, message, states);
         }
     }
 
-    checkInput(name) {
-        const rules = this.rules[name];
-        const errors = [];
-        const isEmpty = !this.methods.required.func(getInputValue(this.inputs[name]), this.inputs[name]); // eslint-disable-line max-len
-
-        if (isEmpty && rules.required) {
-            errors.push(this.getErrorMessage(name, 'required'));
-        } else if (!isEmpty) {
-            Object.keys(rules).forEach((method) => {
-                const params = rules[method];
-
-                if (params) {
-                    if (this.methods[method]) {
-                        const valid = this.methods[method].func(getInputValue(this.inputs[name]), this.inputs[name], params); // eslint-disable-line max-len
-
-                        if (!valid) {
-                            errors.push(this.getErrorMessage(name, method));
-                        }
-                    } else {
-                        errors.push(`Method "${method}" not found`);
-                    }
-                }
-            });
-        }
-
-        if (errors.length) {
-            this.markError(name, errors);
-        } else {
-            this.markValid(name);
-        }
-
-        return errors;
-    }
-
-    markError(name, errors) {
-        if (!this.fields[name] || !this.messages[name]) {
+    /**
+     *
+     * @param field
+     * @param message
+     * @param error
+     * @param valid
+     * @param errors
+     */
+    markError(field, message, { error, valid }, errors) {
+        if (!field || !message) {
             return;
         }
 
-        this.fields[name].classList.add(this.options.states.error);
-        this.fields[name].classList.remove(this.options.states.valid);
+        field.classList.add(error);
+        field.classList.remove(valid);
 
-        this.messages[name].innerHTML = errors.join(', ');
+        message.innerHTML = errors.join(', ');
     }
 
-    markValid(name) {
-        if (!this.fields[name] || !this.messages[name]) {
+    markValid(field, message, { error, valid }) {
+        if (!field || !message) {
             return;
         }
 
-        this.fields[name].classList.add(this.options.states.valid);
-        this.fields[name].classList.remove(this.options.states.error);
+        field.classList.add(valid);
+        field.classList.remove(error);
 
-        this.messages[name].innerHTML = '';
+        message.innerHTML = '';
     }
 
-    getErrorMessage(name, method) {
+    getErrorMessage(name, method) { // todo think about it
         let message = '';
 
         if (this.options.messages[name] && this.options.messages[name][method]) {
@@ -494,12 +351,5 @@ class JediValidate {
         );
     }
 }
-
-// fixme (now for test pass)
-JediValidate.getData = getData;
-JediValidate.getInputData = getInputData;
-JediValidate.getInputValue = getInputValue;
-JediValidate.getRadioGroupValue = getRadioGroupValue;
-JediValidate.createObject = createObject;
 
 module.exports = JediValidate;
