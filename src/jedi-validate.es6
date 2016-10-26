@@ -4,6 +4,7 @@ import { translate, addTranslation, setLanguage } from './i18n/jedi-validate-i18
 import { getFormOptions, getInputRules } from './lib/get-options.es6';
 import { validateData, validateField } from './lib/validate-data.es6';
 import { ajax } from './lib/ajax.es6';
+import defaultMethods from './lib/methods.es6';
 
 class JediValidate {
     constructor(root, options = {}) {
@@ -44,8 +45,10 @@ class JediValidate {
 
         this.fields = {};
         this.inputs = {};
-        this.messages = {};
+        this.messages = {}; // object with message nodes
+        this.errorMessages = {}; // object with error strings
         this.data = {};
+        this.methods = defaultMethods;
 
         this.nodes = this.cacheNodes(this.root, this.options);
 
@@ -65,8 +68,9 @@ class JediValidate {
             });
         });
 
-        this.initMethods();
         this.ready();
+
+        this.errorMessages = this.initErrorMessages(this.rules, this.options.messages, this.methods);
     }
     
     static addToDictionary(sourceText, translatedText, language) {
@@ -92,7 +96,7 @@ class JediValidate {
 
         this.nodes.form.addEventListener('submit', (event) => {
             this.data = getData(this.inputs);
-            const errors = validateData(this.rules, this.methods, this.data, this.inputs, this.getErrorMessage.bind(this)); // fixme getErrorMessage
+            const errors = validateData(this.rules, this.methods, this.data, this.inputs, this.errorMessages);
 
             if (errors && Object.keys(errors).filter(name => errors[name]).length !== 0) {
                 Object.keys(errors).forEach(name =>
@@ -191,7 +195,7 @@ class JediValidate {
                     ...inputData,
                 };
 
-                const errors = validateField(this.rules[name], this.methods, value, input, this.getErrorMessage.bind(this)); // fixme getErrorMessage
+                const errors = validateField(this.rules[name], this.methods, value, input, this.errorMessages);
                 this.markField(this.fields[name], this.messages[name], this.options.states, errors);
             });
 
@@ -293,18 +297,6 @@ class JediValidate {
         message.innerHTML = '';
     }
 
-    getErrorMessage(name, method) { // todo think about it
-        let message = '';
-
-        if (this.options.messages[name] && this.options.messages[name][method]) {
-            message = this.options.messages[name][method];
-        } else {
-            message = this.methods[method].message;
-        }
-
-        return message;
-    }
-
     addMethod(rule, func, message) {
         this.methods[rule] = {
             func,
@@ -312,43 +304,15 @@ class JediValidate {
         };
     }
 
-    initMethods() {
-        this.methods = {};
-
-        this.addMethod('required', value =>
-            value && value.trim() !== '',
-            translate('This field is required')
-        );
-
-        this.addMethod('regexp', (value, element, regexp) =>
-            regexp.test(value),
-                translate('Please, provide correct value')
-        );
-
-        this.addMethod('email', value =>
-            /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i.test(value),
-            translate('This email is incorrect')
-        );
-
-        this.addMethod('filesize', (value, element, size) =>
-            [...element.files].reduce((r, file) => file.size < size && r, true),
-            translate('This file is too large')
-        );
-
-        this.addMethod('extension', (value, element, extensions) =>
-            [...element.files].reduce((r, file) => extensions.indexOf(file.name.split('.').pop()) !== -1 && r, true),
-            translate('This extension is not supported')
-        );
-
-        this.addMethod('tel', value =>
-            /^([\+]+)*[0-9\x20\x28\x29\-]{5,20}$/.test(value),
-            translate('This phone number is incorrect')
-        );
-
-        this.addMethod('url', value =>
-            /[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi.test(value), // eslint-disable-line max-len
-            translate('Wrong url')
-        );
+    // todo rewrite
+    initErrorMessages(rules, messages, methods) {
+        return Object.keys(rules).reduce((names, name) => ({
+                ...names,
+                [name]: Object.keys(rules[name]).reduce((ruleNames, method) => ({
+                    ...ruleNames,
+                    [method]: messages[name] && messages[name][method] || methods[method] && methods[method].message || '',
+                }), {})
+        }), {});
     }
 }
 
