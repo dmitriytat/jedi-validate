@@ -1,6 +1,6 @@
 import deepmerge from 'deepmerge';
-import { getData, getInputData, getInputValue, getRadioGroupValue, createObject, convertData, getValueByName } from './lib/get-data.es6';
-import { translate, addTranslation, setLanguage } from './i18n/jedi-validate-i18n.es6';
+import { getData, getInputData, convertData, getValueByName } from './lib/get-data.es6';
+import { addTranslation, setLanguage } from './i18n/jedi-validate-i18n.es6';
 import { getFormOptions, getInputRules } from './lib/get-options.es6';
 import { validateData, validateField } from './lib/validate-data.es6';
 import { ajax } from './lib/ajax.es6';
@@ -58,21 +58,29 @@ class JediValidate {
         this.options = deepmerge(this.options, formOptions);
         this.options = deepmerge(this.options, options);
 
-        this.rules = {...this.options.rules};
+        this.rules = { ...this.options.rules };
 
         setLanguage(this.options.language);
 
         Object.keys(this.options.translations).forEach((language) => {
             Object.keys(this.options.translations[language]).forEach((translation) => {
-                addTranslation(translation, this.options.translations[language][translation], language);
+                addTranslation(
+                    translation,
+                    this.options.translations[language][translation],
+                    language
+                );
             });
         });
 
         this.ready();
 
-        this.errorMessages = this.initErrorMessages(this.rules, this.options.messages, this.methods);
+        this.errorMessages = this.initErrorMessages(
+            this.rules,
+            this.options.messages,
+            this.methods
+        );
     }
-    
+
     static addToDictionary(sourceText, translatedText, language) {
         addTranslation(sourceText, translatedText, language);
     }
@@ -90,17 +98,29 @@ class JediValidate {
             baseMessage: root.querySelector(`.${options.containers.baseMessage}`),
         };
     }
-    
+
     ready() {
         this.nodes.form.setAttribute('novalidate', 'novalidate');
 
         this.nodes.form.addEventListener('submit', (event) => {
             this.data = getData(this.inputs);
-            const errors = validateData(this.rules, this.methods, this.data, this.inputs, this.errorMessages);
+            const errors = validateData(
+                this.rules,
+                this.methods,
+                this.data,
+                this.inputs,
+                this.errorMessages
+            );
 
             if (errors && Object.keys(errors).filter(name => errors[name]).length !== 0) {
                 Object.keys(errors).forEach(name =>
-                    this.markField(this.fields[name], this.messages[name], this.options.states, errors[name]));
+                    this.markField(
+                        this.fields[name],
+                        this.messages[name],
+                        this.options.states,
+                        errors[name]
+                    )
+                );
 
                 try {
                     this.options.callbacks.error(errors);
@@ -195,7 +215,13 @@ class JediValidate {
                     ...inputData,
                 };
 
-                const errors = validateField(this.rules[name], this.methods, value, input, this.errorMessages);
+                const errors = validateField(
+                    this.rules[name],
+                    this.methods,
+                    value,
+                    input,
+                    this.errorMessages
+                );
                 this.markField(this.fields[name], this.messages[name], this.options.states, errors);
             });
 
@@ -207,7 +233,7 @@ class JediValidate {
     }
 
     send(options) {
-        ajax(options).then(response => {
+        ajax(options).then((response) => {
             if (response.validationErrors) {
                 try {
                     this.options.callbacks.error(response.validationErrors);
@@ -225,7 +251,12 @@ class JediValidate {
                 }
 
                 Object.keys(response.validationErrors).forEach(name =>
-                    this.markField(this.fields[name], this.messages[name], this.options.states, response.validationErrors[name])
+                    this.markField(
+                        this.fields[name],
+                        this.messages[name],
+                        this.options.states,
+                        response.validationErrors[name]
+                    )
                 );
             } else {
                 try {
@@ -307,11 +338,11 @@ class JediValidate {
     // todo rewrite
     initErrorMessages(rules, messages, methods) {
         return Object.keys(rules).reduce((names, name) => ({
-                ...names,
-                [name]: Object.keys(rules[name]).reduce((ruleNames, method) => ({
-                    ...ruleNames,
-                    [method]: messages[name] && messages[name][method] || methods[method] && methods[method].message || '',
-                }), {})
+            ...names,
+            [name]: Object.keys(rules[name]).reduce((ruleNames, method) => ({
+                ...ruleNames,
+                [method]: (messages[name] && messages[name][method]) || (methods[method] && methods[method].message) || '',
+            }), {}),
         }), {});
     }
 }

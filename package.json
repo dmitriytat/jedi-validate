@@ -9,8 +9,8 @@
     "build": "rimraf ./dist && webpack --progress --colors",
     "tests-build": "rimraf ./dist-tests && webpack --config ./webpack.config.tests.js --progress --colors",
     "test-browser": "npm run tests-build && mocha-phantomjs ./tests/test.html",
-    "lint": "eslint src/*",
-    "fix": "eslint src/* --fix"
+    "lint": "eslint src/**/*.es6",
+    "fix": "eslint src/**/*.es6 --fix"
   },
   "repository": {
     "type": "git",
