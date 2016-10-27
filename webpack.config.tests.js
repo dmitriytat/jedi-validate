@@ -2,17 +2,13 @@ var webpack = require('webpack');
 
 module.exports = {
     entry: {
-        'jedi-validate': './src/jedi-validate.es6',
-        'jedi-validate.min': './src/jedi-validate.es6',
+        'tests': './tests/tests.es6',
     },
     devtool: 'source-map',
     output: {
-        path: './dist',
+        path: './dist-tests/',
         filename: '[name].js',
-        libraryTarget: 'umd',
-        library: 'JediValidate',
-        sourceMapFilename: '[name].js.map',
-        publicPath: '/dist/'
+        publicPath: '/dist-tests/'
     },
     module: {
         loaders: [
@@ -30,10 +26,4 @@ module.exports = {
     eslint: {
         configFile: './.eslintrc'
     },
-    plugins: [
-        new webpack.optimize.UglifyJsPlugin({
-            include: /\.min\.js$/,
-            minimize: true
-        })
-    ]
 };

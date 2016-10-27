@@ -4,10 +4,11 @@
   "description": "A lightweight form validation component",
   "main": "./dist/jedi-validate.js",
   "scripts": {
-    "test": "npm run test-browser",
+    "test": "npm run tests-build && npm run test-browser",
     "dev": "rimraf ./dist && webpack-dev-server --hot --inline --progress --colors --watch",
     "build": "rimraf ./dist && webpack --progress --colors",
-    "test-browser": "npm run build && mocha-phantomjs ./tests/test.html",
+    "tests-build": "rimraf ./dist-tests && webpack --config ./webpack.config.tests.js --progress --colors",
+    "test-browser": "npm run tests-build && mocha-phantomjs ./tests/test.html",
     "lint": "eslint src/*",
     "fix": "eslint src/* --fix"
   },

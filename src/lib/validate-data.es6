@@ -1,13 +1,13 @@
 import { getValueByName } from './get-data.es6';
 
-export function validateField(rules, methods, value, input, getErrorMessage) { // fixme getErrorMessage is bad
+export function validateField(rules, methods, value, input, errorMessages) {
     if (!input) return [];
 
     const { name } = input;
     const isEmpty = !methods.required.func(value, input);
 
     if (isEmpty && rules.required) {
-        return [getErrorMessage(name, 'required')]; // todo think about it
+        return [errorMessages[name].required];
     }
 
     if (isEmpty) {
@@ -22,7 +22,7 @@ export function validateField(rules, methods, value, input, getErrorMessage) { /
             const valid = methods[method].func(value, input, params);
 
             if (!valid) {
-                errors.push(getErrorMessage(name, method)); // todo think about it
+                errors.push(errorMessages[name][method]);
             }
         } else {
             errors.push(`Method "${method}" not found`);
@@ -32,10 +32,10 @@ export function validateField(rules, methods, value, input, getErrorMessage) { /
     }, []);
 }
 
-export function validateData(rules, methods, data, inputs, getErrorMessage) { // fixme getErrorMessage is bad
+export function validateData(rules, methods, data, inputs, errorMessages) {
     return Object.keys(rules).reduce((obj, name) => {
         const value = getValueByName(name, data);
-        const errors = validateField(rules[name], methods, value, inputs[name], getErrorMessage);
+        const errors = validateField(rules[name], methods, value, inputs[name], errorMessages);
         return {
             ...obj,
             [name]: errors.length ? errors : undefined,

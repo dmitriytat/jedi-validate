@@ -74,9 +74,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _ajax = __webpack_require__(7);
 	
+	var _methods = __webpack_require__(8);
+	
+	var _methods2 = _interopRequireDefault(_methods);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
@@ -125,8 +129,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        this.fields = {};
 	        this.inputs = {};
-	        this.messages = {};
+	        this.messages = {}; // object with message nodes
+	        this.errorMessages = {}; // object with error strings
 	        this.data = {};
+	        this.methods = _methods2.default;
 	
 	        this.nodes = this.cacheNodes(this.root, this.options);
 	
@@ -146,8 +152,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	            });
 	        });
 	
-	        this.initMethods();
 	        this.ready();
+	
+	        this.errorMessages = this.initErrorMessages(this.rules, this.options.messages, this.methods);
 	    }
 	
 	    _createClass(JediValidate, [{
@@ -176,7 +183,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            this.nodes.form.addEventListener('submit', function (event) {
 	                _this2.data = (0, _getData.getData)(_this2.inputs);
-	                var errors = (0, _validateData.validateData)(_this2.rules, _this2.methods, _this2.data, _this2.inputs, _this2.getErrorMessage.bind(_this2)); // fixme getErrorMessage
+	                var errors = (0, _validateData.validateData)(_this2.rules, _this2.methods, _this2.data, _this2.inputs, _this2.errorMessages);
 	
 	                if (errors && Object.keys(errors).filter(function (name) {
 	                    return errors[name];
@@ -275,7 +282,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	                    _this2.data = _extends({}, _this2.data, inputData);
 	
-	                    var errors = (0, _validateData.validateField)(_this2.rules[name], _this2.methods, value, input, _this2.getErrorMessage.bind(_this2)); // fixme getErrorMessage
+	                    var errors = (0, _validateData.validateField)(_this2.rules[name], _this2.methods, value, input, _this2.errorMessages);
 	                    _this2.markField(_this2.fields[name], _this2.messages[name], _this2.options.states, errors);
 	                });
 	
@@ -398,20 +405,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	            message.innerHTML = '';
 	        }
 	    }, {
-	        key: 'getErrorMessage',
-	        value: function getErrorMessage(name, method) {
-	            // todo think about it
-	            var message = '';
-	
-	            if (this.options.messages[name] && this.options.messages[name][method]) {
-	                message = this.options.messages[name][method];
-	            } else {
-	                message = this.methods[method].message;
-	            }
-	
-	            return message;
-	        }
-	    }, {
 	        key: 'addMethod',
 	        value: function addMethod(rule, func, message) {
 	            this.methods[rule] = {
@@ -419,46 +412,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	                message: message
 	            };
 	        }
+	
+	        // todo rewrite
+	
 	    }, {
-	        key: 'initMethods',
-	        value: function initMethods() {
-	            this.methods = {};
-	
-	            this.addMethod('required', function (value) {
-	                return value && value.trim() !== '';
-	            }, (0, _jediValidateI18n.translate)('This field is required'));
-	
-	            this.addMethod('regexp', function (value, element, regexp) {
-	                return regexp.test(value);
-	            }, (0, _jediValidateI18n.translate)('Please, provide correct value'));
-	
-	            this.addMethod('email', function (value) {
-	                return (/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i.test(value)
-	                );
-	            }, (0, _jediValidateI18n.translate)('This email is incorrect'));
-	
-	            this.addMethod('filesize', function (value, element, size) {
-	                return [].concat(_toConsumableArray(element.files)).reduce(function (r, file) {
-	                    return file.size < size && r;
-	                }, true);
-	            }, (0, _jediValidateI18n.translate)('This file is too large'));
-	
-	            this.addMethod('extension', function (value, element, extensions) {
-	                return [].concat(_toConsumableArray(element.files)).reduce(function (r, file) {
-	                    return extensions.indexOf(file.name.split('.').pop()) !== -1 && r;
-	                }, true);
-	            }, (0, _jediValidateI18n.translate)('This extension is not supported'));
-	
-	            this.addMethod('tel', function (value) {
-	                return (/^([\+]+)*[0-9\x20\x28\x29\-]{5,20}$/.test(value)
-	                );
-	            }, (0, _jediValidateI18n.translate)('This phone number is incorrect'));
-	
-	            this.addMethod('url', function (value) {
-	                return (/[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi.test(value)
-	                );
-	            }, // eslint-disable-line max-len
-	            (0, _jediValidateI18n.translate)('Wrong url'));
+	        key: 'initErrorMessages',
+	        value: function initErrorMessages(rules, messages, methods) {
+	            return Object.keys(rules).reduce(function (names, name) {
+	                return _extends({}, names, _defineProperty({}, name, Object.keys(rules[name]).reduce(function (ruleNames, method) {
+	                    return _extends({}, ruleNames, _defineProperty({}, method, messages[name] && messages[name][method] || methods[method] && methods[method].message || ''));
+	                }, {})));
+	            }, {});
 	        }
 	    }], [{
 	        key: 'addToDictionary',
@@ -829,8 +793,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 	
-	function validateField(rules, methods, value, input, getErrorMessage) {
-	    // fixme getErrorMessage is bad
+	function validateField(rules, methods, value, input, errorMessages) {
 	    if (!input) return [];
 	
 	    var name = input.name;
@@ -838,7 +801,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var isEmpty = !methods.required.func(value, input);
 	
 	    if (isEmpty && rules.required) {
-	        return [getErrorMessage(name, 'required')]; // todo think about it
+	        return [errorMessages[name].required];
 	    }
 	
 	    if (isEmpty) {
@@ -853,7 +816,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var valid = methods[method].func(value, input, params);
 	
 	            if (!valid) {
-	                errors.push(getErrorMessage(name, method)); // todo think about it
+	                errors.push(errorMessages[name][method]);
 	            }
 	        } else {
 	            errors.push('Method "' + method + '" not found');
@@ -863,11 +826,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, []);
 	}
 	
-	function validateData(rules, methods, data, inputs, getErrorMessage) {
-	    // fixme getErrorMessage is bad
+	function validateData(rules, methods, data, inputs, errorMessages) {
 	    return Object.keys(rules).reduce(function (obj, name) {
 	        var value = (0, _getData.getValueByName)(name, data);
-	        var errors = validateField(rules[name], methods, value, inputs[name], getErrorMessage);
+	        var errors = validateField(rules[name], methods, value, inputs[name], errorMessages);
 	        return _extends({}, obj, _defineProperty({}, name, errors.length ? errors : undefined));
 	    }, {});
 	}
@@ -922,6 +884,72 @@ return /******/ (function(modules) { // webpackBootstrap
 	        xhr.send(options.method.toUpperCase() === 'POST' ? options.data : '');
 	    });
 	}
+
+/***/ },
+/* 8 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _jediValidateI18n = __webpack_require__(3);
+	
+	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+	
+	exports.default = {
+	    required: {
+	        func: function func(value) {
+	            return value && value.trim() !== '';
+	        },
+	        message: (0, _jediValidateI18n.translate)('This field is required')
+	    },
+	    regexp: {
+	        func: function func(value, element, regexp) {
+	            return regexp.test(value);
+	        },
+	        message: (0, _jediValidateI18n.translate)('Please, provide correct value')
+	    },
+	    email: {
+	        func: function func(value) {
+	            return (/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i.test(value)
+	            );
+	        },
+	        message: (0, _jediValidateI18n.translate)('This email is incorrect')
+	    },
+	    filesize: {
+	        func: function func(value, element, size) {
+	            return [].concat(_toConsumableArray(element.files)).reduce(function (r, file) {
+	                return file.size < size && r;
+	            }, true);
+	        }, // eslint-disable-line max-len
+	        message: (0, _jediValidateI18n.translate)('This file is too large')
+	    },
+	    extension: {
+	        func: function func(value, element, extensions) {
+	            return [].concat(_toConsumableArray(element.files)).reduce(function (r, file) {
+	                return extensions.indexOf(file.name.split('.').pop()) !== -1 && r;
+	            }, true);
+	        }, // eslint-disable-line max-len
+	        message: (0, _jediValidateI18n.translate)('This extension is not supported')
+	    },
+	    tel: {
+	        func: function func(value) {
+	            return (/^([\+]+)*[0-9\x20\x28\x29\-]{5,20}$/.test(value)
+	            );
+	        },
+	        message: (0, _jediValidateI18n.translate)('This phone number is incorrect')
+	    },
+	    url: {
+	        func: function func(value) {
+	            return (/[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi.test(value)
+	            );
+	        }, // eslint-disable-line max-len
+	        message: (0, _jediValidateI18n.translate)('Wrong url')
+	    }
+	};
 
 /***/ }
 /******/ ])
