@@ -30,8 +30,10 @@ class JediValidate {
             },
             formStatePrefix: 'jedi-',
             callbacks: {
-                success() {},
-                error() {},
+                success() {
+                },
+                error() {
+                },
             },
             clean: true,
             redirect: true,
@@ -103,12 +105,14 @@ class JediValidate {
         this.nodes.form.setAttribute('novalidate', 'novalidate');
 
         this.nodes.form.addEventListener('submit', (event) => {
+            event.preventDefault();
             this.data = getData(this.inputs);
+            console.log(this.data)
+
             const errors = validateData(
                 this.rules,
                 this.methods,
                 this.data,
-                this.inputs,
                 this.errorMessages
             );
 
@@ -147,7 +151,7 @@ class JediValidate {
             // fix get opt data
             this.send({
                 ...this.options.ajax,
-                data: convertData(this.data, this.options.ajax.sendType, this.inputs),
+                data: convertData(this.data, this.options.ajax.sendType),
             });
         });
 
@@ -219,7 +223,7 @@ class JediValidate {
                     this.rules[name],
                     this.methods,
                     value,
-                    input,
+                    input.name,
                     this.errorMessages
                 );
                 this.markField(this.fields[name], this.messages[name], this.options.states, errors);

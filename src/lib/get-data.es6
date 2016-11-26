@@ -39,8 +39,8 @@ export function getValueByName(name, data) {
     return getValueByPath(path, data);
 }
 
-export function getRadioGroupValue(elements) {
-    return [...elements].map(radio => getInputValue(radio)).filter(Boolean)[0];
+export function getRadioGroupValue(inputs) {
+    return [...inputs].map(radio => getInputValue(radio)).filter(Boolean)[0];
 }
 
 export function getInputValue(input) {
@@ -60,6 +60,8 @@ export function getInputValue(input) {
     case 'checkbox':
     case 'radio':
         return input.checked ? input.value : '';
+    case 'file':
+        return input.files;
     default:
         return input.value;
     }
@@ -89,7 +91,7 @@ export function getQueryPart(name, data) {
     return `${name}=${encodeURIComponent(data)}&`;
 }
 
-export function convertData(data, type, inputs) { // todo think about inputs
+export function convertData(data, type) { // todo think about inputs
     let convertedData;
 
     switch (type) {
@@ -97,18 +99,22 @@ export function convertData(data, type, inputs) { // todo think about inputs
         convertedData = Object.keys(data)
                 .reduce((query, name) => `${query}${getQueryPart(name, data[name])}`, '');
         return convertedData.length ? convertedData.slice(0, -1) : '';
-    case 'formData': // todo rewrite, file issue
+    case 'formData': // todo rework
         return Object.keys(data).reduce((formData, name) => {
-            if (inputs[name] && inputs[name].type && inputs[name].type === 'file') {
-                if (inputs[name].hasAttribute('multiple')) {
-                    for (let i = 0; i < inputs[name].files.length; i += 1) {
-                        formData.append(`${name}[]`, inputs[name].files[i]);
+            if (data[name] instanceof FileList) {
+                if (data[name].length > 1) {
+                    for (let i = 0; i < data[name].length; i += 1) {
+                        formData.append(`${name}[${i}]`, data[name][i]);
                     }
-                } else {
-                    formData.append(name, inputs[name].files[0]);
+                } else if (data[name].length === 1) {
+                    formData.append(name, data[name][0]);
                 }
             } else {
-                formData.append(name, getInputValue(inputs[name]));
+                if (typeof data[name] === 'object') {
+                    Object.keys(data[name]).forEach(key => formData.append(`${name}[${key}]`, data[name][key]));
+                } else {
+                    formData.append(name, data[name]);
+                }
             }
 
             return formData;

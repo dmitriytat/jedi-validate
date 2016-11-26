@@ -1,10 +1,7 @@
 import { getValueByName } from './get-data.es6';
 
-export function validateField(rules, methods, value, input, errorMessages) {
-    if (!input) return [];
-
-    const { name } = input;
-    const isEmpty = !methods.required.func(value, input);
+export function validateField(rules, methods, value, name, errorMessages) {
+    const isEmpty = !methods.required.func(value);
 
     if (isEmpty && rules.required) {
         return [errorMessages[name].required];
@@ -19,7 +16,7 @@ export function validateField(rules, methods, value, input, errorMessages) {
         if (!params) return errors;
 
         if (methods[method]) {
-            const valid = methods[method].func(value, input, params);
+            const valid = methods[method].func(value, params);
 
             if (!valid) {
                 errors.push(errorMessages[name][method]);
@@ -32,10 +29,10 @@ export function validateField(rules, methods, value, input, errorMessages) {
     }, []);
 }
 
-export function validateData(rules, methods, data, inputs, errorMessages) {
+export function validateData(rules, methods, data, errorMessages) {
     return Object.keys(rules).reduce((obj, name) => {
         const value = getValueByName(name, data);
-        const errors = validateField(rules[name], methods, value, inputs[name], errorMessages);
+        const errors = validateField(rules[name], methods, value, name, errorMessages);
         return {
             ...obj,
             [name]: errors.length ? errors : undefined,

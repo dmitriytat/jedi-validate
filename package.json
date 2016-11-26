@@ -4,7 +4,7 @@
   "description": "A lightweight form validation component",
   "main": "./dist/jedi-validate.js",
   "scripts": {
-    "test": "npm run tests-build && npm run test-browser",
+    "test": "npm run test-browser",
     "dev": "rimraf ./dist && webpack-dev-server --hot --inline --progress --colors --watch",
     "build": "rimraf ./dist && webpack --progress --colors",
     "tests-build": "rimraf ./dist-tests && webpack --config ./webpack.config.tests.js --progress --colors",
@@ -32,6 +32,8 @@
     "babel-loader": "^6.2.5",
     "babel-preset-es2015": "^6.14.0",
     "babel-preset-stage-3": "^6.17.0",
+    "babel-register": "^6.18.0",
+    "blanket": "^1.2.3",
     "bootstrap": "^3.3.7",
     "chai": "^3.5.0",
     "eslint": "^3.8.1",
@@ -40,6 +42,7 @@
     "eslint-plugin-import": "^2.0.1",
     "eslint-plugin-jsx-a11y": "^2.2.3",
     "eslint-plugin-react": "^6.4.1",
+    "istanbul": "^0.4.5",
     "json-loader": "^0.5.4",
     "mocha": "^3.0.2",
     "rimraf": "^2.5.4",
@@ -47,6 +50,7 @@
     "webpack-dev-server": "^1.16.2"
   },
   "dependencies": {
+    "babel-plugin-__coverage__": "^11.0.0",
     "deepmerge": "^1.2.0"
   }
 }

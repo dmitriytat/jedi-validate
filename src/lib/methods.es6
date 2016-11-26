@@ -2,11 +2,11 @@ import { translate } from '../i18n/jedi-validate-i18n.es6';
 
 export default {
     required: {
-        func: value => value && value.trim() !== '',
+        func: value => value && (value instanceof FileList || value.trim()) !== '',
         message: translate('This field is required'),
     },
     regexp: {
-        func: (value, element, regexp) => regexp.test(value),
+        func: (value, regexp) => regexp.test(value),
         message: translate('Please, provide correct value'),
     },
     email: {
@@ -14,11 +14,11 @@ export default {
         message: translate('This email is incorrect'),
     },
     filesize: {
-        func: (value, element, size) => [...element.files].reduce((r, file) => file.size < size && r, true), // eslint-disable-line max-len
+        func: (value, size) => [...value].reduce((r, file) => file.size < size && r, true), // eslint-disable-line max-len
         message: translate('This file is too large'),
     },
     extension: {
-        func: (value, element, extensions) => [...element.files].reduce((r, file) => extensions.indexOf(file.name.split('.').pop()) !== -1 && r, true), // eslint-disable-line max-len
+        func: (value, extensions) => [...value].reduce((r, file) => extensions.indexOf(file.name.split('.').pop()) !== -1 && r, true), // eslint-disable-line max-len
         message: translate('This extension is not supported'),
     },
     tel: {
