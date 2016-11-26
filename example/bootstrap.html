@@ -97,8 +97,8 @@
     new JediValidate(formWrapper, {
         ajax: {
 			url: '/example/ajax.json',
-			sendType: 'serialize',
-			method: 'get',
+			sendType: 'formData',
+			method: 'post',
 		},
         states: {
             error: 'has-error',
