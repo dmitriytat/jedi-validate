@@ -8,7 +8,7 @@ module.exports = {
     },
     devtool: 'source-map',
     output: {
-        path: './dist',
+        path: 'dist',
         filename: '[name].js',
         libraryTarget: 'umd',
         library: 'JediValidate',
@@ -16,20 +16,23 @@ module.exports = {
         publicPath: '/dist/'
     },
     module: {
-        loaders: [
+        rules: [
+            // {
+            //     enforce: 'pre',
+            //     test: /\.es6$/,
+            //     exclude: /node_modules/,
+            //     loader: 'eslint-loader',
+            // },
             {
                 test: /\.es6/,
                 exclude: /(node_modules|bower_components)/,
-                loader: 'babel', 
+                loader: 'babel-loader',
             },
-            { test: /\.json$/, loader: 'json' }
+            {
+                test: /\.json$/,
+                loader: 'json-loader',
+            }
         ],
-        preLoaders: [
-            { test: /\.es6$/, exclude: /node_modules/, loader: 'eslint-loader' }
-        ]
-    },
-    eslint: {
-        configFile: './.eslintrc'
     },
     plugins: [
         new webpack.optimize.UglifyJsPlugin({
