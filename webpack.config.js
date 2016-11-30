@@ -3,7 +3,8 @@ var webpack = require('webpack');
 module.exports = {
     entry: {
         'jedi-validate': './src/jedi-validate.es6',
-        'jedi-validate.min': './src/jedi-validate.es6'
+        'jedi-validate.min': './src/jedi-validate.es6',
+        'tests': './tests/tests.es6',
     },
     devtool: 'source-map',
     output: {
@@ -11,7 +12,7 @@ module.exports = {
         filename: '[name].js',
         libraryTarget: 'umd',
         library: 'JediValidate',
-        sourceMapFilename: '[name].map',
+        sourceMapFilename: '[name].js.map',
         publicPath: '/dist/'
     },
     module: {
@@ -19,10 +20,7 @@ module.exports = {
             {
                 test: /\.es6/,
                 exclude: /(node_modules|bower_components)/,
-                loader: 'babel',
-                query: {
-                    presets: ['es2015']
-                }
+                loader: 'babel', 
             },
             { test: /\.json$/, loader: 'json' }
         ],
