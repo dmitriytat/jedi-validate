@@ -271,3 +271,8 @@ You can define your own error messages in case validation fails. In case a form 
 - 1.0.6 fix bug with sending
 - 1.0.5 add enhanced language support
 - 1.0.4 add simple language support
+- 1.1.1 change internal structure
+    - get data from inputs
+    - store data
+    - validate data
+    - migrate to webpack 2
