@@ -68,8 +68,13 @@ export function getInputValue(input) {
 }
 
 export function getInputData(input) {
+    let name = input.name;
+    if (!name && Array.isArray(input) && input[0]) {
+        name = input[0].name;
+    }
+
     const value = getInputValue(input);
-    const path = convertNameToPath(input.name);
+    const path = convertNameToPath(name);
 
     return createObject(path, value);
 }
@@ -109,12 +114,10 @@ export function convertData(data, type) { // todo think about inputs
                 } else if (data[name].length === 1) {
                     formData.append(name, data[name][0]);
                 }
+            } else if (typeof data[name] === 'object') {
+                Object.keys(data[name]).forEach(key => formData.append(`${name}[${key}]`, data[name][key]));
             } else {
-                if (typeof data[name] === 'object') {
-                    Object.keys(data[name]).forEach(key => formData.append(`${name}[${key}]`, data[name][key]));
-                } else {
-                    formData.append(name, data[name]);
-                }
+                formData.append(name, data[name]);
             }
 
             return formData;

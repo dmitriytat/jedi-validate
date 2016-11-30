@@ -1,4 +1,4 @@
-import { validateField, } from '../src/lib/validate-data.es6';
+import { validateField, validateData } from '../src/lib/validate-data.es6';
 import methods from '../src/lib/methods.es6';
 
 const rules = {
@@ -39,11 +39,17 @@ const errorMessages = {
 describe('Validate data', function () {
     describe('Validate Field', function () {
         it('Pass correct value', function () {
-            assert.deepEqual(validateField(rules.phone, methods, data.phone, inputs.phone, errorMessages), []);
+            assert.deepEqual(validateField(rules.phone, methods, data.phone, 'phone', errorMessages), []);
         });
 
         it('Pass incorrect value', function () {
-            assert.deepEqual(validateField(rules.phone2, methods, data.phone2, inputs.phone2, errorMessages), [errorMessages.phone.regexp]);
+            assert.deepEqual(validateField(rules.phone2, methods, data.phone2, 'phone2', errorMessages), [errorMessages.phone2.regexp]);
+        });
+    });
+
+    describe('Validate data', function () {
+        it('Validate values', function () {
+            assert.deepEqual(validateData(rules, methods, data, errorMessages), { phone: undefined, phone2: [errorMessages.phone2.regexp] });
         });
     });
 });

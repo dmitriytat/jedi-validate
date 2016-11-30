@@ -107,7 +107,7 @@ class JediValidate {
         this.nodes.form.addEventListener('submit', (event) => {
             event.preventDefault();
             this.data = getData(this.inputs);
-            console.log(this.data)
+            console.log(this.data);
 
             const errors = validateData(
                 this.rules,

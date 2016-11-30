@@ -1,20 +1,18 @@
 {
   "name": "jedi-validate",
-  "version": "1.0.6",
+  "version": "1.1.0",
   "description": "A lightweight form validation component",
   "main": "./dist/jedi-validate.js",
   "scripts": {
-    "test": "npm run test-browser",
-    "dev": "rimraf ./dist && webpack-dev-server --hot --inline --progress --colors --watch",
+    "test": "npm run build && mocha-phantomjs ./tests/test.html",
+    "dev": "rimraf ./dist && webpack-dev-server --hot --inline --progress --colors --watch --port 4000",
     "build": "rimraf ./dist && webpack --progress --colors",
-    "tests-build": "rimraf ./dist-tests && webpack --config ./webpack.config.tests.js --progress --colors",
-    "test-browser": "npm run tests-build && mocha-phantomjs ./tests/test.html",
     "lint": "eslint src/**/*.es6",
     "fix": "eslint src/**/*.es6 --fix"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dimkosru/jedi-validate.git"
+    "url": "git+https://github.com/dmitriytat/jedi-validate.git"
   },
   "keywords": [
     "form",
@@ -24,9 +22,9 @@
   "author": "Dmitriy Tatarintsev <tatarintsevd@gmail.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/dimkosru/jedi-validate/issues"
+    "url": "https://github.com/dmitriytat/jedi-validate/issues"
   },
-  "homepage": "https://github.com/dimkosru/jedi-validate#readme",
+  "homepage": "https://github.com/dmitriytat/jedi-validate#readme",
   "devDependencies": {
     "babel-core": "^6.14.0",
     "babel-loader": "^6.2.5",
@@ -47,10 +45,10 @@
     "mocha": "^3.0.2",
     "rimraf": "^2.5.4",
     "webpack": "^1.13.2",
+    "babel-plugin-__coverage__": "^11.0.0",
     "webpack-dev-server": "^1.16.2"
   },
   "dependencies": {
-    "babel-plugin-__coverage__": "^11.0.0",
     "deepmerge": "^1.2.0"
   }
 }

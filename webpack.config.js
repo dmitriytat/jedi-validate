@@ -3,8 +3,8 @@ var webpack = require('webpack');
 module.exports = {
     entry: {
         'jedi-validate': './src/jedi-validate.es6',
-        'map': './map/map.es6',
         'jedi-validate.min': './src/jedi-validate.es6',
+        'tests': './tests/tests.es6',
     },
     devtool: 'source-map',
     output: {
