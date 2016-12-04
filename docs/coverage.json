@@ -1,0 +1,32 @@
+{
+  "coverage": "100%",
+  "expectCount": 17,
+  "actualCount": 17,
+  "files": {
+    "src/i18n/jedi-validate-i18n.es6": {
+      "expectCount": 2,
+      "actualCount": 2,
+      "undocumentLines": []
+    },
+    "src/lib/ajax.es6": {
+      "expectCount": 1,
+      "actualCount": 1,
+      "undocumentLines": []
+    },
+    "src/lib/get-data.es6": {
+      "expectCount": 10,
+      "actualCount": 10,
+      "undocumentLines": []
+    },
+    "src/lib/get-options.es6": {
+      "expectCount": 2,
+      "actualCount": 2,
+      "undocumentLines": []
+    },
+    "src/lib/validate-data.es6": {
+      "expectCount": 2,
+      "actualCount": 2,
+      "undocumentLines": []
+    }
+  }
+}

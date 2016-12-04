@@ -1,0 +1,1200 @@
+{
+  "type": "Program",
+  "start": 0,
+  "end": 885,
+  "loc": {
+    "start": {
+      "line": 1,
+      "column": 0
+    },
+    "end": {
+      "line": 32,
+      "column": 0
+    }
+  },
+  "sourceType": "module",
+  "body": [
+    {
+      "type": "VariableDeclaration",
+      "start": 0,
+      "end": 61,
+      "loc": {
+        "start": {
+          "line": 1,
+          "column": 0
+        },
+        "end": {
+          "line": 1,
+          "column": 61
+        }
+      },
+      "declarations": [
+        {
+          "type": "VariableDeclarator",
+          "start": 6,
+          "end": 60,
+          "loc": {
+            "start": {
+              "line": 1,
+              "column": 6
+            },
+            "end": {
+              "line": 1,
+              "column": 60
+            }
+          },
+          "id": {
+            "type": "Identifier",
+            "start": 6,
+            "end": 16,
+            "loc": {
+              "start": {
+                "line": 1,
+                "column": 6
+              },
+              "end": {
+                "line": 1,
+                "column": 16
+              }
+            },
+            "name": "dictionary"
+          },
+          "init": {
+            "type": "CallExpression",
+            "start": 19,
+            "end": 60,
+            "loc": {
+              "start": {
+                "line": 1,
+                "column": 19
+              },
+              "end": {
+                "line": 1,
+                "column": 60
+              }
+            },
+            "callee": {
+              "type": "Identifier",
+              "start": 19,
+              "end": 26,
+              "loc": {
+                "start": {
+                  "line": 1,
+                  "column": 19
+                },
+                "end": {
+                  "line": 1,
+                  "column": 26
+                }
+              },
+              "name": "require"
+            },
+            "arguments": [
+              {
+                "type": "Literal",
+                "start": 27,
+                "end": 59,
+                "loc": {
+                  "start": {
+                    "line": 1,
+                    "column": 27
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 59
+                  }
+                },
+                "value": "./jedi-validate-i18n-data.json",
+                "rawValue": "./jedi-validate-i18n-data.json",
+                "raw": "'./jedi-validate-i18n-data.json'"
+              }
+            ]
+          }
+        }
+      ],
+      "kind": "const",
+      "trailingComments": [
+        {
+          "type": "Block",
+          "value": "*\r\n * Default language\r\n * @type {string}\r\n ",
+          "start": 65,
+          "end": 113,
+          "loc": {
+            "start": {
+              "line": 3,
+              "column": 0
+            },
+            "end": {
+              "line": 6,
+              "column": 3
+            }
+          },
+          "range": [
+            65,
+            113
+          ]
+        }
+      ]
+    },
+    {
+      "type": "VariableDeclaration",
+      "start": 115,
+      "end": 144,
+      "loc": {
+        "start": {
+          "line": 7,
+          "column": 0
+        },
+        "end": {
+          "line": 7,
+          "column": 29
+        }
+      },
+      "declarations": [
+        {
+          "type": "VariableDeclarator",
+          "start": 121,
+          "end": 143,
+          "loc": {
+            "start": {
+              "line": 7,
+              "column": 6
+            },
+            "end": {
+              "line": 7,
+              "column": 28
+            }
+          },
+          "id": {
+            "type": "Identifier",
+            "start": 121,
+            "end": 136,
+            "loc": {
+              "start": {
+                "line": 7,
+                "column": 6
+              },
+              "end": {
+                "line": 7,
+                "column": 21
+              }
+            },
+            "name": "defaultLanguage",
+            "leadingComments": null
+          },
+          "init": {
+            "type": "Literal",
+            "start": 139,
+            "end": 143,
+            "loc": {
+              "start": {
+                "line": 7,
+                "column": 24
+              },
+              "end": {
+                "line": 7,
+                "column": 28
+              }
+            },
+            "value": "en",
+            "rawValue": "en",
+            "raw": "'en'"
+          },
+          "leadingComments": null
+        }
+      ],
+      "kind": "const",
+      "leadingComments": [
+        {
+          "type": "Block",
+          "value": "*\r\n * Default language\r\n * @type {string}\r\n ",
+          "start": 65,
+          "end": 113,
+          "loc": {
+            "start": {
+              "line": 3,
+              "column": 0
+            },
+            "end": {
+              "line": 6,
+              "column": 3
+            }
+          },
+          "range": [
+            65,
+            113
+          ]
+        }
+      ],
+      "trailingComments": [
+        {
+          "type": "Block",
+          "value": "*\r\n * Translate phrase\r\n * @param {string} text - phrase to translate\r\n * @param {string} language - language token\r\n * @returns {string} - translated text\r\n ",
+          "start": 148,
+          "end": 310,
+          "loc": {
+            "start": {
+              "line": 9,
+              "column": 0
+            },
+            "end": {
+              "line": 14,
+              "column": 3
+            }
+          },
+          "range": [
+            148,
+            310
+          ]
+        }
+      ]
+    },
+    {
+      "type": "ExportNamedDeclaration",
+      "start": 312,
+      "end": 450,
+      "loc": {
+        "start": {
+          "line": 15,
+          "column": 0
+        },
+        "end": {
+          "line": 17,
+          "column": 1
+        }
+      },
+      "declaration": {
+        "type": "FunctionDeclaration",
+        "start": 319,
+        "end": 450,
+        "loc": {
+          "start": {
+            "line": 15,
+            "column": 7
+          },
+          "end": {
+            "line": 17,
+            "column": 1
+          }
+        },
+        "id": {
+          "type": "Identifier",
+          "start": 328,
+          "end": 337,
+          "loc": {
+            "start": {
+              "line": 15,
+              "column": 16
+            },
+            "end": {
+              "line": 15,
+              "column": 25
+            }
+          },
+          "name": "translate",
+          "leadingComments": null
+        },
+        "generator": false,
+        "expression": false,
+        "async": false,
+        "params": [
+          {
+            "type": "Identifier",
+            "start": 338,
+            "end": 342,
+            "loc": {
+              "start": {
+                "line": 15,
+                "column": 26
+              },
+              "end": {
+                "line": 15,
+                "column": 30
+              }
+            },
+            "name": "text"
+          },
+          {
+            "type": "AssignmentPattern",
+            "start": 344,
+            "end": 370,
+            "loc": {
+              "start": {
+                "line": 15,
+                "column": 32
+              },
+              "end": {
+                "line": 15,
+                "column": 58
+              }
+            },
+            "operator": "=",
+            "left": {
+              "type": "Identifier",
+              "start": 344,
+              "end": 352,
+              "loc": {
+                "start": {
+                  "line": 15,
+                  "column": 32
+                },
+                "end": {
+                  "line": 15,
+                  "column": 40
+                }
+              },
+              "name": "language"
+            },
+            "right": {
+              "type": "Identifier",
+              "start": 355,
+              "end": 370,
+              "loc": {
+                "start": {
+                  "line": 15,
+                  "column": 43
+                },
+                "end": {
+                  "line": 15,
+                  "column": 58
+                }
+              },
+              "name": "defaultLanguage"
+            }
+          }
+        ],
+        "body": {
+          "type": "BlockStatement",
+          "start": 372,
+          "end": 450,
+          "loc": {
+            "start": {
+              "line": 15,
+              "column": 60
+            },
+            "end": {
+              "line": 17,
+              "column": 1
+            }
+          },
+          "body": [
+            {
+              "type": "ReturnStatement",
+              "start": 379,
+              "end": 447,
+              "loc": {
+                "start": {
+                  "line": 16,
+                  "column": 4
+                },
+                "end": {
+                  "line": 16,
+                  "column": 72
+                }
+              },
+              "argument": {
+                "type": "LogicalExpression",
+                "start": 386,
+                "end": 446,
+                "loc": {
+                  "start": {
+                    "line": 16,
+                    "column": 11
+                  },
+                  "end": {
+                    "line": 16,
+                    "column": 71
+                  }
+                },
+                "left": {
+                  "type": "LogicalExpression",
+                  "start": 387,
+                  "end": 437,
+                  "loc": {
+                    "start": {
+                      "line": 16,
+                      "column": 12
+                    },
+                    "end": {
+                      "line": 16,
+                      "column": 62
+                    }
+                  },
+                  "left": {
+                    "type": "MemberExpression",
+                    "start": 387,
+                    "end": 407,
+                    "loc": {
+                      "start": {
+                        "line": 16,
+                        "column": 12
+                      },
+                      "end": {
+                        "line": 16,
+                        "column": 32
+                      }
+                    },
+                    "object": {
+                      "type": "Identifier",
+                      "start": 387,
+                      "end": 397,
+                      "loc": {
+                        "start": {
+                          "line": 16,
+                          "column": 12
+                        },
+                        "end": {
+                          "line": 16,
+                          "column": 22
+                        }
+                      },
+                      "name": "dictionary"
+                    },
+                    "property": {
+                      "type": "Identifier",
+                      "start": 398,
+                      "end": 406,
+                      "loc": {
+                        "start": {
+                          "line": 16,
+                          "column": 23
+                        },
+                        "end": {
+                          "line": 16,
+                          "column": 31
+                        }
+                      },
+                      "name": "language"
+                    },
+                    "computed": true
+                  },
+                  "operator": "&&",
+                  "right": {
+                    "type": "MemberExpression",
+                    "start": 411,
+                    "end": 437,
+                    "loc": {
+                      "start": {
+                        "line": 16,
+                        "column": 36
+                      },
+                      "end": {
+                        "line": 16,
+                        "column": 62
+                      }
+                    },
+                    "object": {
+                      "type": "MemberExpression",
+                      "start": 411,
+                      "end": 431,
+                      "loc": {
+                        "start": {
+                          "line": 16,
+                          "column": 36
+                        },
+                        "end": {
+                          "line": 16,
+                          "column": 56
+                        }
+                      },
+                      "object": {
+                        "type": "Identifier",
+                        "start": 411,
+                        "end": 421,
+                        "loc": {
+                          "start": {
+                            "line": 16,
+                            "column": 36
+                          },
+                          "end": {
+                            "line": 16,
+                            "column": 46
+                          }
+                        },
+                        "name": "dictionary"
+                      },
+                      "property": {
+                        "type": "Identifier",
+                        "start": 422,
+                        "end": 430,
+                        "loc": {
+                          "start": {
+                            "line": 16,
+                            "column": 47
+                          },
+                          "end": {
+                            "line": 16,
+                            "column": 55
+                          }
+                        },
+                        "name": "language"
+                      },
+                      "computed": true
+                    },
+                    "property": {
+                      "type": "Identifier",
+                      "start": 432,
+                      "end": 436,
+                      "loc": {
+                        "start": {
+                          "line": 16,
+                          "column": 57
+                        },
+                        "end": {
+                          "line": 16,
+                          "column": 61
+                        }
+                      },
+                      "name": "text"
+                    },
+                    "computed": true
+                  },
+                  "parenthesizedExpression": true
+                },
+                "operator": "||",
+                "right": {
+                  "type": "Identifier",
+                  "start": 442,
+                  "end": 446,
+                  "loc": {
+                    "start": {
+                      "line": 16,
+                      "column": 67
+                    },
+                    "end": {
+                      "line": 16,
+                      "column": 71
+                    }
+                  },
+                  "name": "text"
+                }
+              }
+            }
+          ],
+          "trailingComments": null
+        },
+        "leadingComments": [
+          {
+            "type": "Block",
+            "value": "*\r\n * Translate phrase\r\n * @param {string} text - phrase to translate\r\n * @param {string} language - language token\r\n * @returns {string} - translated text\r\n ",
+            "start": 148,
+            "end": 310,
+            "loc": {
+              "start": {
+                "line": 9,
+                "column": 0
+              },
+              "end": {
+                "line": 14,
+                "column": 3
+              }
+            },
+            "range": [
+              148,
+              310
+            ]
+          }
+        ],
+        "trailingComments": [
+          {
+            "type": "Block",
+            "value": "*\r\n * Add translation pair to dictionary\r\n * @param {string} sourceText - phrase\r\n * @param {string} translatedText - translated phrase\r\n * @param {string} language - language token\r\n ",
+            "start": 454,
+            "end": 642,
+            "loc": {
+              "start": {
+                "line": 19,
+                "column": 0
+              },
+              "end": {
+                "line": 24,
+                "column": 3
+              }
+            },
+            "range": [
+              454,
+              642
+            ]
+          }
+        ]
+      },
+      "specifiers": [],
+      "source": null,
+      "leadingComments": [
+        {
+          "type": "Block",
+          "value": "*\r\n * Translate phrase\r\n * @param {string} text - phrase to translate\r\n * @param {string} language - language token\r\n * @returns {string} - translated text\r\n ",
+          "start": 148,
+          "end": 310,
+          "loc": {
+            "start": {
+              "line": 9,
+              "column": 0
+            },
+            "end": {
+              "line": 14,
+              "column": 3
+            }
+          },
+          "range": [
+            148,
+            310
+          ]
+        }
+      ],
+      "trailingComments": [
+        {
+          "type": "Block",
+          "value": "*\r\n * Add translation pair to dictionary\r\n * @param {string} sourceText - phrase\r\n * @param {string} translatedText - translated phrase\r\n * @param {string} language - language token\r\n ",
+          "start": 454,
+          "end": 642,
+          "loc": {
+            "start": {
+              "line": 19,
+              "column": 0
+            },
+            "end": {
+              "line": 24,
+              "column": 3
+            }
+          },
+          "range": [
+            454,
+            642
+          ]
+        }
+      ]
+    },
+    {
+      "type": "ExportNamedDeclaration",
+      "start": 644,
+      "end": 883,
+      "loc": {
+        "start": {
+          "line": 25,
+          "column": 0
+        },
+        "end": {
+          "line": 31,
+          "column": 1
+        }
+      },
+      "declaration": {
+        "type": "FunctionDeclaration",
+        "start": 651,
+        "end": 883,
+        "loc": {
+          "start": {
+            "line": 25,
+            "column": 7
+          },
+          "end": {
+            "line": 31,
+            "column": 1
+          }
+        },
+        "id": {
+          "type": "Identifier",
+          "start": 660,
+          "end": 674,
+          "loc": {
+            "start": {
+              "line": 25,
+              "column": 16
+            },
+            "end": {
+              "line": 25,
+              "column": 30
+            }
+          },
+          "name": "addTranslation",
+          "leadingComments": null
+        },
+        "generator": false,
+        "expression": false,
+        "async": false,
+        "params": [
+          {
+            "type": "Identifier",
+            "start": 675,
+            "end": 685,
+            "loc": {
+              "start": {
+                "line": 25,
+                "column": 31
+              },
+              "end": {
+                "line": 25,
+                "column": 41
+              }
+            },
+            "name": "sourceText"
+          },
+          {
+            "type": "Identifier",
+            "start": 687,
+            "end": 701,
+            "loc": {
+              "start": {
+                "line": 25,
+                "column": 43
+              },
+              "end": {
+                "line": 25,
+                "column": 57
+              }
+            },
+            "name": "translatedText"
+          },
+          {
+            "type": "AssignmentPattern",
+            "start": 703,
+            "end": 729,
+            "loc": {
+              "start": {
+                "line": 25,
+                "column": 59
+              },
+              "end": {
+                "line": 25,
+                "column": 85
+              }
+            },
+            "operator": "=",
+            "left": {
+              "type": "Identifier",
+              "start": 703,
+              "end": 711,
+              "loc": {
+                "start": {
+                  "line": 25,
+                  "column": 59
+                },
+                "end": {
+                  "line": 25,
+                  "column": 67
+                }
+              },
+              "name": "language"
+            },
+            "right": {
+              "type": "Identifier",
+              "start": 714,
+              "end": 729,
+              "loc": {
+                "start": {
+                  "line": 25,
+                  "column": 70
+                },
+                "end": {
+                  "line": 25,
+                  "column": 85
+                }
+              },
+              "name": "defaultLanguage"
+            }
+          }
+        ],
+        "body": {
+          "type": "BlockStatement",
+          "start": 731,
+          "end": 883,
+          "loc": {
+            "start": {
+              "line": 25,
+              "column": 87
+            },
+            "end": {
+              "line": 31,
+              "column": 1
+            }
+          },
+          "body": [
+            {
+              "type": "IfStatement",
+              "start": 738,
+              "end": 822,
+              "loc": {
+                "start": {
+                  "line": 26,
+                  "column": 4
+                },
+                "end": {
+                  "line": 28,
+                  "column": 5
+                }
+              },
+              "test": {
+                "type": "BinaryExpression",
+                "start": 742,
+                "end": 776,
+                "loc": {
+                  "start": {
+                    "line": 26,
+                    "column": 8
+                  },
+                  "end": {
+                    "line": 26,
+                    "column": 42
+                  }
+                },
+                "left": {
+                  "type": "MemberExpression",
+                  "start": 742,
+                  "end": 762,
+                  "loc": {
+                    "start": {
+                      "line": 26,
+                      "column": 8
+                    },
+                    "end": {
+                      "line": 26,
+                      "column": 28
+                    }
+                  },
+                  "object": {
+                    "type": "Identifier",
+                    "start": 742,
+                    "end": 752,
+                    "loc": {
+                      "start": {
+                        "line": 26,
+                        "column": 8
+                      },
+                      "end": {
+                        "line": 26,
+                        "column": 18
+                      }
+                    },
+                    "name": "dictionary"
+                  },
+                  "property": {
+                    "type": "Identifier",
+                    "start": 753,
+                    "end": 761,
+                    "loc": {
+                      "start": {
+                        "line": 26,
+                        "column": 19
+                      },
+                      "end": {
+                        "line": 26,
+                        "column": 27
+                      }
+                    },
+                    "name": "language"
+                  },
+                  "computed": true
+                },
+                "operator": "===",
+                "right": {
+                  "type": "Identifier",
+                  "start": 767,
+                  "end": 776,
+                  "loc": {
+                    "start": {
+                      "line": 26,
+                      "column": 33
+                    },
+                    "end": {
+                      "line": 26,
+                      "column": 42
+                    }
+                  },
+                  "name": "undefined"
+                }
+              },
+              "consequent": {
+                "type": "BlockStatement",
+                "start": 778,
+                "end": 822,
+                "loc": {
+                  "start": {
+                    "line": 26,
+                    "column": 44
+                  },
+                  "end": {
+                    "line": 28,
+                    "column": 5
+                  }
+                },
+                "body": [
+                  {
+                    "type": "ExpressionStatement",
+                    "start": 789,
+                    "end": 815,
+                    "loc": {
+                      "start": {
+                        "line": 27,
+                        "column": 8
+                      },
+                      "end": {
+                        "line": 27,
+                        "column": 34
+                      }
+                    },
+                    "expression": {
+                      "type": "AssignmentExpression",
+                      "start": 789,
+                      "end": 814,
+                      "loc": {
+                        "start": {
+                          "line": 27,
+                          "column": 8
+                        },
+                        "end": {
+                          "line": 27,
+                          "column": 33
+                        }
+                      },
+                      "operator": "=",
+                      "left": {
+                        "type": "MemberExpression",
+                        "start": 789,
+                        "end": 809,
+                        "loc": {
+                          "start": {
+                            "line": 27,
+                            "column": 8
+                          },
+                          "end": {
+                            "line": 27,
+                            "column": 28
+                          }
+                        },
+                        "object": {
+                          "type": "Identifier",
+                          "start": 789,
+                          "end": 799,
+                          "loc": {
+                            "start": {
+                              "line": 27,
+                              "column": 8
+                            },
+                            "end": {
+                              "line": 27,
+                              "column": 18
+                            }
+                          },
+                          "name": "dictionary"
+                        },
+                        "property": {
+                          "type": "Identifier",
+                          "start": 800,
+                          "end": 808,
+                          "loc": {
+                            "start": {
+                              "line": 27,
+                              "column": 19
+                            },
+                            "end": {
+                              "line": 27,
+                              "column": 27
+                            }
+                          },
+                          "name": "language"
+                        },
+                        "computed": true
+                      },
+                      "right": {
+                        "type": "ObjectExpression",
+                        "start": 812,
+                        "end": 814,
+                        "loc": {
+                          "start": {
+                            "line": 27,
+                            "column": 31
+                          },
+                          "end": {
+                            "line": 27,
+                            "column": 33
+                          }
+                        },
+                        "properties": []
+                      }
+                    }
+                  }
+                ]
+              },
+              "alternate": null
+            },
+            {
+              "type": "ExpressionStatement",
+              "start": 830,
+              "end": 880,
+              "loc": {
+                "start": {
+                  "line": 30,
+                  "column": 4
+                },
+                "end": {
+                  "line": 30,
+                  "column": 54
+                }
+              },
+              "expression": {
+                "type": "AssignmentExpression",
+                "start": 830,
+                "end": 879,
+                "loc": {
+                  "start": {
+                    "line": 30,
+                    "column": 4
+                  },
+                  "end": {
+                    "line": 30,
+                    "column": 53
+                  }
+                },
+                "operator": "=",
+                "left": {
+                  "type": "MemberExpression",
+                  "start": 830,
+                  "end": 862,
+                  "loc": {
+                    "start": {
+                      "line": 30,
+                      "column": 4
+                    },
+                    "end": {
+                      "line": 30,
+                      "column": 36
+                    }
+                  },
+                  "object": {
+                    "type": "MemberExpression",
+                    "start": 830,
+                    "end": 850,
+                    "loc": {
+                      "start": {
+                        "line": 30,
+                        "column": 4
+                      },
+                      "end": {
+                        "line": 30,
+                        "column": 24
+                      }
+                    },
+                    "object": {
+                      "type": "Identifier",
+                      "start": 830,
+                      "end": 840,
+                      "loc": {
+                        "start": {
+                          "line": 30,
+                          "column": 4
+                        },
+                        "end": {
+                          "line": 30,
+                          "column": 14
+                        }
+                      },
+                      "name": "dictionary"
+                    },
+                    "property": {
+                      "type": "Identifier",
+                      "start": 841,
+                      "end": 849,
+                      "loc": {
+                        "start": {
+                          "line": 30,
+                          "column": 15
+                        },
+                        "end": {
+                          "line": 30,
+                          "column": 23
+                        }
+                      },
+                      "name": "language"
+                    },
+                    "computed": true
+                  },
+                  "property": {
+                    "type": "Identifier",
+                    "start": 851,
+                    "end": 861,
+                    "loc": {
+                      "start": {
+                        "line": 30,
+                        "column": 25
+                      },
+                      "end": {
+                        "line": 30,
+                        "column": 35
+                      }
+                    },
+                    "name": "sourceText"
+                  },
+                  "computed": true
+                },
+                "right": {
+                  "type": "Identifier",
+                  "start": 865,
+                  "end": 879,
+                  "loc": {
+                    "start": {
+                      "line": 30,
+                      "column": 39
+                    },
+                    "end": {
+                      "line": 30,
+                      "column": 53
+                    }
+                  },
+                  "name": "translatedText"
+                }
+              }
+            }
+          ]
+        },
+        "leadingComments": [
+          {
+            "type": "Block",
+            "value": "*\r\n * Add translation pair to dictionary\r\n * @param {string} sourceText - phrase\r\n * @param {string} translatedText - translated phrase\r\n * @param {string} language - language token\r\n ",
+            "start": 454,
+            "end": 642,
+            "loc": {
+              "start": {
+                "line": 19,
+                "column": 0
+              },
+              "end": {
+                "line": 24,
+                "column": 3
+              }
+            },
+            "range": [
+              454,
+              642
+            ]
+          }
+        ],
+        "trailingComments": []
+      },
+      "specifiers": [],
+      "source": null,
+      "leadingComments": [
+        {
+          "type": "Block",
+          "value": "*\r\n * Add translation pair to dictionary\r\n * @param {string} sourceText - phrase\r\n * @param {string} translatedText - translated phrase\r\n * @param {string} language - language token\r\n ",
+          "start": 454,
+          "end": 642,
+          "loc": {
+            "start": {
+              "line": 19,
+              "column": 0
+            },
+            "end": {
+              "line": 24,
+              "column": 3
+            }
+          },
+          "range": [
+            454,
+            642
+          ]
+        }
+      ]
+    }
+  ]
+}

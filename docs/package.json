@@ -1,0 +1,54 @@
+{
+  "name": "jedi-validate",
+  "version": "1.1.2",
+  "description": "A lightweight form validation component",
+  "main": "./dist/jedi-validate.js",
+  "scripts": {
+    "test": "npm run build && mocha-phantomjs ./tests/test.html",
+    "dev": "rimraf ./dist && webpack-dev-server --hot --inline --progress --colors --watch --port 4000",
+    "build": "rimraf ./docs && npm run esdoc && rimraf ./dist && webpack --progress --colors",
+    "lint": "eslint src/**/*.es6",
+    "fix": "eslint src/**/*.es6 --fix",
+    "esdoc": "esdoc -c esdoc.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dmitriytat/jedi-validate.git"
+  },
+  "keywords": [
+    "form",
+    "validation",
+    "formdata"
+  ],
+  "author": "Dmitriy Tatarintsev <tatarintsevd@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/dmitriytat/jedi-validate/issues"
+  },
+  "homepage": "https://github.com/dmitriytat/jedi-validate#readme",
+  "devDependencies": {
+    "babel-core": "^6.14.0",
+    "babel-loader": "^6.2.5",
+    "babel-plugin-transform-class-properties": "^6.19.0",
+    "babel-preset-es2015": "^6.14.0",
+    "babel-preset-stage-3": "^6.17.0",
+    "bootstrap": "^3.3.7",
+    "chai": "^3.5.0",
+    "babel-eslint": "^7.1.1",
+    "eslint": "^3.11.1",
+    "eslint-config-airbnb": "^12.0.0",
+    "eslint-loader": "^1.6.0",
+    "eslint-plugin-import": "^2.0.1",
+    "eslint-plugin-jsx-a11y": "^2.2.3",
+    "eslint-plugin-react": "^6.4.1",
+    "extract-text-webpack-plugin": "2.0.0-beta.4",
+    "json-loader": "^0.5.4",
+    "mocha": "^3.0.2",
+    "rimraf": "^2.5.4",
+    "webpack": "2.1.0-beta.27",
+    "webpack-dev-server": "2.1.0-beta.12"
+  },
+  "dependencies": {
+    "deepmerge": "^1.2.0"
+  }
+}

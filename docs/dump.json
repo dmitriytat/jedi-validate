@@ -1,0 +1,2434 @@
+[
+  {
+    "__docId__": 0,
+    "kind": "file",
+    "static": true,
+    "variation": null,
+    "name": "src/i18n/jedi-validate-i18n.es6",
+    "memberof": null,
+    "longname": "src/i18n/jedi-validate-i18n.es6",
+    "access": null,
+    "description": null,
+    "lineNumber": 1,
+    "content": "const dictionary = require('./jedi-validate-i18n-data.json');\r\n\r\n/**\r\n * Default language\r\n * @type {string}\r\n */\r\nconst defaultLanguage = 'en';\r\n\r\n/**\r\n * Translate phrase\r\n * @param {string} text - phrase to translate\r\n * @param {string} language - language token\r\n * @returns {string} - translated text\r\n */\r\nexport function translate(text, language = defaultLanguage) {\r\n    return (dictionary[language] && dictionary[language][text]) || text;\r\n}\r\n\r\n/**\r\n * Add translation pair to dictionary\r\n * @param {string} sourceText - phrase\r\n * @param {string} translatedText - translated phrase\r\n * @param {string} language - language token\r\n */\r\nexport function addTranslation(sourceText, translatedText, language = defaultLanguage) {\r\n    if (dictionary[language] === undefined) {\r\n        dictionary[language] = {};\r\n    }\r\n\r\n    dictionary[language][sourceText] = translatedText;\r\n}\r\n"
+  },
+  {
+    "__docId__": 1,
+    "kind": "variable",
+    "static": true,
+    "variation": null,
+    "name": "dictionary",
+    "memberof": "src/i18n/jedi-validate-i18n.es6",
+    "longname": "src/i18n/jedi-validate-i18n.es6~dictionary",
+    "access": null,
+    "export": false,
+    "importPath": "jedi-validate/src/i18n/jedi-validate-i18n.es6",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 1,
+    "undocument": true,
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 2,
+    "kind": "variable",
+    "static": true,
+    "variation": null,
+    "name": "defaultLanguage",
+    "memberof": "src/i18n/jedi-validate-i18n.es6",
+    "longname": "src/i18n/jedi-validate-i18n.es6~defaultLanguage",
+    "access": null,
+    "export": false,
+    "importPath": "jedi-validate/src/i18n/jedi-validate-i18n.es6",
+    "importStyle": null,
+    "description": "Default language",
+    "lineNumber": 7,
+    "type": {
+      "nullable": null,
+      "types": [
+        "string"
+      ],
+      "spread": false,
+      "description": null
+    }
+  },
+  {
+    "__docId__": 3,
+    "kind": "function",
+    "static": true,
+    "variation": null,
+    "name": "translate",
+    "memberof": "src/i18n/jedi-validate-i18n.es6",
+    "longname": "src/i18n/jedi-validate-i18n.es6~translate",
+    "access": null,
+    "export": true,
+    "importPath": "jedi-validate/src/i18n/jedi-validate-i18n.es6",
+    "importStyle": "{translate}",
+    "description": "Translate phrase",
+    "lineNumber": 15,
+    "unknown": [
+      {
+        "tagName": "@returns",
+        "tagValue": "{string} - translated text"
+      }
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "text",
+        "description": "phrase to translate"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "language",
+        "description": "language token"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "string"
+      ],
+      "spread": false,
+      "description": "translated text"
+    },
+    "generator": false
+  },
+  {
+    "__docId__": 4,
+    "kind": "function",
+    "static": true,
+    "variation": null,
+    "name": "addTranslation",
+    "memberof": "src/i18n/jedi-validate-i18n.es6",
+    "longname": "src/i18n/jedi-validate-i18n.es6~addTranslation",
+    "access": null,
+    "export": true,
+    "importPath": "jedi-validate/src/i18n/jedi-validate-i18n.es6",
+    "importStyle": "{addTranslation}",
+    "description": "Add translation pair to dictionary",
+    "lineNumber": 25,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "sourceText",
+        "description": "phrase"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "translatedText",
+        "description": "translated phrase"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "language",
+        "description": "language token"
+      }
+    ],
+    "generator": false
+  },
+  {
+    "__docId__": 5,
+    "kind": "file",
+    "static": true,
+    "variation": null,
+    "name": "src/jedi-validate.es6",
+    "memberof": null,
+    "longname": "src/jedi-validate.es6",
+    "access": null,
+    "description": null,
+    "lineNumber": 1,
+    "content": "import deepmerge from 'deepmerge';\r\nimport { getData, getInputData, convertData, getValueByName } from './lib/get-data.es6';\r\nimport { addTranslation, translate } from './i18n/jedi-validate-i18n.es6';\r\nimport { getFormOptions, getInputRules } from './lib/get-options.es6';\r\nimport { validateData, validateField } from './lib/validate-data.es6';\r\nimport { ajax } from './lib/ajax.es6';\r\nimport defaultMethods from './lib/methods.es6';\r\n\r\nclass JediValidate {\r\n    /**\r\n     * Object with fields\r\n     * @type {Object.<string, Element>}\r\n     */\r\n    fields = {};\r\n    /**\r\n     * Object with inputs nodes\r\n     * @type {Object.<string, HTMLInputElement|HTMLSelectElement|Array>}\r\n     */\r\n    inputs = {};\r\n    /**\r\n     * Object with message nodes\r\n     * @type {Object.<string, Element>}\r\n     */\r\n    messages = {};\r\n    /**\r\n     * Object with error message\r\n     * @type {Object.<string, Object.<string, string>>}\r\n     */\r\n    errorMessages = {};\r\n    /**\r\n     * Object with error message\r\n     * @type {object} - data object\r\n     */\r\n    data = {};\r\n    /**\r\n     * Validate methods\r\n     * @type {Object.<string, {func: Function, message: string}>}\r\n     */\r\n    methods = { ...defaultMethods };\r\n    /**\r\n     * Validator options\r\n     * @type {{ajax: {url: string, enctype: string, sendType: string, method: string}, rules: {}, messages: {}, containers: {parent: string, message: string, baseMessage: string}, states: {error: string, valid: string, pristine: string, dirty: string}, formStatePrefix: string, callbacks: {success: (function(object)), error: (function(object.<string, Array.<string>>))}, clean: boolean, redirect: boolean, language: string, translations: {}}}\r\n     */\r\n    options = {};\r\n    /**\r\n     * Validator rules\r\n     * @type {object}\r\n     */\r\n    rules = {};\r\n    /**\r\n     * JediValidate\r\n     * @param {HTMLElement} root - element which wrap form element\r\n     * @param {object} options - object with options\r\n     */\r\n    constructor(root, options = {}) {\r\n        const defaultOptions = {\r\n            ajax: {\r\n                url: null,\r\n                enctype: 'application/x-www-form-urlencoded',\r\n                sendType: 'serialize', // 'serialize', 'formData', 'json'\r\n                method: 'GET',\r\n            },\r\n            rules: {},\r\n            messages: {},\r\n            containers: {\r\n                parent: 'form-group',\r\n                message: 'help-block',\r\n                baseMessage: 'base-error',\r\n            },\r\n            states: {\r\n                error: 'error',\r\n                valid: 'valid',\r\n                pristine: 'pristine',\r\n                dirty: 'dirty',\r\n            },\r\n            formStatePrefix: 'jedi-',\r\n            callbacks: {\r\n                success() {\r\n                },\r\n                error() {\r\n                },\r\n            },\r\n            clean: true,\r\n            redirect: true,\r\n            language: 'en',\r\n            translations: {},\r\n        };\r\n\r\n        this.root = root;\r\n\r\n        this.options = deepmerge(defaultOptions, options);\r\n\r\n        this.nodes = JediValidate.cacheNodes(this.root, this.options);\r\n\r\n        const formOptions = getFormOptions(this.nodes.form);\r\n\r\n        this.options = deepmerge(this.options, defaultOptions);\r\n        this.options = deepmerge(this.options, formOptions);\r\n        this.options = deepmerge(this.options, options);\r\n\r\n        this.rules = { ...this.options.rules };\r\n\r\n        // todo rewrite translations\r\n        Object.keys(this.options.translations).forEach((language) => {\r\n            Object.keys(this.options.translations[language]).forEach((translation) => {\r\n                addTranslation(\r\n                    translation,\r\n                    this.options.translations[language][translation],\r\n                    language\r\n                );\r\n            });\r\n        });\r\n\r\n        this.ready();\r\n\r\n        this.errorMessages = JediValidate.initErrorMessages(\r\n            this.rules,\r\n            this.options.messages,\r\n            this.methods,\r\n            this.options.language\r\n        );\r\n    }\r\n\r\n    /**\r\n     * Add localisation to JediValidate\r\n     * @param {string} sourceText - text on english\r\n     * @param {string} translatedText - text on needed language\r\n     * @param {string} language - language\r\n     */\r\n    static addToDictionary(sourceText, translatedText, language) {\r\n        addTranslation(sourceText, translatedText, language);\r\n    }\r\n\r\n    /**\r\n     * Return object with working elements\r\n     * @param root Root element for search\r\n     * @param options Object with selectors\r\n     * @returns {{form: Element, inputs: NodeList, baseMessage: Element}}\r\n     */\r\n    static cacheNodes(root, options) {\r\n        return {\r\n            form: root.querySelector('form'),\r\n            inputs: root.querySelectorAll('[name]'),\r\n            baseMessage: root.querySelector(`.${options.containers.baseMessage}`),\r\n        };\r\n    }\r\n\r\n    ready() {\r\n        this.nodes.form.setAttribute('novalidate', 'novalidate');\r\n\r\n        this.nodes.form.addEventListener('submit', (event) => {\r\n            event.preventDefault();\r\n            this.data = getData(this.inputs);\r\n\r\n            const errors = validateData(\r\n                this.rules,\r\n                this.methods,\r\n                this.data,\r\n                this.errorMessages\r\n            );\r\n\r\n            if (errors && Object.keys(errors).filter(name => errors[name]).length !== 0) {\r\n                Object.keys(errors).forEach(name =>\r\n                    JediValidate.markField(\r\n                        this.fields[name],\r\n                        this.messages[name],\r\n                        this.options.states,\r\n                        errors[name]\r\n                    )\r\n                );\r\n\r\n                try {\r\n                    this.options.callbacks.error(errors);\r\n                } catch (e) {\r\n                    console.error(e);\r\n                }\r\n\r\n                event.preventDefault();\r\n                return;\r\n            }\r\n\r\n            if (this.options.ajax && this.options.ajax.url) {\r\n                event.preventDefault();\r\n            } else {\r\n                try {\r\n                    this.options.callbacks.success(null);\r\n                } catch (e) {\r\n                    console.error(e);\r\n                }\r\n\r\n                return;\r\n            }\r\n\r\n            const convertedData = convertData(this.data, this.options.ajax.sendType);\r\n            this.send({\r\n                ...this.options.ajax,\r\n                data: convertedData,\r\n            });\r\n        });\r\n\r\n        this.nodes.inputs.forEach((input) => {\r\n            const name = input.name;\r\n\r\n            if (this.inputs[name]) {\r\n                if (Array.isArray(this.inputs[name])) {\r\n                    this.inputs[name].push(input);\r\n                } else {\r\n                    const groupInput = [this.inputs[name], input];\r\n                    groupInput.name = name;\r\n                    this.inputs[name] = groupInput;\r\n                }\r\n            } else {\r\n                this.inputs[name] = input;\r\n\r\n                let field = input.parentNode;\r\n\r\n                do {\r\n                    if (field.classList.contains(this.options.containers.parent)) {\r\n                        this.fields[name] = field;\r\n                        break;\r\n                    }\r\n\r\n                    field = field.parentNode;\r\n                } while (field);\r\n\r\n                if (!this.fields[name]) {\r\n                    throw new Error('Have no parent field');\r\n                }\r\n\r\n                this.fields[name].classList.add(this.options.states.pristine);\r\n\r\n                const messageElement = this.fields[name].querySelector(`.${this.options.containers.message}`);\r\n\r\n                if (messageElement) {\r\n                    this.messages[name] = messageElement;\r\n                } else {\r\n                    this.messages[name] = document.createElement('div');\r\n                    this.messages[name].classList.add(this.options.containers.message);\r\n                    this.fields[name].appendChild(this.messages[name]);\r\n                }\r\n\r\n                this.rules[name] = this.rules[name] || {};\r\n                const inputRules = getInputRules(input);\r\n                this.rules[name] = deepmerge(this.rules[name], inputRules);\r\n\r\n                Object.keys(this.rules[name]).forEach((rule) => {\r\n                    if (this.rules[name][rule]) {\r\n                        this.fields[name].classList.add(rule);\r\n                    }\r\n                });\r\n            }\r\n\r\n            input.addEventListener('change', () => {\r\n                this.fields[name].classList.remove(this.options.states.dirty);\r\n\r\n                const inputData = getInputData(input);\r\n                const value = getValueByName(name, inputData);\r\n\r\n                this.data = {\r\n                    ...this.data,\r\n                    ...inputData,\r\n                };\r\n\r\n                const errors = validateField(\r\n                    this.rules[name],\r\n                    this.methods,\r\n                    value,\r\n                    input.name,\r\n                    this.errorMessages\r\n                );\r\n\r\n                JediValidate.markField(\r\n                    this.fields[name],\r\n                    this.messages[name],\r\n                    this.options.states,\r\n                    errors\r\n                );\r\n            });\r\n\r\n            input.addEventListener('input', () => {\r\n                this.fields[name].classList.remove(this.options.states.pristine);\r\n                this.fields[name].classList.add(this.options.states.dirty);\r\n            });\r\n        });\r\n    }\r\n\r\n    /**\r\n     * Send form\r\n     * @param {object} options - object with options for sending\r\n     * @param {string} options.url\r\n     * @param {string} options.enctype\r\n     * @param {string} options.sendType\r\n     * @param {string} options.method\r\n     * @param {string|FormData} options.data\r\n     */\r\n    send(options) {\r\n        ajax(options).then((response) => {\r\n            if (response.validationErrors) {\r\n                try {\r\n                    this.options.callbacks.error(response.validationErrors);\r\n                } catch (e) {\r\n                    console.error(e);\r\n                }\r\n\r\n                if (response.validationErrors.base) {\r\n                    this.nodes.baseMessage.innerHTML = response.validationErrors.base.join(', ');\r\n                    this.root.classList.add(this.options.formStatePrefix + this.options.states.error); // eslint-disable-line max-len\r\n                    this.root.classList.remove(this.options.formStatePrefix + this.options.states.valid); // eslint-disable-line max-len\r\n                    delete response.validationErrors.base; // eslint-disable-line no-param-reassign\r\n                } else {\r\n                    this.nodes.baseMessage.innerHTML = '';\r\n                }\r\n\r\n                Object.keys(response.validationErrors).forEach(name =>\r\n                    JediValidate.markField(\r\n                        this.fields[name],\r\n                        this.messages[name],\r\n                        this.options.states,\r\n                        response.validationErrors[name]\r\n                    )\r\n                );\r\n            } else {\r\n                try {\r\n                    this.options.callbacks.success(response);\r\n                } catch (e) {\r\n                    console.error(e);\r\n                }\r\n\r\n                if (this.options.redirect && response.redirect) {\r\n                    window.location.href = response.redirect;\r\n                    return;\r\n                }\r\n\r\n                if (this.options.clean) {\r\n                    this.nodes.form.reset();\r\n                }\r\n            }\r\n        }).catch(({ method, url, status, statusText }) => {\r\n            console.warn(`${method} ${url} ${status} (${statusText})`);\r\n\r\n            this.nodes.baseMessage.innerHTML = translate('Can not send form!', this.options.language);\r\n            this.root.classList.add(this.options.formStatePrefix + this.options.states.error); // eslint-disable-line max-len\r\n            this.root.classList.remove(this.options.formStatePrefix + this.options.states.valid); // eslint-disable-line max-len\r\n        });\r\n    }\r\n\r\n    /**\r\n     *\r\n     * @param {Element} field\r\n     * @param message\r\n     * @param states\r\n     * @param errors\r\n     */\r\n    static markField(field, message, states, errors) {\r\n        if (errors && errors.length) {\r\n            JediValidate.markError(field, message, states, errors);\r\n        } else {\r\n            JediValidate.markValid(field, message, states);\r\n        }\r\n    }\r\n\r\n    /**\r\n     *\r\n     * @param {Element} field\r\n     * @param {Element} message\r\n     * @param {string} error\r\n     * @param {string} valid\r\n     * @param {Array.<string>} errors\r\n     */\r\n    static markError(field, message, { error, valid }, errors) {\r\n        if (!field || !message) {\r\n            return;\r\n        }\r\n\r\n        field.classList.add(error);\r\n        field.classList.remove(valid);\r\n\r\n        message.innerHTML = errors.join(', '); // eslint-disable-line no-param-reassign\r\n    }\r\n\r\n    /**\r\n     *\r\n     * @param {Element} field\r\n     * @param {Element} message\r\n     * @param {string} error\r\n     * @param {string} valid\r\n     */\r\n    static markValid(field, message, { error, valid }) {\r\n        if (!field || !message) {\r\n            return;\r\n        }\r\n\r\n        field.classList.add(valid);\r\n        field.classList.remove(error);\r\n\r\n        message.innerHTML = ''; // eslint-disable-line no-param-reassign\r\n    }\r\n\r\n    /**\r\n     * Add rule to validator\r\n     * @param {string} rule - rule name\r\n     * @param {Function} func - function\r\n     * @param {string} message - error message\r\n     */\r\n    addMethod(rule, func, message) {\r\n        this.methods[rule] = {\r\n            func,\r\n            message,\r\n        };\r\n    }\r\n\r\n    /**\r\n     * Init error messages\r\n     * @param {object} rules\r\n     * @param {object} messages\r\n     * @param {object} methods\r\n     * @param {string} language\r\n     * @returns {Object.<string, Object.<string, string>>}\r\n     */\r\n    static initErrorMessages(rules, messages, methods, language) {\r\n        return Object.keys(rules).reduce((names, name) => ({\r\n            ...names,\r\n            [name]: Object.keys(rules[name]).reduce((ruleNames, method) => ({\r\n                ...ruleNames,\r\n                [method]: translate((messages[name] && messages[name][method]) || (methods[method] && methods[method].message) || '', language),\r\n            }), {}),\r\n        }), {});\r\n    }\r\n}\r\n\r\nmodule.exports = JediValidate;\r\n"
+  },
+  {
+    "__docId__": 6,
+    "kind": "class",
+    "static": true,
+    "variation": null,
+    "name": "JediValidate",
+    "memberof": "src/jedi-validate.es6",
+    "longname": "src/jedi-validate.es6~JediValidate",
+    "access": null,
+    "export": false,
+    "importPath": "jedi-validate/src/jedi-validate.es6",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 9,
+    "undocument": true,
+    "interface": false
+  },
+  {
+    "__docId__": 7,
+    "kind": "constructor",
+    "static": false,
+    "variation": null,
+    "name": "constructor",
+    "memberof": "src/jedi-validate.es6~JediValidate",
+    "longname": "src/jedi-validate.es6~JediValidate#constructor",
+    "access": null,
+    "description": "JediValidate",
+    "lineNumber": 55,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "HTMLElement"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "root",
+        "description": "element which wrap form element"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "object"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "options",
+        "description": "object with options"
+      }
+    ],
+    "generator": false
+  },
+  {
+    "__docId__": 8,
+    "kind": "member",
+    "static": false,
+    "variation": null,
+    "name": "root",
+    "memberof": "src/jedi-validate.es6~JediValidate",
+    "longname": "src/jedi-validate.es6~JediValidate#root",
+    "access": null,
+    "description": null,
+    "lineNumber": 89,
+    "undocument": true,
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 9,
+    "kind": "member",
+    "static": false,
+    "variation": null,
+    "name": "options",
+    "memberof": "src/jedi-validate.es6~JediValidate",
+    "longname": "src/jedi-validate.es6~JediValidate#options",
+    "access": null,
+    "description": null,
+    "lineNumber": 91,
+    "undocument": true,
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 10,
+    "kind": "member",
+    "static": false,
+    "variation": null,
+    "name": "nodes",
+    "memberof": "src/jedi-validate.es6~JediValidate",
+    "longname": "src/jedi-validate.es6~JediValidate#nodes",
+    "access": null,
+    "description": null,
+    "lineNumber": 93,
+    "undocument": true,
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 11,
+    "kind": "member",
+    "static": false,
+    "variation": null,
+    "name": "options",
+    "memberof": "src/jedi-validate.es6~JediValidate",
+    "longname": "src/jedi-validate.es6~JediValidate#options",
+    "access": null,
+    "description": null,
+    "lineNumber": 97,
+    "undocument": true,
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 12,
+    "kind": "member",
+    "static": false,
+    "variation": null,
+    "name": "options",
+    "memberof": "src/jedi-validate.es6~JediValidate",
+    "longname": "src/jedi-validate.es6~JediValidate#options",
+    "access": null,
+    "description": null,
+    "lineNumber": 98,
+    "undocument": true,
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 13,
+    "kind": "member",
+    "static": false,
+    "variation": null,
+    "name": "options",
+    "memberof": "src/jedi-validate.es6~JediValidate",
+    "longname": "src/jedi-validate.es6~JediValidate#options",
+    "access": null,
+    "description": null,
+    "lineNumber": 99,
+    "undocument": true,
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 14,
+    "kind": "member",
+    "static": false,
+    "variation": null,
+    "name": "rules",
+    "memberof": "src/jedi-validate.es6~JediValidate",
+    "longname": "src/jedi-validate.es6~JediValidate#rules",
+    "access": null,
+    "description": null,
+    "lineNumber": 101,
+    "undocument": true,
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 15,
+    "kind": "member",
+    "static": false,
+    "variation": null,
+    "name": "errorMessages",
+    "memberof": "src/jedi-validate.es6~JediValidate",
+    "longname": "src/jedi-validate.es6~JediValidate#errorMessages",
+    "access": null,
+    "description": null,
+    "lineNumber": 116,
+    "undocument": true,
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 16,
+    "kind": "method",
+    "static": true,
+    "variation": null,
+    "name": "addToDictionary",
+    "memberof": "src/jedi-validate.es6~JediValidate",
+    "longname": "src/jedi-validate.es6~JediValidate.addToDictionary",
+    "access": null,
+    "description": "Add localisation to JediValidate",
+    "lineNumber": 130,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "sourceText",
+        "description": "text on english"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "translatedText",
+        "description": "text on needed language"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "language",
+        "description": "language"
+      }
+    ],
+    "generator": false
+  },
+  {
+    "__docId__": 17,
+    "kind": "method",
+    "static": true,
+    "variation": null,
+    "name": "cacheNodes",
+    "memberof": "src/jedi-validate.es6~JediValidate",
+    "longname": "src/jedi-validate.es6~JediValidate.cacheNodes",
+    "access": null,
+    "description": "Return object with working elements",
+    "lineNumber": 140,
+    "unknown": [
+      {
+        "tagName": "@returns",
+        "tagValue": "{{form: Element, inputs: NodeList, baseMessage: Element}}"
+      }
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "*"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "root",
+        "description": "Root element for search"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "*"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "options",
+        "description": "Object with selectors"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "{form: Element, inputs: NodeList, baseMessage: Element}"
+      ],
+      "spread": false,
+      "description": ""
+    },
+    "generator": false
+  },
+  {
+    "__docId__": 18,
+    "kind": "method",
+    "static": false,
+    "variation": null,
+    "name": "ready",
+    "memberof": "src/jedi-validate.es6~JediValidate",
+    "longname": "src/jedi-validate.es6~JediValidate#ready",
+    "access": null,
+    "description": null,
+    "lineNumber": 148,
+    "undocument": true,
+    "params": [],
+    "generator": false
+  },
+  {
+    "__docId__": 19,
+    "kind": "member",
+    "static": false,
+    "variation": null,
+    "name": "data",
+    "memberof": "src/jedi-validate.es6~JediValidate",
+    "longname": "src/jedi-validate.es6~JediValidate#data",
+    "access": null,
+    "description": null,
+    "lineNumber": 153,
+    "undocument": true,
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 20,
+    "kind": "member",
+    "static": false,
+    "variation": null,
+    "name": "data",
+    "memberof": "src/jedi-validate.es6~JediValidate",
+    "longname": "src/jedi-validate.es6~JediValidate#data",
+    "access": null,
+    "description": null,
+    "lineNumber": 259,
+    "undocument": true,
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 21,
+    "kind": "method",
+    "static": false,
+    "variation": null,
+    "name": "send",
+    "memberof": "src/jedi-validate.es6~JediValidate",
+    "longname": "src/jedi-validate.es6~JediValidate#send",
+    "access": null,
+    "description": "Send form",
+    "lineNumber": 296,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "object"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "options",
+        "description": "object with options for sending"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "options.url",
+        "description": ""
+      },
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "options.enctype",
+        "description": ""
+      },
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "options.sendType",
+        "description": ""
+      },
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "options.method",
+        "description": ""
+      },
+      {
+        "nullable": null,
+        "types": [
+          "string",
+          "FormData"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "options.data",
+        "description": ""
+      }
+    ],
+    "generator": false
+  },
+  {
+    "__docId__": 22,
+    "kind": "method",
+    "static": true,
+    "variation": null,
+    "name": "markField",
+    "memberof": "src/jedi-validate.es6~JediValidate",
+    "longname": "src/jedi-validate.es6~JediValidate.markField",
+    "access": null,
+    "description": "",
+    "lineNumber": 354,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "Element"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "field",
+        "description": ""
+      },
+      {
+        "nullable": null,
+        "types": [
+          "*"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "message",
+        "description": ""
+      },
+      {
+        "nullable": null,
+        "types": [
+          "*"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "states",
+        "description": ""
+      },
+      {
+        "nullable": null,
+        "types": [
+          "*"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "errors",
+        "description": ""
+      }
+    ],
+    "generator": false
+  },
+  {
+    "__docId__": 23,
+    "kind": "method",
+    "static": true,
+    "variation": null,
+    "name": "markError",
+    "memberof": "src/jedi-validate.es6~JediValidate",
+    "longname": "src/jedi-validate.es6~JediValidate.markError",
+    "access": null,
+    "description": "",
+    "lineNumber": 370,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "Element"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "field",
+        "description": ""
+      },
+      {
+        "nullable": null,
+        "types": [
+          "Element"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "message",
+        "description": ""
+      },
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "error",
+        "description": ""
+      },
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "valid",
+        "description": ""
+      },
+      {
+        "nullable": null,
+        "types": [
+          "Array.<string>"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "errors",
+        "description": ""
+      }
+    ],
+    "generator": false
+  },
+  {
+    "__docId__": 24,
+    "kind": "method",
+    "static": true,
+    "variation": null,
+    "name": "markValid",
+    "memberof": "src/jedi-validate.es6~JediValidate",
+    "longname": "src/jedi-validate.es6~JediValidate.markValid",
+    "access": null,
+    "description": "",
+    "lineNumber": 388,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "Element"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "field",
+        "description": ""
+      },
+      {
+        "nullable": null,
+        "types": [
+          "Element"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "message",
+        "description": ""
+      },
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "error",
+        "description": ""
+      },
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "valid",
+        "description": ""
+      }
+    ],
+    "generator": false
+  },
+  {
+    "__docId__": 25,
+    "kind": "method",
+    "static": false,
+    "variation": null,
+    "name": "addMethod",
+    "memberof": "src/jedi-validate.es6~JediValidate",
+    "longname": "src/jedi-validate.es6~JediValidate#addMethod",
+    "access": null,
+    "description": "Add rule to validator",
+    "lineNumber": 405,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "rule",
+        "description": "rule name"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "Function"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "func",
+        "description": "function"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "message",
+        "description": "error message"
+      }
+    ],
+    "generator": false
+  },
+  {
+    "__docId__": 26,
+    "kind": "method",
+    "static": true,
+    "variation": null,
+    "name": "initErrorMessages",
+    "memberof": "src/jedi-validate.es6~JediValidate",
+    "longname": "src/jedi-validate.es6~JediValidate.initErrorMessages",
+    "access": null,
+    "description": "Init error messages",
+    "lineNumber": 420,
+    "unknown": [
+      {
+        "tagName": "@returns",
+        "tagValue": "{Object.<string, Object.<string, string>>}"
+      }
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "object"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "rules",
+        "description": ""
+      },
+      {
+        "nullable": null,
+        "types": [
+          "object"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "messages",
+        "description": ""
+      },
+      {
+        "nullable": null,
+        "types": [
+          "object"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "methods",
+        "description": ""
+      },
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "language",
+        "description": ""
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "Object.<string, Object.<string, string>>"
+      ],
+      "spread": false,
+      "description": ""
+    },
+    "generator": false
+  },
+  {
+    "__docId__": 27,
+    "kind": "file",
+    "static": true,
+    "variation": null,
+    "name": "src/lib/ajax.es6",
+    "memberof": null,
+    "longname": "src/lib/ajax.es6",
+    "access": null,
+    "description": null,
+    "lineNumber": 1,
+    "content": "import { translate } from '../i18n/jedi-validate-i18n.es6';\r\n\r\n/**\r\n * Sending request\r\n * @param {{url: string, enctype: string, sendType: string, method: string, data: string|FormData}} options - Sending options\r\n * @returns {Promise}\r\n */\r\nexport function ajax(options) {\r\n    return new Promise((resolve, reject) => {\r\n        const xhr = new XMLHttpRequest();\r\n\r\n        xhr.open(options.method, options.url + (options.method.toUpperCase() === 'GET' ? (`?${options.data}`) : ''), true);\r\n\r\n        if (options.sendType === 'serialize') {\r\n            xhr.setRequestHeader('Content-type', options.enctype);\r\n        } else if (options.sendType === 'json') {\r\n            xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');\r\n        }\r\n\r\n        xhr.onreadystatechange = () => {\r\n            if (xhr.readyState === 4) {\r\n                if (xhr.status === 200) {\r\n                    let response = {};\r\n\r\n                    try {\r\n                        response = JSON.parse(xhr.responseText);\r\n                    } catch (e) {\r\n                        response.validationErrors = { base: [translate('JSON parsing error')] }; // todo rewrite translate now dont work\r\n                    }\r\n\r\n                    resolve(response);\r\n                } else {\r\n                    reject({\r\n                        xhr,\r\n                        method: options.method,\r\n                        url: options.url,\r\n                        status: xhr.status,\r\n                        statusText: xhr.statusText,\r\n                    });\r\n                }\r\n            }\r\n        };\r\n\r\n        xhr.send(options.method.toUpperCase() === 'POST' ? options.data : '');\r\n    }\r\n    );\r\n}\r\n\r\nexport default ajax;\r\n"
+  },
+  {
+    "__docId__": 28,
+    "kind": "function",
+    "static": true,
+    "variation": null,
+    "name": "ajax",
+    "memberof": "src/lib/ajax.es6",
+    "longname": "src/lib/ajax.es6~ajax",
+    "access": null,
+    "export": true,
+    "importPath": "jedi-validate/src/lib/ajax.es6",
+    "importStyle": "{ajax}",
+    "description": "Sending request",
+    "lineNumber": 8,
+    "unknown": [
+      {
+        "tagName": "@returns",
+        "tagValue": "{Promise}"
+      }
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "{url: string, enctype: string, sendType: string, method: string, data: string|FormData}"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "options",
+        "description": "Sending options"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "Promise"
+      ],
+      "spread": false,
+      "description": ""
+    },
+    "generator": false
+  },
+  {
+    "__docId__": 29,
+    "kind": "file",
+    "static": true,
+    "variation": null,
+    "name": "src/lib/get-data.es6",
+    "memberof": null,
+    "longname": "src/lib/get-data.es6",
+    "access": null,
+    "description": null,
+    "lineNumber": 1,
+    "content": "import deepmerge from 'deepmerge';\r\n\r\n/**\r\n * Create object by path and value\r\n * @param {Array} path - path array\r\n * @param {string|FileList} value - value on input\r\n * @returns {object} - data object\r\n */\r\nexport function createObject(path, value) {\r\n    const segment = path[0];\r\n\r\n    if (segment.length === 0) {\r\n        return value;\r\n    } else if (segment === '[]') {\r\n        return [createObject(path.slice(1), value)];\r\n    }\r\n\r\n    return { [segment]: createObject(path.slice(1), value) };\r\n}\r\n\r\n/**\r\n * Name regexp for conversion to path\r\n * @type {RegExp}\r\n */\r\nconst NAME = /(\\[(\\w*)\\]|\\w*)/gi;\r\n\r\n/**\r\n * Convert name of input to path array\r\n * @param {string} name - name of input\r\n * @returns {Array} - path to value in data object\r\n */\r\nexport function convertNameToPath(name) {\r\n    const path = [];\r\n\r\n    let matches = NAME.exec(name);\r\n    while (matches !== null) {\r\n        if (matches.index === NAME.lastIndex) {\r\n            NAME.lastIndex += 1;\r\n        }\r\n\r\n        path.push(matches[2] || matches[1]);\r\n\r\n        matches = NAME.exec(name);\r\n    }\r\n\r\n    return path;\r\n}\r\n\r\n/**\r\n * Get value from data object by path\r\n * @param {Array} path - value path\r\n * @param {object} data - data object\r\n * @returns {string} - value\r\n */\r\nexport function getValueByPath(path, data) {\r\n    return path.reduce((value, segment) => (segment && value ? value[segment] : value), data || '');\r\n}\r\n\r\n/**\r\n * Get value from data object by name\r\n * @param {string} name - input name\r\n * @param {object} data - data object\r\n */\r\nexport function getValueByName(name, data) {\r\n    const path = convertNameToPath(name);\r\n    return getValueByPath(path, data);\r\n}\r\n\r\n/**\r\n * Get value from radio group\r\n * @param {Array} inputs - array of radio inputs\r\n * @returns {string} - value of checked input\r\n */\r\nexport function getRadioGroupValue(inputs) {\r\n    return [...inputs].map(radio => getInputValue(radio)).filter(Boolean)[0];\r\n}\r\n\r\n/**\r\n * Get value form input\r\n * @param {HTMLInputElement|HTMLSelectElement|Array} input - input element or array of HTMLInputElements\r\n * @returns {string|FileList|Array} - value of input, or array of value if input is select\r\n */\r\nexport function getInputValue(input) {\r\n    if (!input) return '';\r\n\r\n    const { type } = input;\r\n\r\n    if (Array.isArray(input)) {\r\n        return getRadioGroupValue(input);\r\n    }\r\n\r\n    switch (type) {\r\n    case 'select-one':\r\n        return input.options.length ? input.options[input.selectedIndex].value : '';\r\n    case 'select-multiple':\r\n        return [...input.options].filter(option => option.selected).map(option => option.value);\r\n    case 'checkbox':\r\n    case 'radio':\r\n        return input.checked ? input.value : '';\r\n    case 'file':\r\n        return input.files;\r\n    default:\r\n        return input.value;\r\n    }\r\n}\r\n\r\n/**\r\n * Get object which key is name of input and value is value of input\r\n * @param {HTMLInputElement|array} input - input element or Array of HTMLInputElements\r\n * @returns {object} - data\r\n */\r\nexport function getInputData(input) {\r\n    let name = input.name;\r\n    if (!name && Array.isArray(input) && input[0]) {\r\n        name = input[0].name;\r\n    }\r\n\r\n    const value = getInputValue(input);\r\n    const path = convertNameToPath(name);\r\n\r\n    return createObject(path, value);\r\n}\r\n\r\n/**\r\n * Get data object with values from inputs object\r\n * @param {object} inputs - inputs object\r\n * @returns {object} - data object\r\n */\r\nexport function getData(inputs) {\r\n    return Object.keys(inputs).reduce(\r\n        (data, name) => deepmerge(data, getInputData(inputs[name])),\r\n        {}\r\n    );\r\n}\r\n\r\n/**\r\n * Create part url for serialize method\r\n * @param {string} name\r\n * @param {object|Array|string} data\r\n * @returns {string} - part of url\r\n */\r\nexport function getQueryPart(name, data) {\r\n    if (Array.isArray(data)) {\r\n        return data.reduce((part, index) => part + getQueryPart(`${name}[${index}]`, data[index]), '');\r\n    } else if (typeof data === 'object') {\r\n        return Object.keys(data).reduce((part, index) => part + getQueryPart(`${name}[${index}]`, data[index]), '');\r\n    }\r\n\r\n    return `${name}=${encodeURIComponent(data)}&`;\r\n}\r\n\r\n/**\r\n * Convert data object to value for sending\r\n * @param {object} data - data object\r\n * @param {string} type - type of conversion\r\n * @returns {string|FormData} - output value\r\n */\r\nexport function convertData(data, type) {\r\n    let convertedData;\r\n\r\n    switch (type) {\r\n    case 'serialize':\r\n        convertedData = Object.keys(data)\r\n                .reduce((query, name) => `${query}${getQueryPart(name, data[name])}`, '');\r\n        return convertedData.length ? convertedData.slice(0, -1) : '';\r\n    case 'formData':\r\n        return Object.keys(data).reduce((formData, name) => {\r\n            if (data[name] instanceof FileList) {\r\n                if (data[name].length > 1) {\r\n                    for (let i = 0; i < data[name].length; i += 1) {\r\n                        formData.append(`${name}[${i}]`, data[name][i]);\r\n                    }\r\n                } else if (data[name].length === 1) {\r\n                    formData.append(name, data[name][0]);\r\n                }\r\n            } else if (typeof data[name] === 'object') {\r\n                Object.keys(data[name]).forEach(key => formData.append(`${name}[${key}]`, data[name][key]));\r\n            } else {\r\n                formData.append(name, data[name]);\r\n            }\r\n\r\n            return formData;\r\n        }, new FormData());\r\n    case 'json':\r\n    default:\r\n        return JSON.stringify(data);\r\n    }\r\n}\r\n"
+  },
+  {
+    "__docId__": 30,
+    "kind": "function",
+    "static": true,
+    "variation": null,
+    "name": "createObject",
+    "memberof": "src/lib/get-data.es6",
+    "longname": "src/lib/get-data.es6~createObject",
+    "access": null,
+    "export": true,
+    "importPath": "jedi-validate/src/lib/get-data.es6",
+    "importStyle": "{createObject}",
+    "description": "Create object by path and value",
+    "lineNumber": 9,
+    "unknown": [
+      {
+        "tagName": "@returns",
+        "tagValue": "{object} - data object"
+      }
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "Array"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "path",
+        "description": "path array"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "string",
+          "FileList"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "value",
+        "description": "value on input"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "object"
+      ],
+      "spread": false,
+      "description": "data object"
+    },
+    "generator": false
+  },
+  {
+    "__docId__": 31,
+    "kind": "variable",
+    "static": true,
+    "variation": null,
+    "name": "NAME",
+    "memberof": "src/lib/get-data.es6",
+    "longname": "src/lib/get-data.es6~NAME",
+    "access": null,
+    "export": false,
+    "importPath": "jedi-validate/src/lib/get-data.es6",
+    "importStyle": null,
+    "description": "Name regexp for conversion to path",
+    "lineNumber": 25,
+    "type": {
+      "nullable": null,
+      "types": [
+        "RegExp"
+      ],
+      "spread": false,
+      "description": null
+    }
+  },
+  {
+    "__docId__": 32,
+    "kind": "function",
+    "static": true,
+    "variation": null,
+    "name": "convertNameToPath",
+    "memberof": "src/lib/get-data.es6",
+    "longname": "src/lib/get-data.es6~convertNameToPath",
+    "access": null,
+    "export": true,
+    "importPath": "jedi-validate/src/lib/get-data.es6",
+    "importStyle": "{convertNameToPath}",
+    "description": "Convert name of input to path array",
+    "lineNumber": 32,
+    "unknown": [
+      {
+        "tagName": "@returns",
+        "tagValue": "{Array} - path to value in data object"
+      }
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "name",
+        "description": "name of input"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "Array"
+      ],
+      "spread": false,
+      "description": "path to value in data object"
+    },
+    "generator": false
+  },
+  {
+    "__docId__": 33,
+    "kind": "function",
+    "static": true,
+    "variation": null,
+    "name": "getValueByPath",
+    "memberof": "src/lib/get-data.es6",
+    "longname": "src/lib/get-data.es6~getValueByPath",
+    "access": null,
+    "export": true,
+    "importPath": "jedi-validate/src/lib/get-data.es6",
+    "importStyle": "{getValueByPath}",
+    "description": "Get value from data object by path",
+    "lineNumber": 55,
+    "unknown": [
+      {
+        "tagName": "@returns",
+        "tagValue": "{string} - value"
+      }
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "Array"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "path",
+        "description": "value path"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "object"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "data",
+        "description": "data object"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "string"
+      ],
+      "spread": false,
+      "description": "value"
+    },
+    "generator": false
+  },
+  {
+    "__docId__": 34,
+    "kind": "function",
+    "static": true,
+    "variation": null,
+    "name": "getValueByName",
+    "memberof": "src/lib/get-data.es6",
+    "longname": "src/lib/get-data.es6~getValueByName",
+    "access": null,
+    "export": true,
+    "importPath": "jedi-validate/src/lib/get-data.es6",
+    "importStyle": "{getValueByName}",
+    "description": "Get value from data object by name",
+    "lineNumber": 64,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "name",
+        "description": "input name"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "object"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "data",
+        "description": "data object"
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    },
+    "generator": false
+  },
+  {
+    "__docId__": 35,
+    "kind": "function",
+    "static": true,
+    "variation": null,
+    "name": "getRadioGroupValue",
+    "memberof": "src/lib/get-data.es6",
+    "longname": "src/lib/get-data.es6~getRadioGroupValue",
+    "access": null,
+    "export": true,
+    "importPath": "jedi-validate/src/lib/get-data.es6",
+    "importStyle": "{getRadioGroupValue}",
+    "description": "Get value from radio group",
+    "lineNumber": 74,
+    "unknown": [
+      {
+        "tagName": "@returns",
+        "tagValue": "{string} - value of checked input"
+      }
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "Array"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "inputs",
+        "description": "array of radio inputs"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "string"
+      ],
+      "spread": false,
+      "description": "value of checked input"
+    },
+    "generator": false
+  },
+  {
+    "__docId__": 36,
+    "kind": "function",
+    "static": true,
+    "variation": null,
+    "name": "getInputValue",
+    "memberof": "src/lib/get-data.es6",
+    "longname": "src/lib/get-data.es6~getInputValue",
+    "access": null,
+    "export": true,
+    "importPath": "jedi-validate/src/lib/get-data.es6",
+    "importStyle": "{getInputValue}",
+    "description": "Get value form input",
+    "lineNumber": 83,
+    "unknown": [
+      {
+        "tagName": "@returns",
+        "tagValue": "{string|FileList|Array} - value of input, or array of value if input is select"
+      }
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "HTMLInputElement",
+          "HTMLSelectElement",
+          "Array"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "input",
+        "description": "input element or array of HTMLInputElements"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "string",
+        "FileList",
+        "Array"
+      ],
+      "spread": false,
+      "description": "value of input, or array of value if input is select"
+    },
+    "generator": false
+  },
+  {
+    "__docId__": 37,
+    "kind": "function",
+    "static": true,
+    "variation": null,
+    "name": "getInputData",
+    "memberof": "src/lib/get-data.es6",
+    "longname": "src/lib/get-data.es6~getInputData",
+    "access": null,
+    "export": true,
+    "importPath": "jedi-validate/src/lib/get-data.es6",
+    "importStyle": "{getInputData}",
+    "description": "Get object which key is name of input and value is value of input",
+    "lineNumber": 112,
+    "unknown": [
+      {
+        "tagName": "@returns",
+        "tagValue": "{object} - data"
+      }
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "HTMLInputElement",
+          "array"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "input",
+        "description": "input element or Array of HTMLInputElements"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "object"
+      ],
+      "spread": false,
+      "description": "data"
+    },
+    "generator": false
+  },
+  {
+    "__docId__": 38,
+    "kind": "function",
+    "static": true,
+    "variation": null,
+    "name": "getData",
+    "memberof": "src/lib/get-data.es6",
+    "longname": "src/lib/get-data.es6~getData",
+    "access": null,
+    "export": true,
+    "importPath": "jedi-validate/src/lib/get-data.es6",
+    "importStyle": "{getData}",
+    "description": "Get data object with values from inputs object",
+    "lineNumber": 129,
+    "unknown": [
+      {
+        "tagName": "@returns",
+        "tagValue": "{object} - data object"
+      }
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "object"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "inputs",
+        "description": "inputs object"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "object"
+      ],
+      "spread": false,
+      "description": "data object"
+    },
+    "generator": false
+  },
+  {
+    "__docId__": 39,
+    "kind": "function",
+    "static": true,
+    "variation": null,
+    "name": "getQueryPart",
+    "memberof": "src/lib/get-data.es6",
+    "longname": "src/lib/get-data.es6~getQueryPart",
+    "access": null,
+    "export": true,
+    "importPath": "jedi-validate/src/lib/get-data.es6",
+    "importStyle": "{getQueryPart}",
+    "description": "Create part url for serialize method",
+    "lineNumber": 142,
+    "unknown": [
+      {
+        "tagName": "@returns",
+        "tagValue": "{string} - part of url"
+      }
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "name",
+        "description": ""
+      },
+      {
+        "nullable": null,
+        "types": [
+          "object",
+          "Array",
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "data",
+        "description": ""
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "string"
+      ],
+      "spread": false,
+      "description": "part of url"
+    },
+    "generator": false
+  },
+  {
+    "__docId__": 40,
+    "kind": "function",
+    "static": true,
+    "variation": null,
+    "name": "convertData",
+    "memberof": "src/lib/get-data.es6",
+    "longname": "src/lib/get-data.es6~convertData",
+    "access": null,
+    "export": true,
+    "importPath": "jedi-validate/src/lib/get-data.es6",
+    "importStyle": "{convertData}",
+    "description": "Convert data object to value for sending",
+    "lineNumber": 158,
+    "unknown": [
+      {
+        "tagName": "@returns",
+        "tagValue": "{string|FormData} - output value"
+      }
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "object"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "data",
+        "description": "data object"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "type",
+        "description": "type of conversion"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "string",
+        "FormData"
+      ],
+      "spread": false,
+      "description": "output value"
+    },
+    "generator": false
+  },
+  {
+    "__docId__": 41,
+    "kind": "file",
+    "static": true,
+    "variation": null,
+    "name": "src/lib/get-options.es6",
+    "memberof": null,
+    "longname": "src/lib/get-options.es6",
+    "access": null,
+    "description": null,
+    "lineNumber": 1,
+    "content": "/**\r\n * Get ajax options from form\r\n * @param {HTMLFormElement} form - form element\r\n * @returns {{ajax: {url: string, method: string, enctype: string, sendType: *}}} - object with options for sending\r\n */\r\nexport function getFormOptions(form) {\r\n    const enctype = form.getAttribute('enctype');\r\n\r\n    return {\r\n        ajax: {\r\n            url: form.getAttribute('action'),\r\n            method: form.getAttribute('method'),\r\n            enctype: enctype,\r\n            sendType: enctype === 'multipart/form-data' ? 'formData' : undefined,\r\n        },\r\n    };\r\n}\r\n\r\n/**\r\n * Get validate options from input attribute of className\r\n * @param {HTMLInputElement|HTMLSelectElement} input - input for validation\r\n * @returns {object} - rules\r\n */\r\nexport function getInputRules(input) {\r\n    const defaultRules = ['required', 'email', 'tel', 'url'];\r\n\r\n    const rules = defaultRules.reduce((inputRules, rule) => ({\r\n        ...inputRules,\r\n        [rule]: input.hasAttribute(rule) || input.type === rule || input.classList.contains(rule),\r\n    }), {});\r\n\r\n    return {\r\n        ...rules,\r\n        regexp: input.hasAttribute('pattern') ? new RegExp(input.getAttribute('pattern')) : undefined,\r\n    };\r\n}\r\n"
+  },
+  {
+    "__docId__": 42,
+    "kind": "function",
+    "static": true,
+    "variation": null,
+    "name": "getFormOptions",
+    "memberof": "src/lib/get-options.es6",
+    "longname": "src/lib/get-options.es6~getFormOptions",
+    "access": null,
+    "export": true,
+    "importPath": "jedi-validate/src/lib/get-options.es6",
+    "importStyle": "{getFormOptions}",
+    "description": "Get ajax options from form",
+    "lineNumber": 6,
+    "unknown": [
+      {
+        "tagName": "@returns",
+        "tagValue": "{{ajax: {url: string, method: string, enctype: string, sendType: *}}} - object with options for sending"
+      }
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "HTMLFormElement"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "form",
+        "description": "form element"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "{ajax: {url: string, method: string, enctype: string, sendType: *}}"
+      ],
+      "spread": false,
+      "description": "object with options for sending"
+    },
+    "generator": false
+  },
+  {
+    "__docId__": 43,
+    "kind": "function",
+    "static": true,
+    "variation": null,
+    "name": "getInputRules",
+    "memberof": "src/lib/get-options.es6",
+    "longname": "src/lib/get-options.es6~getInputRules",
+    "access": null,
+    "export": true,
+    "importPath": "jedi-validate/src/lib/get-options.es6",
+    "importStyle": "{getInputRules}",
+    "description": "Get validate options from input attribute of className",
+    "lineNumber": 24,
+    "unknown": [
+      {
+        "tagName": "@returns",
+        "tagValue": "{object} - rules"
+      }
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "HTMLInputElement",
+          "HTMLSelectElement"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "input",
+        "description": "input for validation"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "object"
+      ],
+      "spread": false,
+      "description": "rules"
+    },
+    "generator": false
+  },
+  {
+    "__docId__": 44,
+    "kind": "file",
+    "static": true,
+    "variation": null,
+    "name": "src/lib/methods.es6",
+    "memberof": null,
+    "longname": "src/lib/methods.es6",
+    "access": null,
+    "description": null,
+    "lineNumber": 1,
+    "content": "export default {\r\n    required: {\r\n        func: (value) => {\r\n            if (!value) return false;\r\n            if (Array.isArray(value) && value.length === 0) return false;\r\n            if (value instanceof FileList && value.length === 0) return false;\r\n            if (typeof value === 'string' && value.trim() === '') return false;\r\n            \r\n            return true;\r\n        },\r\n        message: 'This field is required',\r\n    },\r\n    regexp: {\r\n        func: (value, regexp) => regexp.test(value),\r\n        message: 'Please, provide correct value',\r\n    },\r\n    email: {\r\n        func: value => /[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}/i.test(value),\r\n        message: 'This email is incorrect',\r\n    },\r\n    filesize: {\r\n        func: (value, size) => [...value].reduce((r, file) => file.size < size && r, true), // eslint-disable-line max-len\r\n        message: 'This file is too large',\r\n    },\r\n    extension: {\r\n        func: (value, extensions) => [...value].reduce((r, file) => extensions.indexOf(file.name.split('.').pop()) !== -1 && r, true), // eslint-disable-line max-len\r\n        message: 'This extension is not supported',\r\n    },\r\n    tel: {\r\n        func: value => /^([\\+]+)*[0-9\\x20\\x28\\x29\\-]{5,20}$/.test(value),\r\n        message: 'This phone number is incorrect',\r\n    },\r\n    url: {\r\n        func: value => /[-a-zA-Z0-9@:%_\\+.~#?&//=]{2,256}\\.[a-z]{2,4}\\b(\\/[-a-zA-Z0-9@:%_\\+.~#?&//=]*)?/gi.test(value), // eslint-disable-line max-len\r\n        message: 'Wrong url',\r\n    },\r\n};\r\n"
+  },
+  {
+    "__docId__": 45,
+    "kind": "file",
+    "static": true,
+    "variation": null,
+    "name": "src/lib/validate-data.es6",
+    "memberof": null,
+    "longname": "src/lib/validate-data.es6",
+    "access": null,
+    "description": null,
+    "lineNumber": 1,
+    "content": "import { getValueByName } from './get-data.es6';\r\n\r\n/**\r\n * Validate field\r\n * @param {object} rules - object with rules for validation\r\n * @param {object} methods - validation methods\r\n * @param {string|FileList|Array} value - value of input\r\n * @param {string} name - name on input\r\n * @param {object} errorMessages - object with error messages\r\n * @returns {Array.<string>} - array of field errors\r\n */\r\nexport function validateField(rules, methods, value, name, errorMessages) {\r\n    const isEmpty = !methods.required.func(value);\r\n\r\n    if (isEmpty && rules.required) {\r\n        return [errorMessages[name].required];\r\n    }\r\n\r\n    if (isEmpty) {\r\n        return [];\r\n    }\r\n\r\n    return Object.keys(rules).reduce((errors, method) => {\r\n        const params = rules[method];\r\n        if (!params) return errors;\r\n\r\n        if (methods[method]) {\r\n            const valid = methods[method].func(value, params);\r\n\r\n            if (!valid) {\r\n                errors.push(errorMessages[name][method]);\r\n            }\r\n        } else {\r\n            errors.push(`Method \"${method}\" not found`);\r\n        }\r\n\r\n        return errors;\r\n    }, []);\r\n}\r\n\r\n/**\r\n * Validate data object\r\n * @param {object} rules - object with rules for validation\r\n * @param {object} methods - validation methods\r\n * @param {object} data - data object\r\n * @param {object} errorMessages - object with error messages\r\n * @returns {object.<string, Array.<string>>} - object of fields error arrays\r\n */\r\nexport function validateData(rules, methods, data, errorMessages) {\r\n    return Object.keys(rules).reduce((obj, name) => {\r\n        const value = getValueByName(name, data);\r\n        const errors = validateField(rules[name], methods, value, name, errorMessages);\r\n        return {\r\n            ...obj,\r\n            [name]: errors.length ? errors : undefined,\r\n        };\r\n    }, {});\r\n}\r\n"
+  },
+  {
+    "__docId__": 46,
+    "kind": "function",
+    "static": true,
+    "variation": null,
+    "name": "validateField",
+    "memberof": "src/lib/validate-data.es6",
+    "longname": "src/lib/validate-data.es6~validateField",
+    "access": null,
+    "export": true,
+    "importPath": "jedi-validate/src/lib/validate-data.es6",
+    "importStyle": "{validateField}",
+    "description": "Validate field",
+    "lineNumber": 12,
+    "unknown": [
+      {
+        "tagName": "@returns",
+        "tagValue": "{Array.<string>} - array of field errors"
+      }
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "object"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "rules",
+        "description": "object with rules for validation"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "object"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "methods",
+        "description": "validation methods"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "string",
+          "FileList",
+          "Array"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "value",
+        "description": "value of input"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "name",
+        "description": "name on input"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "object"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "errorMessages",
+        "description": "object with error messages"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "Array.<string>"
+      ],
+      "spread": false,
+      "description": "array of field errors"
+    },
+    "generator": false
+  },
+  {
+    "__docId__": 47,
+    "kind": "function",
+    "static": true,
+    "variation": null,
+    "name": "validateData",
+    "memberof": "src/lib/validate-data.es6",
+    "longname": "src/lib/validate-data.es6~validateData",
+    "access": null,
+    "export": true,
+    "importPath": "jedi-validate/src/lib/validate-data.es6",
+    "importStyle": "{validateData}",
+    "description": "Validate data object",
+    "lineNumber": 49,
+    "unknown": [
+      {
+        "tagName": "@returns",
+        "tagValue": "{object.<string, Array.<string>>} - object of fields error arrays"
+      }
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "object"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "rules",
+        "description": "object with rules for validation"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "object"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "methods",
+        "description": "validation methods"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "object"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "data",
+        "description": "data object"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "object"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "errorMessages",
+        "description": "object with error messages"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "object.<string, Array.<string>>"
+      ],
+      "spread": false,
+      "description": "object of fields error arrays"
+    },
+    "generator": false
+  },
+  {
+    "__docId__": 49,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "Infinity",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Infinity",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Infinity",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 50,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "NaN",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/NaN",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~NaN",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 51,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "undefined",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~undefined",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 52,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "null",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~null",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 53,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "Object",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Object",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 54,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "object",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~object",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 55,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "Function",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Function",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 56,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "function",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~function",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 57,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "Boolean",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Boolean",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 58,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "boolean",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~boolean",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 59,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "Symbol",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Symbol",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 60,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "Error",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Error",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 61,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "EvalError",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/EvalError",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~EvalError",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 62,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "InternalError",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/InternalError",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~InternalError",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 63,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "RangeError",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RangeError",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~RangeError",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 64,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "ReferenceError",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ReferenceError",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~ReferenceError",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 65,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "SyntaxError",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/SyntaxError",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~SyntaxError",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 66,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "TypeError",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypeError",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~TypeError",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 67,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "URIError",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/URIError",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~URIError",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 68,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "Number",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Number",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 69,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "number",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~number",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 70,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "Date",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Date",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 71,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "String",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~String",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 72,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "string",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~string",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 73,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "RegExp",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~RegExp",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 74,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Array",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 75,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "Int8Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Int8Array",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Int8Array",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 76,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "Uint8Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Uint8Array",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 77,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "Uint8ClampedArray",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8ClampedArray",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Uint8ClampedArray",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 78,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "Int16Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Int16Array",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Int16Array",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 79,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "Uint16Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint16Array",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Uint16Array",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 80,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "Int32Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Int32Array",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Int32Array",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 81,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "Uint32Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint32Array",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Uint32Array",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 82,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "Float32Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Float32Array",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 83,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "Float64Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float64Array",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Float64Array",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 84,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "Map",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Map",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 85,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "Set",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Set",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 86,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "WeakMap",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakMap",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~WeakMap",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 87,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "WeakSet",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakSet",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~WeakSet",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 88,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "ArrayBuffer",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~ArrayBuffer",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 89,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "DataView",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~DataView",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 90,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "JSON",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~JSON",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 91,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "Promise",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Promise",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 92,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "Generator",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Generator",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Generator",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 93,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "GeneratorFunction",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/GeneratorFunction",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~GeneratorFunction",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 94,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "Reflect",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Reflect",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Reflect",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 95,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "Proxy",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Proxy",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 97,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "CanvasRenderingContext2D",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D",
+    "memberof": "BuiltinExternal/WebAPIExternal.js",
+    "longname": "BuiltinExternal/WebAPIExternal.js~CanvasRenderingContext2D",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 98,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "DocumentFragment",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment",
+    "memberof": "BuiltinExternal/WebAPIExternal.js",
+    "longname": "BuiltinExternal/WebAPIExternal.js~DocumentFragment",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 99,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "Element",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/API/Element",
+    "memberof": "BuiltinExternal/WebAPIExternal.js",
+    "longname": "BuiltinExternal/WebAPIExternal.js~Element",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 100,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "Event",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/API/Event",
+    "memberof": "BuiltinExternal/WebAPIExternal.js",
+    "longname": "BuiltinExternal/WebAPIExternal.js~Event",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 101,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "Node",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/API/Node",
+    "memberof": "BuiltinExternal/WebAPIExternal.js",
+    "longname": "BuiltinExternal/WebAPIExternal.js~Node",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 102,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "NodeList",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/API/NodeList",
+    "memberof": "BuiltinExternal/WebAPIExternal.js",
+    "longname": "BuiltinExternal/WebAPIExternal.js~NodeList",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 103,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "XMLHttpRequest",
+    "externalLink": "https://developer.mozilla.org/en/docs/Web/API/XMLHttpRequest",
+    "memberof": "BuiltinExternal/WebAPIExternal.js",
+    "longname": "BuiltinExternal/WebAPIExternal.js~XMLHttpRequest",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 104,
+    "kind": "external",
+    "static": true,
+    "variation": null,
+    "name": "AudioContext",
+    "externalLink": "https://developer.mozilla.org/en/docs/Web/API/AudioContext",
+    "memberof": "BuiltinExternal/WebAPIExternal.js",
+    "longname": "BuiltinExternal/WebAPIExternal.js~AudioContext",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  }
+]
