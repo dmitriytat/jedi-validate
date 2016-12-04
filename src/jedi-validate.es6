@@ -47,7 +47,6 @@ class JediValidate {
      * @type {object}
      */
     rules = {};
-
     /**
      * JediValidate
      * @param {HTMLElement} root - element which wrap form element
@@ -114,7 +113,7 @@ class JediValidate {
 
         this.ready();
 
-        this.errorMessages = this.initErrorMessages(
+        this.errorMessages = JediValidate.initErrorMessages(
             this.rules,
             this.options.messages,
             this.methods,
@@ -270,7 +269,12 @@ class JediValidate {
                     this.errorMessages
                 );
 
-                JediValidate.markField(this.fields[name], this.messages[name], this.options.states, errors);
+                JediValidate.markField(
+                    this.fields[name],
+                    this.messages[name],
+                    this.options.states,
+                    errors
+                );
             });
 
             input.addEventListener('input', () => {
@@ -282,7 +286,12 @@ class JediValidate {
 
     /**
      * Send form
-     * @param {{url: string, enctype: string, sendType: string, method: string, data: string|FormData}} options - object with options for sending
+     * @param {object} options - object with options for sending
+     * @param {string} options.url
+     * @param {string} options.enctype
+     * @param {string} options.sendType
+     * @param {string} options.method
+     * @param {string|FormData} options.data
      */
     send(options) {
         ajax(options).then((response) => {
@@ -297,7 +306,7 @@ class JediValidate {
                     this.nodes.baseMessage.innerHTML = response.validationErrors.base.join(', ');
                     this.root.classList.add(this.options.formStatePrefix + this.options.states.error); // eslint-disable-line max-len
                     this.root.classList.remove(this.options.formStatePrefix + this.options.states.valid); // eslint-disable-line max-len
-                    delete response.validationErrors.base;
+                    delete response.validationErrors.base; // eslint-disable-line no-param-reassign
                 } else {
                     this.nodes.baseMessage.innerHTML = '';
                 }
@@ -366,7 +375,7 @@ class JediValidate {
         field.classList.add(error);
         field.classList.remove(valid);
 
-        message.innerHTML = errors.join(', ');
+        message.innerHTML = errors.join(', '); // eslint-disable-line no-param-reassign
     }
 
     /**
@@ -384,7 +393,7 @@ class JediValidate {
         field.classList.add(valid);
         field.classList.remove(error);
 
-        message.innerHTML = '';
+        message.innerHTML = ''; // eslint-disable-line no-param-reassign
     }
 
     /**
@@ -408,7 +417,7 @@ class JediValidate {
      * @param {string} language
      * @returns {Object.<string, Object.<string, string>>}
      */
-    initErrorMessages(rules, messages, methods, language) {
+    static initErrorMessages(rules, messages, methods, language) {
         return Object.keys(rules).reduce((names, name) => ({
             ...names,
             [name]: Object.keys(rules[name]).reduce((ruleNames, method) => ({

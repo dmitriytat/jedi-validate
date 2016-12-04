@@ -25,7 +25,7 @@ export function createObject(path, value) {
 const NAME = /(\[(\w*)\]|\w*)/gi;
 
 /**
- * Convart name of input to path array
+ * Convert name of input to path array
  * @param {string} name - name of input
  * @returns {Array} - path to value in data object
  */
@@ -50,6 +50,7 @@ export function convertNameToPath(name) {
  * Get value from data object by path
  * @param {Array} path - value path
  * @param {object} data - data object
+ * @returns {string} - value
  */
 export function getValueByPath(path, data) {
     return path.reduce((value, segment) => (segment && value ? value[segment] : value), data || '');
@@ -68,7 +69,7 @@ export function getValueByName(name, data) {
 /**
  * Get value from radio group
  * @param {Array} inputs - array of radio inputs
- * @returns {string} value of checked input
+ * @returns {string} - value of checked input
  */
 export function getRadioGroupValue(inputs) {
     return [...inputs].map(radio => getInputValue(radio)).filter(Boolean)[0];

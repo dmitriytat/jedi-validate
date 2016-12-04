@@ -2,7 +2,7 @@
 
 [![NPM](https://nodei.co/npm/jedi-validate.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/jedi-validate/)
 
-* [Introduction](#intro)
+* [Introduction & documentation](#intro)
 * [Installation and Usage](#install)
 * [Options](#options)
   * [Default Options](#default)
@@ -18,6 +18,7 @@
     Introduction
 </h1>
 Jedi Validate is a lightweight form validation component.
+[Documentation](http://dmitriytat.github.io/jedi-validate/)
 
 ## How Can I Use It?
 

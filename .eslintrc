@@ -1,4 +1,5 @@
 {
+  "parser": "babel-eslint",
   "extends": "airbnb",
   "plugins": [
     "react",
@@ -28,6 +29,7 @@
     "window": true,
     "XMLHttpRequest": true,
     "document": true,
-    "FormData": true
+    "FormData": true,
+    "FileList": true
   }
 }

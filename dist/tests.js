@@ -133,7 +133,7 @@ function createObject(path, value) {
 var NAME = /(\[(\w*)\]|\w*)/gi;
 
 /**
- * Convart name of input to path array
+ * Convert name of input to path array
  * @param {string} name - name of input
  * @returns {Array} - path to value in data object
  */
@@ -158,6 +158,7 @@ function convertNameToPath(name) {
  * Get value from data object by path
  * @param {Array} path - value path
  * @param {object} data - data object
+ * @returns {string} - value
  */
 function getValueByPath(path, data) {
     return path.reduce(function (value, segment) {
@@ -178,7 +179,7 @@ function getValueByName(name, data) {
 /**
  * Get value from radio group
  * @param {Array} inputs - array of radio inputs
- * @returns {string} value of checked input
+ * @returns {string} - value of checked input
  */
 function getRadioGroupValue(inputs) {
     return [].concat(_toConsumableArray(inputs)).map(function (radio) {

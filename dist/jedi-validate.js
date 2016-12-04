@@ -133,7 +133,7 @@ function createObject(path, value) {
 var NAME = /(\[(\w*)\]|\w*)/gi;
 
 /**
- * Convart name of input to path array
+ * Convert name of input to path array
  * @param {string} name - name of input
  * @returns {Array} - path to value in data object
  */
@@ -158,6 +158,7 @@ function convertNameToPath(name) {
  * Get value from data object by path
  * @param {Array} path - value path
  * @param {object} data - data object
+ * @returns {string} - value
  */
 function getValueByPath(path, data) {
     return path.reduce(function (value, segment) {
@@ -178,7 +179,7 @@ function getValueByName(name, data) {
 /**
  * Get value from radio group
  * @param {Array} inputs - array of radio inputs
- * @returns {string} value of checked input
+ * @returns {string} - value of checked input
  */
 function getRadioGroupValue(inputs) {
     return [].concat(_toConsumableArray(inputs)).map(function (radio) {
@@ -407,27 +408,44 @@ return deepmerge
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
-    value: true
+  value: true
 });
 exports.translate = translate;
 exports.addTranslation = addTranslation;
 var dictionary = __webpack_require__(7);
 
-var defaultLang = 'en';
+/**
+ * Default language
+ * @type {string}
+ */
+var defaultLanguage = 'en';
 
+/**
+ * Translate phrase
+ * @param {string} text - phrase to translate
+ * @param {string} language - language token
+ * @returns {string} - translated text
+ */
 function translate(text) {
-    var lang = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : defaultLang;
+  var language = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : defaultLanguage;
 
-    return dictionary[lang] && dictionary[lang][text] || text;
+  return dictionary[language] && dictionary[language][text] || text;
 }
 
+/**
+ * Add translation pair to dictionary
+ * @param {string} sourceText - phrase
+ * @param {string} translatedText - translated phrase
+ * @param {string} language - language token
+ */
 function addTranslation(sourceText, translatedText) {
-    var lang = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : defaultLang;
+  var language = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : defaultLanguage;
 
-    if (dictionary[lang] === undefined) {
-        dictionary[lang] = {};
-    }
-    dictionary[lang][sourceText] = translatedText;
+  if (dictionary[language] === undefined) {
+    dictionary[language] = {};
+  }
+
+  dictionary[language][sourceText] = translatedText;
 }
 
 /***/ },
@@ -742,7 +760,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var JediValidate = function () {
-
     /**
      * JediValidate
      * @param {HTMLElement} root - element which wrap form element
@@ -838,7 +855,7 @@ var JediValidate = function () {
 
         this.ready();
 
-        this.errorMessages = this.initErrorMessages(this.rules, this.options.messages, this.methods, this.options.language);
+        this.errorMessages = JediValidate.initErrorMessages(this.rules, this.options.messages, this.methods, this.options.language);
     }
 
     /**
@@ -991,7 +1008,12 @@ var JediValidate = function () {
 
         /**
          * Send form
-         * @param {{url: string, enctype: string, sendType: string, method: string, data: string|FormData}} options - object with options for sending
+         * @param {object} options - object with options for sending
+         * @param {string} options.url
+         * @param {string} options.enctype
+         * @param {string} options.sendType
+         * @param {string} options.method
+         * @param {string|FormData} options.data
          */
 
     }, {
@@ -1011,7 +1033,7 @@ var JediValidate = function () {
                         _this3.nodes.baseMessage.innerHTML = response.validationErrors.base.join(', ');
                         _this3.root.classList.add(_this3.options.formStatePrefix + _this3.options.states.error); // eslint-disable-line max-len
                         _this3.root.classList.remove(_this3.options.formStatePrefix + _this3.options.states.valid); // eslint-disable-line max-len
-                        delete response.validationErrors.base;
+                        delete response.validationErrors.base; // eslint-disable-line no-param-reassign
                     } else {
                         _this3.nodes.baseMessage.innerHTML = '';
                     }
@@ -1083,15 +1105,6 @@ var JediValidate = function () {
          * @returns {Object.<string, Object.<string, string>>}
          */
 
-    }, {
-        key: 'initErrorMessages',
-        value: function initErrorMessages(rules, messages, methods, language) {
-            return Object.keys(rules).reduce(function (names, name) {
-                return _extends({}, names, _defineProperty({}, name, Object.keys(rules[name]).reduce(function (ruleNames, method) {
-                    return _extends({}, ruleNames, _defineProperty({}, method, (0, _jediValidateI18n.translate)(messages[name] && messages[name][method] || methods[method] && methods[method].message || '', language)));
-                }, {})));
-            }, {});
-        }
     }], [{
         key: 'addToDictionary',
         value: function addToDictionary(sourceText, translatedText, language) {
@@ -1146,7 +1159,7 @@ var JediValidate = function () {
             field.classList.add(error);
             field.classList.remove(valid);
 
-            message.innerHTML = errors.join(', ');
+            message.innerHTML = errors.join(', '); // eslint-disable-line no-param-reassign
         }
 
         /**
@@ -1170,7 +1183,16 @@ var JediValidate = function () {
             field.classList.add(valid);
             field.classList.remove(error);
 
-            message.innerHTML = '';
+            message.innerHTML = ''; // eslint-disable-line no-param-reassign
+        }
+    }, {
+        key: 'initErrorMessages',
+        value: function initErrorMessages(rules, messages, methods, language) {
+            return Object.keys(rules).reduce(function (names, name) {
+                return _extends({}, names, _defineProperty({}, name, Object.keys(rules[name]).reduce(function (ruleNames, method) {
+                    return _extends({}, ruleNames, _defineProperty({}, method, (0, _jediValidateI18n.translate)(messages[name] && messages[name][method] || methods[method] && methods[method].message || '', language)));
+                }, {})));
+            }, {});
         }
     }]);
 
