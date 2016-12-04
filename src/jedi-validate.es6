@@ -1,12 +1,58 @@
 import deepmerge from 'deepmerge';
 import { getData, getInputData, convertData, getValueByName } from './lib/get-data.es6';
-import { addTranslation, setLanguage } from './i18n/jedi-validate-i18n.es6';
+import { addTranslation, translate } from './i18n/jedi-validate-i18n.es6';
 import { getFormOptions, getInputRules } from './lib/get-options.es6';
 import { validateData, validateField } from './lib/validate-data.es6';
 import { ajax } from './lib/ajax.es6';
 import defaultMethods from './lib/methods.es6';
 
 class JediValidate {
+    /**
+     * Object with fields
+     * @type {Object.<string, Element>}
+     */
+    fields = {};
+    /**
+     * Object with inputs nodes
+     * @type {Object.<string, HTMLInputElement|HTMLSelectElement|Array>}
+     */
+    inputs = {};
+    /**
+     * Object with message nodes
+     * @type {Object.<string, Element>}
+     */
+    messages = {};
+    /**
+     * Object with error message
+     * @type {Object.<string, Object.<string, string>>}
+     */
+    errorMessages = {};
+    /**
+     * Object with error message
+     * @type {object} - data object
+     */
+    data = {};
+    /**
+     * Validate methods
+     * @type {Object.<string, {func: Function, message: string}>}
+     */
+    methods = { ...defaultMethods };
+    /**
+     * Validator options
+     * @type {{ajax: {url: string, enctype: string, sendType: string, method: string}, rules: {}, messages: {}, containers: {parent: string, message: string, baseMessage: string}, states: {error: string, valid: string, pristine: string, dirty: string}, formStatePrefix: string, callbacks: {success: (function(object)), error: (function(object.<string, Array.<string>>))}, clean: boolean, redirect: boolean, language: string, translations: {}}}
+     */
+    options = {};
+    /**
+     * Validator rules
+     * @type {object}
+     */
+    rules = {};
+
+    /**
+     * JediValidate
+     * @param {HTMLElement} root - element which wrap form element
+     * @param {object} options - object with options
+     */
     constructor(root, options = {}) {
         const defaultOptions = {
             ajax: {
@@ -45,14 +91,7 @@ class JediValidate {
 
         this.options = deepmerge(defaultOptions, options);
 
-        this.fields = {};
-        this.inputs = {};
-        this.messages = {}; // object with message nodes
-        this.errorMessages = {}; // object with error strings
-        this.data = {};
-        this.methods = defaultMethods;
-
-        this.nodes = this.cacheNodes(this.root, this.options);
+        this.nodes = JediValidate.cacheNodes(this.root, this.options);
 
         const formOptions = getFormOptions(this.nodes.form);
 
@@ -62,8 +101,7 @@ class JediValidate {
 
         this.rules = { ...this.options.rules };
 
-        setLanguage(this.options.language);
-
+        // todo rewrite translations
         Object.keys(this.options.translations).forEach((language) => {
             Object.keys(this.options.translations[language]).forEach((translation) => {
                 addTranslation(
@@ -79,10 +117,17 @@ class JediValidate {
         this.errorMessages = this.initErrorMessages(
             this.rules,
             this.options.messages,
-            this.methods
+            this.methods,
+            this.options.language
         );
     }
 
+    /**
+     * Add localisation to JediValidate
+     * @param {string} sourceText - text on english
+     * @param {string} translatedText - text on needed language
+     * @param {string} language - language
+     */
     static addToDictionary(sourceText, translatedText, language) {
         addTranslation(sourceText, translatedText, language);
     }
@@ -93,7 +138,7 @@ class JediValidate {
      * @param options Object with selectors
      * @returns {{form: Element, inputs: NodeList, baseMessage: Element}}
      */
-    cacheNodes(root, options) {
+    static cacheNodes(root, options) {
         return {
             form: root.querySelector('form'),
             inputs: root.querySelectorAll('[name]'),
@@ -107,7 +152,6 @@ class JediValidate {
         this.nodes.form.addEventListener('submit', (event) => {
             event.preventDefault();
             this.data = getData(this.inputs);
-            console.log(this.data);
 
             const errors = validateData(
                 this.rules,
@@ -118,7 +162,7 @@ class JediValidate {
 
             if (errors && Object.keys(errors).filter(name => errors[name]).length !== 0) {
                 Object.keys(errors).forEach(name =>
-                    this.markField(
+                    JediValidate.markField(
                         this.fields[name],
                         this.messages[name],
                         this.options.states,
@@ -136,11 +180,11 @@ class JediValidate {
                 return;
             }
 
-            if (this.options.ajax) { // todo check without (&& this.options.ajax.url)
+            if (this.options.ajax && this.options.ajax.url) {
                 event.preventDefault();
             } else {
                 try {
-                    this.options.callbacks.success(errors, event);
+                    this.options.callbacks.success(null);
                 } catch (e) {
                     console.error(e);
                 }
@@ -148,10 +192,10 @@ class JediValidate {
                 return;
             }
 
-            // fix get opt data
+            const convertedData = convertData(this.data, this.options.ajax.sendType);
             this.send({
                 ...this.options.ajax,
-                data: convertData(this.data, this.options.ajax.sendType),
+                data: convertedData,
             });
         });
 
@@ -207,7 +251,6 @@ class JediValidate {
                 });
             }
 
-            // todo think about
             input.addEventListener('change', () => {
                 this.fields[name].classList.remove(this.options.states.dirty);
 
@@ -226,7 +269,8 @@ class JediValidate {
                     input.name,
                     this.errorMessages
                 );
-                this.markField(this.fields[name], this.messages[name], this.options.states, errors);
+
+                JediValidate.markField(this.fields[name], this.messages[name], this.options.states, errors);
             });
 
             input.addEventListener('input', () => {
@@ -236,6 +280,10 @@ class JediValidate {
         });
     }
 
+    /**
+     * Send form
+     * @param {{url: string, enctype: string, sendType: string, method: string, data: string|FormData}} options - object with options for sending
+     */
     send(options) {
         ajax(options).then((response) => {
             if (response.validationErrors) {
@@ -255,7 +303,7 @@ class JediValidate {
                 }
 
                 Object.keys(response.validationErrors).forEach(name =>
-                    this.markField(
+                    JediValidate.markField(
                         this.fields[name],
                         this.messages[name],
                         this.options.states,
@@ -281,7 +329,7 @@ class JediValidate {
         }).catch(({ method, url, status, statusText }) => {
             console.warn(`${method} ${url} ${status} (${statusText})`);
 
-            this.nodes.baseMessage.innerHTML = 'Can not send form!'; // todo: language extension
+            this.nodes.baseMessage.innerHTML = translate('Can not send form!', this.options.language);
             this.root.classList.add(this.options.formStatePrefix + this.options.states.error); // eslint-disable-line max-len
             this.root.classList.remove(this.options.formStatePrefix + this.options.states.valid); // eslint-disable-line max-len
         });
@@ -289,28 +337,28 @@ class JediValidate {
 
     /**
      *
-     * @param field
+     * @param {Element} field
      * @param message
      * @param states
      * @param errors
      */
-    markField(field, message, states, errors) {
+    static markField(field, message, states, errors) {
         if (errors && errors.length) {
-            this.markError(field, message, states, errors);
+            JediValidate.markError(field, message, states, errors);
         } else {
-            this.markValid(field, message, states);
+            JediValidate.markValid(field, message, states);
         }
     }
 
     /**
      *
-     * @param field
-     * @param message
-     * @param error
-     * @param valid
-     * @param errors
+     * @param {Element} field
+     * @param {Element} message
+     * @param {string} error
+     * @param {string} valid
+     * @param {Array.<string>} errors
      */
-    markError(field, message, { error, valid }, errors) {
+    static markError(field, message, { error, valid }, errors) {
         if (!field || !message) {
             return;
         }
@@ -321,7 +369,14 @@ class JediValidate {
         message.innerHTML = errors.join(', ');
     }
 
-    markValid(field, message, { error, valid }) {
+    /**
+     *
+     * @param {Element} field
+     * @param {Element} message
+     * @param {string} error
+     * @param {string} valid
+     */
+    static markValid(field, message, { error, valid }) {
         if (!field || !message) {
             return;
         }
@@ -332,6 +387,12 @@ class JediValidate {
         message.innerHTML = '';
     }
 
+    /**
+     * Add rule to validator
+     * @param {string} rule - rule name
+     * @param {Function} func - function
+     * @param {string} message - error message
+     */
     addMethod(rule, func, message) {
         this.methods[rule] = {
             func,
@@ -339,13 +400,20 @@ class JediValidate {
         };
     }
 
-    // todo rewrite
-    initErrorMessages(rules, messages, methods) {
+    /**
+     * Init error messages
+     * @param {object} rules
+     * @param {object} messages
+     * @param {object} methods
+     * @param {string} language
+     * @returns {Object.<string, Object.<string, string>>}
+     */
+    initErrorMessages(rules, messages, methods, language) {
         return Object.keys(rules).reduce((names, name) => ({
             ...names,
             [name]: Object.keys(rules[name]).reduce((ruleNames, method) => ({
                 ...ruleNames,
-                [method]: (messages[name] && messages[name][method]) || (methods[method] && methods[method].message) || '',
+                [method]: translate((messages[name] && messages[name][method]) || (methods[method] && methods[method].message) || '', language),
             }), {}),
         }), {});
     }

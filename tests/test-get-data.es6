@@ -40,11 +40,11 @@ inputs['parent[child]'].value = data.parent.child;
 
 describe('Get data', function () {
     it('createObject', function () {
-        assert.deepEqual(createObject(['parent', 'child', ''], 'value'), { parent: { child: 'value' } }); // todo think about ''
+        assert.deepEqual(createObject(['parent', 'child', ''], 'value'), { parent: { child: 'value' } });
     });
 
     it('convertNameToPath', function () {
-        assert.deepEqual(convertNameToPath('parent[child]'), ['parent', 'child', '']); // todo think about ''
+        assert.deepEqual(convertNameToPath('parent[child]'), ['parent', 'child', '']);
     });
 
     it('getValueByPath', function () {

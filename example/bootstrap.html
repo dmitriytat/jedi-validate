@@ -17,7 +17,7 @@
 				</div>
 				<div class="panel panel-primary">
 					<div class="panel-heading">User Details</div>
-					<div class="panel-body" id="form">
+					<div class="panel-body" id="form1">
 						<form id="myForm" action="./ajax.php" method="post" class="form-horizontal">
 							<div class="help-block base-error"></div>
 							<div class="form-group">
@@ -85,6 +85,57 @@
 
 					</div>
 				</div>
+				<div class="panel panel-primary">
+					<div class="panel-heading">Text area</div>
+					<div class="panel-body" id="form2">
+						<form action="./ajax.php" method="post" class="form-horizontal">
+							<div class="help-block base-error"></div>
+							<div class="form-group">
+								<label for="text" class="col-sm-2 control-label">Text:</label>
+
+								<div class="col-sm-10">
+									<textarea name="text" id="text" cols="30" rows="10" required></textarea>
+								</div>
+							</div>
+							<hr/>
+							<button type="submit" class="btn  btn-lg btn-success pull-right">Send</button>
+						</form>
+						<div class="base-error alert alert-danger" role="alert" style="display: none"></div>
+					</div>
+				</div>
+				<div class="panel panel-primary">
+					<div class="panel-heading">Select</div>
+					<div class="panel-body" id="form3">
+						<form action="./ajax.php" method="post" class="form-horizontal">
+							<div class="help-block base-error"></div>
+							<div class="form-group">
+								<label for="select" class="col-sm-2 control-label">select:</label>
+
+								<div class="col-sm-10">
+									<select name="select" id="select" required>
+										<option value="1">1</option>
+										<option value="2">2</option>
+										<option value="3">3</option>
+									</select>
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="select2" class="col-sm-2 control-label">multiple:</label>
+
+								<div class="col-sm-10">
+									<select name="select2" id="select2" multiple="multiple" required>
+										<option value="1">1</option>
+										<option value="2">2</option>
+										<option value="3">3</option>
+									</select>
+								</div>
+							</div>
+							<hr/>
+							<button type="submit" class="btn  btn-lg btn-success pull-right">Send</button>
+						</form>
+						<div class="base-error alert alert-danger" role="alert" style="display: none"></div>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -92,45 +143,57 @@
 	<script src="/dist/jedi-validate.js"></script>
 
 	<script>
-    var formWrapper = document.querySelector('#form');
+		var options = {
+			ajax: {
+				url: '/example/ajax.json',
+				sendType: 'formData',
+				method: 'post',
+			},
+			states: {
+				error: 'has-error',
+				valid: 'has-success',
+				dirty: 'has-warning'
+			},
+			rules: {
+				file: {
+					filesize: 2 * 1024 * 1024,
+					extension: "html|css|txt"
+				}
+			},
+			messages: {
+				name: {
+					regexp: "Two words with space"
+				},
+				file: {
+					filesize: "File is too big"
+				},
+				check: {
+					required: "Check it, please!"
+				}
+			},
+			callbacks: {
+				success: function (response) {
+				},
+				error: function (errors) {
+				}
+			}
+		};
 
-    new JediValidate(formWrapper, {
-        ajax: {
-			url: '/example/ajax.json',
-			sendType: 'formData',
-			method: 'post',
-		},
-        states: {
-            error: 'has-error',
-            valid: 'has-success',
-            dirty: 'has-warning'
-        },
-        rules: {
-            file: {
-                filesize: 1 * 1024 * 1024,
-                extension: "html|css|txt"
-            }
-        },
-        messages: {
-            name: {
-                regexp: "Two words with space"
-            },
-            file: {
-                filesize: "File is too big"
-            },
-            check: {
-                required: "Check it, please!"
-            }
-        },
-        callbacks: {
-            success: function (response) {
-                alert(response);
-            },
-            error: function (errors) {
-                alert(errors);
-            }
-        }
-    });
+		var formWrapper = document.querySelector('#form1');
+		new JediValidate(formWrapper, options);
+
+		new JediValidate(document.querySelector('#form2'), Object.assign({}, options, {
+			translations: {
+				"it": {
+					"This field is required": "Questo campo è obbligatorio"
+				}
+			},
+			language: "it"
+		}));
+
+		new JediValidate(document.querySelector('#form3'), Object.assign({}, options, {
+			language: "ru"
+		}));
 </script>
 </body>
 

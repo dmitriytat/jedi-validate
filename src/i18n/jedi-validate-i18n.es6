@@ -1,16 +1,12 @@
 const dictionary = require('./jedi-validate-i18n-data.json');
 
-let currentLang = 'en';
+let defaultLang = 'en';
 
-export function setLanguage(id) {
-    currentLang = id;
-}
-
-export function translate(text, lang = currentLang) {
+export function translate(text, lang = defaultLang) {
     return (dictionary[lang] && dictionary[lang][text]) || text;
 }
 
-export function addTranslation(sourceText, translatedText, lang = currentLang) {
+export function addTranslation(sourceText, translatedText, lang = defaultLang) {
     if (dictionary[lang] === undefined) {
         dictionary[lang] = {};
     }

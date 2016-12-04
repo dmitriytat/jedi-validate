@@ -6,6 +6,8 @@
     "This file is too large": "Попробуйте загрузить файл поменьше",
     "This extension is not supported": "Пожалуйста, выберите файл с правильным расширением",
     "This phone number is incorrect": "Не корректный номер телефона",
-    "Wrong url": "Не корректный url"
+    "Wrong url": "Не корректный url",
+    "Can not send form!": "Форма не отправлена!",
+    "JSON parsing error": "Ошибка разбора JSON"
   }
 }

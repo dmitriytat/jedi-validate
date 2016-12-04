@@ -98,7 +98,7 @@ exports.getData = getData;
 exports.getQueryPart = getQueryPart;
 exports.convertData = convertData;
 
-var _deepmerge = __webpack_require__(2);
+var _deepmerge = __webpack_require__(1);
 
 var _deepmerge2 = _interopRequireDefault(_deepmerge);
 
@@ -108,6 +108,12 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
+/**
+ * Create object by path and value
+ * @param {Array} path - path array
+ * @param {string|FileList} value - value on input
+ * @returns {object} - data object
+ */
 function createObject(path, value) {
     var segment = path[0];
 
@@ -120,7 +126,17 @@ function createObject(path, value) {
     return _defineProperty({}, segment, createObject(path.slice(1), value));
 }
 
+/**
+ * Name regexp for conversion to path
+ * @type {RegExp}
+ */
 var NAME = /(\[(\w*)\]|\w*)/gi;
+
+/**
+ * Convart name of input to path array
+ * @param {string} name - name of input
+ * @returns {Array} - path to value in data object
+ */
 function convertNameToPath(name) {
     var path = [];
 
@@ -138,25 +154,45 @@ function convertNameToPath(name) {
     return path;
 }
 
+/**
+ * Get value from data object by path
+ * @param {Array} path - value path
+ * @param {object} data - data object
+ */
 function getValueByPath(path, data) {
     return path.reduce(function (value, segment) {
         return segment && value ? value[segment] : value;
     }, data || '');
 }
 
+/**
+ * Get value from data object by name
+ * @param {string} name - input name
+ * @param {object} data - data object
+ */
 function getValueByName(name, data) {
     var path = convertNameToPath(name);
     return getValueByPath(path, data);
 }
 
+/**
+ * Get value from radio group
+ * @param {Array} inputs - array of radio inputs
+ * @returns {string} value of checked input
+ */
 function getRadioGroupValue(inputs) {
     return [].concat(_toConsumableArray(inputs)).map(function (radio) {
         return getInputValue(radio);
     }).filter(Boolean)[0];
 }
 
+/**
+ * Get value form input
+ * @param {HTMLInputElement|HTMLSelectElement|Array} input - input element or array of HTMLInputElements
+ * @returns {string|FileList|Array} - value of input, or array of value if input is select
+ */
 function getInputValue(input) {
-    if (!input) return undefined;
+    if (!input) return '';
 
     var type = input.type;
 
@@ -169,7 +205,7 @@ function getInputValue(input) {
         case 'select-one':
             return input.options.length ? input.options[input.selectedIndex].value : '';
         case 'select-multiple':
-            return input.options.filter(function (option) {
+            return [].concat(_toConsumableArray(input.options)).filter(function (option) {
                 return option.selected;
             }).map(function (option) {
                 return option.value;
@@ -184,6 +220,11 @@ function getInputValue(input) {
     }
 }
 
+/**
+ * Get object which key is name of input and value is value of input
+ * @param {HTMLInputElement|array} input - input element or Array of HTMLInputElements
+ * @returns {object} - data
+ */
 function getInputData(input) {
     var name = input.name;
     if (!name && Array.isArray(input) && input[0]) {
@@ -196,12 +237,23 @@ function getInputData(input) {
     return createObject(path, value);
 }
 
+/**
+ * Get data object with values from inputs object
+ * @param {object} inputs - inputs object
+ * @returns {object} - data object
+ */
 function getData(inputs) {
     return Object.keys(inputs).reduce(function (data, name) {
         return (0, _deepmerge2.default)(data, getInputData(inputs[name]));
     }, {});
 }
 
+/**
+ * Create part url for serialize method
+ * @param {string} name
+ * @param {object|Array|string} data
+ * @returns {string} - part of url
+ */
 function getQueryPart(name, data) {
     if (Array.isArray(data)) {
         return data.reduce(function (part, index) {
@@ -216,8 +268,13 @@ function getQueryPart(name, data) {
     return name + '=' + encodeURIComponent(data) + '&';
 }
 
+/**
+ * Convert data object to value for sending
+ * @param {object} data - data object
+ * @param {string} type - type of conversion
+ * @returns {string|FormData} - output value
+ */
 function convertData(data, type) {
-    // todo think about inputs
     var convertedData = void 0;
 
     switch (type) {
@@ -227,7 +284,6 @@ function convertData(data, type) {
             }, '');
             return convertedData.length ? convertedData.slice(0, -1) : '';
         case 'formData':
-            // todo rework
             return Object.keys(data).reduce(function (formData, name) {
                 if (data[name] instanceof FileList) {
                     if (data[name].length > 1) {
@@ -255,42 +311,6 @@ function convertData(data, type) {
 
 /***/ },
 /* 1 */
-/***/ function(module, exports, __webpack_require__) {
-
-"use strict";
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-exports.setLanguage = setLanguage;
-exports.translate = translate;
-exports.addTranslation = addTranslation;
-var dictionary = __webpack_require__(5);
-
-var currentLang = 'en';
-
-function setLanguage(id) {
-    currentLang = id;
-}
-
-function translate(text) {
-    var lang = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : currentLang;
-
-    return dictionary[lang] && dictionary[lang][text] || text;
-}
-
-function addTranslation(sourceText, translatedText) {
-    var lang = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : currentLang;
-
-    if (dictionary[lang] === undefined) {
-        dictionary[lang] = {};
-    }
-    dictionary[lang][sourceText] = translatedText;
-}
-
-/***/ },
-/* 2 */
 /***/ function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;(function (root, factory) {
@@ -380,7 +400,7 @@ return deepmerge
 
 
 /***/ },
-/* 3 */
+/* 2 */
 /***/ function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -389,30 +409,64 @@ return deepmerge
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
+exports.translate = translate;
+exports.addTranslation = addTranslation;
+var dictionary = __webpack_require__(7);
 
-var _jediValidateI18n = __webpack_require__(1);
+var defaultLang = 'en';
+
+function translate(text) {
+    var lang = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : defaultLang;
+
+    return dictionary[lang] && dictionary[lang][text] || text;
+}
+
+function addTranslation(sourceText, translatedText) {
+    var lang = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : defaultLang;
+
+    if (dictionary[lang] === undefined) {
+        dictionary[lang] = {};
+    }
+    dictionary[lang][sourceText] = translatedText;
+}
+
+/***/ },
+/* 3 */
+/***/ function(module, exports) {
+
+"use strict";
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
 
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 exports.default = {
     required: {
         func: function func(value) {
-            return value && (value instanceof FileList || value.trim()) !== '';
+            if (!value) return false;
+            if (Array.isArray(value) && value.length === 0) return false;
+            if (value instanceof FileList && value.length === 0) return false;
+            if (typeof value === 'string' && value.trim() === '') return false;
+
+            return true;
         },
-        message: (0, _jediValidateI18n.translate)('This field is required')
+        message: 'This field is required'
     },
     regexp: {
         func: function func(value, regexp) {
             return regexp.test(value);
         },
-        message: (0, _jediValidateI18n.translate)('Please, provide correct value')
+        message: 'Please, provide correct value'
     },
     email: {
         func: function func(value) {
             return (/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i.test(value)
             );
         },
-        message: (0, _jediValidateI18n.translate)('This email is incorrect')
+        message: 'This email is incorrect'
     },
     filesize: {
         func: function func(value, size) {
@@ -420,7 +474,7 @@ exports.default = {
                 return file.size < size && r;
             }, true);
         }, // eslint-disable-line max-len
-        message: (0, _jediValidateI18n.translate)('This file is too large')
+        message: 'This file is too large'
     },
     extension: {
         func: function func(value, extensions) {
@@ -428,21 +482,21 @@ exports.default = {
                 return extensions.indexOf(file.name.split('.').pop()) !== -1 && r;
             }, true);
         }, // eslint-disable-line max-len
-        message: (0, _jediValidateI18n.translate)('This extension is not supported')
+        message: 'This extension is not supported'
     },
     tel: {
         func: function func(value) {
             return (/^([\+]+)*[0-9\x20\x28\x29\-]{5,20}$/.test(value)
             );
         },
-        message: (0, _jediValidateI18n.translate)('This phone number is incorrect')
+        message: 'This phone number is incorrect'
     },
     url: {
         func: function func(value) {
             return (/[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi.test(value)
             );
         }, // eslint-disable-line max-len
-        message: (0, _jediValidateI18n.translate)('Wrong url')
+        message: 'Wrong url'
     }
 };
 
@@ -466,6 +520,15 @@ var _getData = __webpack_require__(0);
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
+/**
+ * Validate field
+ * @param {object} rules - object with rules for validation
+ * @param {object} methods - validation methods
+ * @param {string|FileList|Array} value - value of input
+ * @param {string} name - name on input
+ * @param {object} errorMessages - object with error messages
+ * @returns {Array.<string>} - array of field errors
+ */
 function validateField(rules, methods, value, name, errorMessages) {
     var isEmpty = !methods.required.func(value);
 
@@ -495,6 +558,14 @@ function validateField(rules, methods, value, name, errorMessages) {
     }, []);
 }
 
+/**
+ * Validate data object
+ * @param {object} rules - object with rules for validation
+ * @param {object} methods - validation methods
+ * @param {object} data - data object
+ * @param {object} errorMessages - object with error messages
+ * @returns {object.<string, Array.<string>>} - object of fields error arrays
+ */
 function validateData(rules, methods, data, errorMessages) {
     return Object.keys(rules).reduce(function (obj, name) {
         var value = (0, _getData.getValueByName)(name, data);
@@ -505,23 +576,7 @@ function validateData(rules, methods, data, errorMessages) {
 
 /***/ },
 /* 5 */
-/***/ function(module, exports) {
-
-module.exports = {
-	"ru": {
-		"This field is required": "Это поле необходимо заполнить",
-		"Please, provide correct value": "Пожалуйста, введите корректное значение",
-		"This email is incorrect": "Пожалуйста, введите корректный адрес электронной почты",
-		"This file is too large": "Попробуйте загрузить файл поменьше",
-		"This extension is not supported": "Пожалуйста, выберите файл с правильным расширением",
-		"This phone number is incorrect": "Не корректный номер телефона",
-		"Wrong url": "Не корректный url"
-	}
-};
-
-/***/ },
-/* 6 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 "use strict";
 'use strict';
@@ -530,12 +585,19 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 exports.ajax = ajax;
-// todo maybe it can be vendor library?
+
+var _jediValidateI18n = __webpack_require__(2);
+
+/**
+ * Sending request
+ * @param {{url: string, enctype: string, sendType: string, method: string, data: string|FormData}} options - Sending options
+ * @returns {Promise}
+ */
 function ajax(options) {
     return new Promise(function (resolve, reject) {
         var xhr = new XMLHttpRequest();
 
-        xhr.open(options.method, options.url + (options.method.toUpperCase() === 'GET' ? '?' + options.data : ''), true); // todo concat url and params
+        xhr.open(options.method, options.url + (options.method.toUpperCase() === 'GET' ? '?' + options.data : ''), true);
 
         if (options.sendType === 'serialize') {
             xhr.setRequestHeader('Content-type', options.enctype);
@@ -551,7 +613,7 @@ function ajax(options) {
                     try {
                         response = JSON.parse(xhr.responseText);
                     } catch (e) {
-                        response.validationErrors = { base: ['JSON parsing error'] }; // todo: language extension
+                        response.validationErrors = { base: [(0, _jediValidateI18n.translate)('JSON parsing error')] }; // todo rewrite translate now dont work
                     }
 
                     resolve(response);
@@ -574,7 +636,7 @@ function ajax(options) {
 exports.default = ajax;
 
 /***/ },
-/* 7 */
+/* 6 */
 /***/ function(module, exports) {
 
 "use strict";
@@ -591,22 +653,31 @@ exports.getInputRules = getInputRules;
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
+/**
+ * Get ajax options from form
+ * @param {HTMLFormElement} form - form element
+ * @returns {{ajax: {url: string, method: string, enctype: string, sendType: *}}} - object with options for sending
+ */
 function getFormOptions(form) {
-    var ajax = {
-        url: form.getAttribute('action'),
-        method: form.getAttribute('method'),
-        enctype: form.getAttribute('enctype')
-    };
+    var enctype = form.getAttribute('enctype');
 
     return {
-        ajax: _extends({}, ajax, {
-            sendType: ajax.enctype === 'multipart/form-data' ? 'formData' : undefined
-        })
+        ajax: {
+            url: form.getAttribute('action'),
+            method: form.getAttribute('method'),
+            enctype: enctype,
+            sendType: enctype === 'multipart/form-data' ? 'formData' : undefined
+        }
     };
 }
 
+/**
+ * Get validate options from input attribute of className
+ * @param {HTMLInputElement|HTMLSelectElement} input - input for validation
+ * @returns {object} - rules
+ */
 function getInputRules(input) {
-    var defaultRules = ['required', 'email', 'tel', 'url']; // todo before initialization adding
+    var defaultRules = ['required', 'email', 'tel', 'url'];
 
     var rules = defaultRules.reduce(function (inputRules, rule) {
         return _extends({}, inputRules, _defineProperty({}, rule, input.hasAttribute(rule) || input.type === rule || input.classList.contains(rule)));
@@ -616,6 +687,24 @@ function getInputRules(input) {
         regexp: input.hasAttribute('pattern') ? new RegExp(input.getAttribute('pattern')) : undefined
     });
 }
+
+/***/ },
+/* 7 */
+/***/ function(module, exports) {
+
+module.exports = {
+	"ru": {
+		"This field is required": "Это поле необходимо заполнить",
+		"Please, provide correct value": "Пожалуйста, введите корректное значение",
+		"This email is incorrect": "Пожалуйста, введите корректный адрес электронной почты",
+		"This file is too large": "Попробуйте загрузить файл поменьше",
+		"This extension is not supported": "Пожалуйста, выберите файл с правильным расширением",
+		"This phone number is incorrect": "Не корректный номер телефона",
+		"Wrong url": "Не корректный url",
+		"Can not send form!": "Форма не отправлена!",
+		"JSON parsing error": "Ошибка разбора JSON"
+	}
+};
 
 /***/ },
 /* 8 */
@@ -628,19 +717,19 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _deepmerge = __webpack_require__(2);
+var _deepmerge = __webpack_require__(1);
 
 var _deepmerge2 = _interopRequireDefault(_deepmerge);
 
 var _getData = __webpack_require__(0);
 
-var _jediValidateI18n = __webpack_require__(1);
+var _jediValidateI18n = __webpack_require__(2);
 
-var _getOptions = __webpack_require__(7);
+var _getOptions = __webpack_require__(6);
 
 var _validateData = __webpack_require__(4);
 
-var _ajax = __webpack_require__(6);
+var _ajax = __webpack_require__(5);
 
 var _methods = __webpack_require__(3);
 
@@ -653,12 +742,47 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var JediValidate = function () {
+
+    /**
+     * JediValidate
+     * @param {HTMLElement} root - element which wrap form element
+     * @param {object} options - object with options
+     */
+
+    /**
+     * Validator options
+     * @type {{ajax: {url: string, enctype: string, sendType: string, method: string}, rules: {}, messages: {}, containers: {parent: string, message: string, baseMessage: string}, states: {error: string, valid: string, pristine: string, dirty: string}, formStatePrefix: string, callbacks: {success: (function(object)), error: (function(object.<string, Array.<string>>))}, clean: boolean, redirect: boolean, language: string, translations: {}}}
+     */
+
+    /**
+     * Object with error message
+     * @type {object} - data object
+     */
+
+    /**
+     * Object with message nodes
+     * @type {Object.<string, Element>}
+     */
+
+    /**
+     * Object with fields
+     * @type {Object.<string, Element>}
+     */
     function JediValidate(root) {
         var _this = this;
 
         var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
         _classCallCheck(this, JediValidate);
+
+        this.fields = {};
+        this.inputs = {};
+        this.messages = {};
+        this.errorMessages = {};
+        this.data = {};
+        this.methods = _extends({}, _methods2.default);
+        this.options = {};
+        this.rules = {};
 
         var defaultOptions = {
             ajax: {
@@ -695,14 +819,7 @@ var JediValidate = function () {
 
         this.options = (0, _deepmerge2.default)(defaultOptions, options);
 
-        this.fields = {};
-        this.inputs = {};
-        this.messages = {}; // object with message nodes
-        this.errorMessages = {}; // object with error strings
-        this.data = {};
-        this.methods = _methods2.default;
-
-        this.nodes = this.cacheNodes(this.root, this.options);
+        this.nodes = JediValidate.cacheNodes(this.root, this.options);
 
         var formOptions = (0, _getOptions.getFormOptions)(this.nodes.form);
 
@@ -712,8 +829,7 @@ var JediValidate = function () {
 
         this.rules = _extends({}, this.options.rules);
 
-        (0, _jediValidateI18n.setLanguage)(this.options.language);
-
+        // todo rewrite translations
         Object.keys(this.options.translations).forEach(function (language) {
             Object.keys(_this.options.translations[language]).forEach(function (translation) {
                 (0, _jediValidateI18n.addTranslation)(translation, _this.options.translations[language][translation], language);
@@ -722,27 +838,38 @@ var JediValidate = function () {
 
         this.ready();
 
-        this.errorMessages = this.initErrorMessages(this.rules, this.options.messages, this.methods);
+        this.errorMessages = this.initErrorMessages(this.rules, this.options.messages, this.methods, this.options.language);
     }
 
+    /**
+     * Add localisation to JediValidate
+     * @param {string} sourceText - text on english
+     * @param {string} translatedText - text on needed language
+     * @param {string} language - language
+     */
+
+    /**
+     * Validator rules
+     * @type {object}
+     */
+
+    /**
+     * Validate methods
+     * @type {Object.<string, {func: Function, message: string}>}
+     */
+
+    /**
+     * Object with error message
+     * @type {Object.<string, Object.<string, string>>}
+     */
+
+    /**
+     * Object with inputs nodes
+     * @type {Object.<string, HTMLInputElement|HTMLSelectElement|Array>}
+     */
+
+
     _createClass(JediValidate, [{
-        key: 'cacheNodes',
-
-
-        /**
-         * Return object with working elements
-         * @param root Root element for search
-         * @param options Object with selectors
-         * @returns {{form: Element, inputs: NodeList, baseMessage: Element}}
-         */
-        value: function cacheNodes(root, options) {
-            return {
-                form: root.querySelector('form'),
-                inputs: root.querySelectorAll('[name]'),
-                baseMessage: root.querySelector('.' + options.containers.baseMessage)
-            };
-        }
-    }, {
         key: 'ready',
         value: function ready() {
             var _this2 = this;
@@ -752,7 +879,6 @@ var JediValidate = function () {
             this.nodes.form.addEventListener('submit', function (event) {
                 event.preventDefault();
                 _this2.data = (0, _getData.getData)(_this2.inputs);
-                console.log(_this2.data);
 
                 var errors = (0, _validateData.validateData)(_this2.rules, _this2.methods, _this2.data, _this2.errorMessages);
 
@@ -760,7 +886,7 @@ var JediValidate = function () {
                     return errors[name];
                 }).length !== 0) {
                     Object.keys(errors).forEach(function (name) {
-                        return _this2.markField(_this2.fields[name], _this2.messages[name], _this2.options.states, errors[name]);
+                        return JediValidate.markField(_this2.fields[name], _this2.messages[name], _this2.options.states, errors[name]);
                     });
 
                     try {
@@ -773,12 +899,11 @@ var JediValidate = function () {
                     return;
                 }
 
-                if (_this2.options.ajax) {
-                    // todo check without (&& this.options.ajax.url)
+                if (_this2.options.ajax && _this2.options.ajax.url) {
                     event.preventDefault();
                 } else {
                     try {
-                        _this2.options.callbacks.success(errors, event);
+                        _this2.options.callbacks.success(null);
                     } catch (e) {
                         console.error(e);
                     }
@@ -786,9 +911,9 @@ var JediValidate = function () {
                     return;
                 }
 
-                // fix get opt data
+                var convertedData = (0, _getData.convertData)(_this2.data, _this2.options.ajax.sendType);
                 _this2.send(_extends({}, _this2.options.ajax, {
-                    data: (0, _getData.convertData)(_this2.data, _this2.options.ajax.sendType)
+                    data: convertedData
                 }));
             });
 
@@ -844,7 +969,6 @@ var JediValidate = function () {
                     });
                 }
 
-                // todo think about
                 input.addEventListener('change', function () {
                     _this2.fields[name].classList.remove(_this2.options.states.dirty);
 
@@ -854,7 +978,8 @@ var JediValidate = function () {
                     _this2.data = _extends({}, _this2.data, inputData);
 
                     var errors = (0, _validateData.validateField)(_this2.rules[name], _this2.methods, value, input.name, _this2.errorMessages);
-                    _this2.markField(_this2.fields[name], _this2.messages[name], _this2.options.states, errors);
+
+                    JediValidate.markField(_this2.fields[name], _this2.messages[name], _this2.options.states, errors);
                 });
 
                 input.addEventListener('input', function () {
@@ -863,6 +988,12 @@ var JediValidate = function () {
                 });
             });
         }
+
+        /**
+         * Send form
+         * @param {{url: string, enctype: string, sendType: string, method: string, data: string|FormData}} options - object with options for sending
+         */
+
     }, {
         key: 'send',
         value: function send(options) {
@@ -886,7 +1017,7 @@ var JediValidate = function () {
                     }
 
                     Object.keys(response.validationErrors).forEach(function (name) {
-                        return _this3.markField(_this3.fields[name], _this3.messages[name], _this3.options.states, response.validationErrors[name]);
+                        return JediValidate.markField(_this3.fields[name], _this3.messages[name], _this3.options.states, response.validationErrors[name]);
                     });
                 } else {
                     try {
@@ -912,7 +1043,7 @@ var JediValidate = function () {
 
                 console.warn(method + ' ' + url + ' ' + status + ' (' + statusText + ')');
 
-                _this3.nodes.baseMessage.innerHTML = 'Can not send form!'; // todo: language extension
+                _this3.nodes.baseMessage.innerHTML = (0, _jediValidateI18n.translate)('Can not send form!', _this3.options.language);
                 _this3.root.classList.add(_this3.options.formStatePrefix + _this3.options.states.error); // eslint-disable-line max-len
                 _this3.root.classList.remove(_this3.options.formStatePrefix + _this3.options.states.valid); // eslint-disable-line max-len
             });
@@ -920,29 +1051,86 @@ var JediValidate = function () {
 
         /**
          *
-         * @param field
+         * @param {Element} field
          * @param message
          * @param states
          * @param errors
          */
 
     }, {
+        key: 'addMethod',
+
+
+        /**
+         * Add rule to validator
+         * @param {string} rule - rule name
+         * @param {Function} func - function
+         * @param {string} message - error message
+         */
+        value: function addMethod(rule, func, message) {
+            this.methods[rule] = {
+                func: func,
+                message: message
+            };
+        }
+
+        /**
+         * Init error messages
+         * @param {object} rules
+         * @param {object} messages
+         * @param {object} methods
+         * @param {string} language
+         * @returns {Object.<string, Object.<string, string>>}
+         */
+
+    }, {
+        key: 'initErrorMessages',
+        value: function initErrorMessages(rules, messages, methods, language) {
+            return Object.keys(rules).reduce(function (names, name) {
+                return _extends({}, names, _defineProperty({}, name, Object.keys(rules[name]).reduce(function (ruleNames, method) {
+                    return _extends({}, ruleNames, _defineProperty({}, method, (0, _jediValidateI18n.translate)(messages[name] && messages[name][method] || methods[method] && methods[method].message || '', language)));
+                }, {})));
+            }, {});
+        }
+    }], [{
+        key: 'addToDictionary',
+        value: function addToDictionary(sourceText, translatedText, language) {
+            (0, _jediValidateI18n.addTranslation)(sourceText, translatedText, language);
+        }
+
+        /**
+         * Return object with working elements
+         * @param root Root element for search
+         * @param options Object with selectors
+         * @returns {{form: Element, inputs: NodeList, baseMessage: Element}}
+         */
+
+    }, {
+        key: 'cacheNodes',
+        value: function cacheNodes(root, options) {
+            return {
+                form: root.querySelector('form'),
+                inputs: root.querySelectorAll('[name]'),
+                baseMessage: root.querySelector('.' + options.containers.baseMessage)
+            };
+        }
+    }, {
         key: 'markField',
         value: function markField(field, message, states, errors) {
             if (errors && errors.length) {
-                this.markError(field, message, states, errors);
+                JediValidate.markError(field, message, states, errors);
             } else {
-                this.markValid(field, message, states);
+                JediValidate.markValid(field, message, states);
             }
         }
 
         /**
          *
-         * @param field
-         * @param message
-         * @param error
-         * @param valid
-         * @param errors
+         * @param {Element} field
+         * @param {Element} message
+         * @param {string} error
+         * @param {string} valid
+         * @param {Array.<string>} errors
          */
 
     }, {
@@ -960,6 +1148,15 @@ var JediValidate = function () {
 
             message.innerHTML = errors.join(', ');
         }
+
+        /**
+         *
+         * @param {Element} field
+         * @param {Element} message
+         * @param {string} error
+         * @param {string} valid
+         */
+
     }, {
         key: 'markValid',
         value: function markValid(field, message, _ref3) {
@@ -974,31 +1171,6 @@ var JediValidate = function () {
             field.classList.remove(error);
 
             message.innerHTML = '';
-        }
-    }, {
-        key: 'addMethod',
-        value: function addMethod(rule, func, message) {
-            this.methods[rule] = {
-                func: func,
-                message: message
-            };
-        }
-
-        // todo rewrite
-
-    }, {
-        key: 'initErrorMessages',
-        value: function initErrorMessages(rules, messages, methods) {
-            return Object.keys(rules).reduce(function (names, name) {
-                return _extends({}, names, _defineProperty({}, name, Object.keys(rules[name]).reduce(function (ruleNames, method) {
-                    return _extends({}, ruleNames, _defineProperty({}, method, messages[name] && messages[name][method] || methods[method] && methods[method].message || ''));
-                }, {})));
-            }, {});
-        }
-    }], [{
-        key: 'addToDictionary',
-        value: function addToDictionary(sourceText, translatedText, language) {
-            (0, _jediValidateI18n.addTranslation)(sourceText, translatedText, language);
         }
     }]);
 

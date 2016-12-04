@@ -1,5 +1,14 @@
 import { getValueByName } from './get-data.es6';
 
+/**
+ * Validate field
+ * @param {object} rules - object with rules for validation
+ * @param {object} methods - validation methods
+ * @param {string|FileList|Array} value - value of input
+ * @param {string} name - name on input
+ * @param {object} errorMessages - object with error messages
+ * @returns {Array.<string>} - array of field errors
+ */
 export function validateField(rules, methods, value, name, errorMessages) {
     const isEmpty = !methods.required.func(value);
 
@@ -29,6 +38,14 @@ export function validateField(rules, methods, value, name, errorMessages) {
     }, []);
 }
 
+/**
+ * Validate data object
+ * @param {object} rules - object with rules for validation
+ * @param {object} methods - validation methods
+ * @param {object} data - data object
+ * @param {object} errorMessages - object with error messages
+ * @returns {object.<string, Array.<string>>} - object of fields error arrays
+ */
 export function validateData(rules, methods, data, errorMessages) {
     return Object.keys(rules).reduce((obj, name) => {
         const value = getValueByName(name, data);

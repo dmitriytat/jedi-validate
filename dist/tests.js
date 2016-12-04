@@ -98,7 +98,7 @@ exports.getData = getData;
 exports.getQueryPart = getQueryPart;
 exports.convertData = convertData;
 
-var _deepmerge = __webpack_require__(2);
+var _deepmerge = __webpack_require__(1);
 
 var _deepmerge2 = _interopRequireDefault(_deepmerge);
 
@@ -108,6 +108,12 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
+/**
+ * Create object by path and value
+ * @param {Array} path - path array
+ * @param {string|FileList} value - value on input
+ * @returns {object} - data object
+ */
 function createObject(path, value) {
     var segment = path[0];
 
@@ -120,7 +126,17 @@ function createObject(path, value) {
     return _defineProperty({}, segment, createObject(path.slice(1), value));
 }
 
+/**
+ * Name regexp for conversion to path
+ * @type {RegExp}
+ */
 var NAME = /(\[(\w*)\]|\w*)/gi;
+
+/**
+ * Convart name of input to path array
+ * @param {string} name - name of input
+ * @returns {Array} - path to value in data object
+ */
 function convertNameToPath(name) {
     var path = [];
 
@@ -138,25 +154,45 @@ function convertNameToPath(name) {
     return path;
 }
 
+/**
+ * Get value from data object by path
+ * @param {Array} path - value path
+ * @param {object} data - data object
+ */
 function getValueByPath(path, data) {
     return path.reduce(function (value, segment) {
         return segment && value ? value[segment] : value;
     }, data || '');
 }
 
+/**
+ * Get value from data object by name
+ * @param {string} name - input name
+ * @param {object} data - data object
+ */
 function getValueByName(name, data) {
     var path = convertNameToPath(name);
     return getValueByPath(path, data);
 }
 
+/**
+ * Get value from radio group
+ * @param {Array} inputs - array of radio inputs
+ * @returns {string} value of checked input
+ */
 function getRadioGroupValue(inputs) {
     return [].concat(_toConsumableArray(inputs)).map(function (radio) {
         return getInputValue(radio);
     }).filter(Boolean)[0];
 }
 
+/**
+ * Get value form input
+ * @param {HTMLInputElement|HTMLSelectElement|Array} input - input element or array of HTMLInputElements
+ * @returns {string|FileList|Array} - value of input, or array of value if input is select
+ */
 function getInputValue(input) {
-    if (!input) return undefined;
+    if (!input) return '';
 
     var type = input.type;
 
@@ -169,7 +205,7 @@ function getInputValue(input) {
         case 'select-one':
             return input.options.length ? input.options[input.selectedIndex].value : '';
         case 'select-multiple':
-            return input.options.filter(function (option) {
+            return [].concat(_toConsumableArray(input.options)).filter(function (option) {
                 return option.selected;
             }).map(function (option) {
                 return option.value;
@@ -184,6 +220,11 @@ function getInputValue(input) {
     }
 }
 
+/**
+ * Get object which key is name of input and value is value of input
+ * @param {HTMLInputElement|array} input - input element or Array of HTMLInputElements
+ * @returns {object} - data
+ */
 function getInputData(input) {
     var name = input.name;
     if (!name && Array.isArray(input) && input[0]) {
@@ -196,12 +237,23 @@ function getInputData(input) {
     return createObject(path, value);
 }
 
+/**
+ * Get data object with values from inputs object
+ * @param {object} inputs - inputs object
+ * @returns {object} - data object
+ */
 function getData(inputs) {
     return Object.keys(inputs).reduce(function (data, name) {
         return (0, _deepmerge2.default)(data, getInputData(inputs[name]));
     }, {});
 }
 
+/**
+ * Create part url for serialize method
+ * @param {string} name
+ * @param {object|Array|string} data
+ * @returns {string} - part of url
+ */
 function getQueryPart(name, data) {
     if (Array.isArray(data)) {
         return data.reduce(function (part, index) {
@@ -216,8 +268,13 @@ function getQueryPart(name, data) {
     return name + '=' + encodeURIComponent(data) + '&';
 }
 
+/**
+ * Convert data object to value for sending
+ * @param {object} data - data object
+ * @param {string} type - type of conversion
+ * @returns {string|FormData} - output value
+ */
 function convertData(data, type) {
-    // todo think about inputs
     var convertedData = void 0;
 
     switch (type) {
@@ -227,7 +284,6 @@ function convertData(data, type) {
             }, '');
             return convertedData.length ? convertedData.slice(0, -1) : '';
         case 'formData':
-            // todo rework
             return Object.keys(data).reduce(function (formData, name) {
                 if (data[name] instanceof FileList) {
                     if (data[name].length > 1) {
@@ -255,42 +311,6 @@ function convertData(data, type) {
 
 /***/ },
 /* 1 */
-/***/ function(module, exports, __webpack_require__) {
-
-"use strict";
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-exports.setLanguage = setLanguage;
-exports.translate = translate;
-exports.addTranslation = addTranslation;
-var dictionary = __webpack_require__(5);
-
-var currentLang = 'en';
-
-function setLanguage(id) {
-    currentLang = id;
-}
-
-function translate(text) {
-    var lang = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : currentLang;
-
-    return dictionary[lang] && dictionary[lang][text] || text;
-}
-
-function addTranslation(sourceText, translatedText) {
-    var lang = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : currentLang;
-
-    if (dictionary[lang] === undefined) {
-        dictionary[lang] = {};
-    }
-    dictionary[lang][sourceText] = translatedText;
-}
-
-/***/ },
-/* 2 */
 /***/ function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;(function (root, factory) {
@@ -380,8 +400,9 @@ return deepmerge
 
 
 /***/ },
+/* 2 */,
 /* 3 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 "use strict";
 'use strict';
@@ -390,29 +411,32 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
-var _jediValidateI18n = __webpack_require__(1);
-
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 exports.default = {
     required: {
         func: function func(value) {
-            return value && (value instanceof FileList || value.trim()) !== '';
+            if (!value) return false;
+            if (Array.isArray(value) && value.length === 0) return false;
+            if (value instanceof FileList && value.length === 0) return false;
+            if (typeof value === 'string' && value.trim() === '') return false;
+
+            return true;
         },
-        message: (0, _jediValidateI18n.translate)('This field is required')
+        message: 'This field is required'
     },
     regexp: {
         func: function func(value, regexp) {
             return regexp.test(value);
         },
-        message: (0, _jediValidateI18n.translate)('Please, provide correct value')
+        message: 'Please, provide correct value'
     },
     email: {
         func: function func(value) {
             return (/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i.test(value)
             );
         },
-        message: (0, _jediValidateI18n.translate)('This email is incorrect')
+        message: 'This email is incorrect'
     },
     filesize: {
         func: function func(value, size) {
@@ -420,7 +444,7 @@ exports.default = {
                 return file.size < size && r;
             }, true);
         }, // eslint-disable-line max-len
-        message: (0, _jediValidateI18n.translate)('This file is too large')
+        message: 'This file is too large'
     },
     extension: {
         func: function func(value, extensions) {
@@ -428,21 +452,21 @@ exports.default = {
                 return extensions.indexOf(file.name.split('.').pop()) !== -1 && r;
             }, true);
         }, // eslint-disable-line max-len
-        message: (0, _jediValidateI18n.translate)('This extension is not supported')
+        message: 'This extension is not supported'
     },
     tel: {
         func: function func(value) {
             return (/^([\+]+)*[0-9\x20\x28\x29\-]{5,20}$/.test(value)
             );
         },
-        message: (0, _jediValidateI18n.translate)('This phone number is incorrect')
+        message: 'This phone number is incorrect'
     },
     url: {
         func: function func(value) {
             return (/[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi.test(value)
             );
         }, // eslint-disable-line max-len
-        message: (0, _jediValidateI18n.translate)('Wrong url')
+        message: 'Wrong url'
     }
 };
 
@@ -466,6 +490,15 @@ var _getData = __webpack_require__(0);
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
+/**
+ * Validate field
+ * @param {object} rules - object with rules for validation
+ * @param {object} methods - validation methods
+ * @param {string|FileList|Array} value - value of input
+ * @param {string} name - name on input
+ * @param {object} errorMessages - object with error messages
+ * @returns {Array.<string>} - array of field errors
+ */
 function validateField(rules, methods, value, name, errorMessages) {
     var isEmpty = !methods.required.func(value);
 
@@ -495,6 +528,14 @@ function validateField(rules, methods, value, name, errorMessages) {
     }, []);
 }
 
+/**
+ * Validate data object
+ * @param {object} rules - object with rules for validation
+ * @param {object} methods - validation methods
+ * @param {object} data - data object
+ * @param {object} errorMessages - object with error messages
+ * @returns {object.<string, Array.<string>>} - object of fields error arrays
+ */
 function validateData(rules, methods, data, errorMessages) {
     return Object.keys(rules).reduce(function (obj, name) {
         var value = (0, _getData.getValueByName)(name, data);
@@ -504,22 +545,7 @@ function validateData(rules, methods, data, errorMessages) {
 }
 
 /***/ },
-/* 5 */
-/***/ function(module, exports) {
-
-module.exports = {
-	"ru": {
-		"This field is required": "Это поле необходимо заполнить",
-		"Please, provide correct value": "Пожалуйста, введите корректное значение",
-		"This email is incorrect": "Пожалуйста, введите корректный адрес электронной почты",
-		"This file is too large": "Попробуйте загрузить файл поменьше",
-		"This extension is not supported": "Пожалуйста, выберите файл с правильным расширением",
-		"This phone number is incorrect": "Не корректный номер телефона",
-		"Wrong url": "Не корректный url"
-	}
-};
-
-/***/ },
+/* 5 */,
 /* 6 */,
 /* 7 */,
 /* 8 */,
@@ -556,11 +582,11 @@ inputs['parent[child]'].value = data.parent.child;
 
 describe('Get data', function () {
     it('createObject', function () {
-        assert.deepEqual((0, _getData.createObject)(['parent', 'child', ''], 'value'), { parent: { child: 'value' } }); // todo think about ''
+        assert.deepEqual((0, _getData.createObject)(['parent', 'child', ''], 'value'), { parent: { child: 'value' } });
     });
 
     it('convertNameToPath', function () {
-        assert.deepEqual((0, _getData.convertNameToPath)('parent[child]'), ['parent', 'child', '']); // todo think about ''
+        assert.deepEqual((0, _getData.convertNameToPath)('parent[child]'), ['parent', 'child', '']);
     });
 
     it('getValueByPath', function () {

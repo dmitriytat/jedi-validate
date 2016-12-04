@@ -1,9 +1,15 @@
-// todo maybe it can be vendor library?
+import { translate } from '../i18n/jedi-validate-i18n.es6';
+
+/**
+ * Sending request
+ * @param {{url: string, enctype: string, sendType: string, method: string, data: string|FormData}} options - Sending options
+ * @returns {Promise}
+ */
 export function ajax(options) {
     return new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
 
-        xhr.open(options.method, options.url + (options.method.toUpperCase() === 'GET' ? (`?${options.data}`) : ''), true); // todo concat url and params
+        xhr.open(options.method, options.url + (options.method.toUpperCase() === 'GET' ? (`?${options.data}`) : ''), true);
 
         if (options.sendType === 'serialize') {
             xhr.setRequestHeader('Content-type', options.enctype);
@@ -19,7 +25,7 @@ export function ajax(options) {
                     try {
                         response = JSON.parse(xhr.responseText);
                     } catch (e) {
-                        response.validationErrors = { base: ['JSON parsing error'] };  // todo: language extension
+                        response.validationErrors = { base: [translate('JSON parsing error')] }; // todo rewrite translate now dont work
                     }
 
                     resolve(response);

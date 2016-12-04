@@ -217,7 +217,7 @@ Example:
 You can set your own rules using the ```addMethod``` function:
 
 ```
-JediValidate.addMethod('methodName', function (value, element, options) {
+JediValidate.addMethod('methodName', function (value, options) {
     return // true if valid
 }, 'Error message');
 ```
@@ -276,3 +276,8 @@ You can define your own error messages in case validation fails. In case a form 
     - store data
     - validate data
     - migrate to webpack 2
+- 1.1.2 fix 
+    - fix translate
+    - fix select value
+    - add examples
+    - add jsdoc
