@@ -113,6 +113,8 @@ class JediValidate {
 
         this.ready();
 
+        console.log('this.inputs', this.inputs)
+
         this.errorMessages = JediValidate.initErrorMessages(
             this.rules,
             this.options.messages,
@@ -151,6 +153,7 @@ class JediValidate {
         this.nodes.form.addEventListener('submit', (event) => {
             event.preventDefault();
             this.data = getData(this.inputs);
+            console.log('this.data', this.data)
 
             const errors = validateData(
                 this.rules,
@@ -199,6 +202,9 @@ class JediValidate {
         });
 
         this.nodes.inputs.forEach((input) => {
+            // fixme "name" and "name in data" not the same
+            // name === "phone[]",
+            // data: { phone: [] } - name === "phone"
             const name = input.name;
 
             if (this.inputs[name]) {
@@ -256,6 +262,7 @@ class JediValidate {
                 const inputData = getInputData(input);
                 const value = getValueByName(name, inputData);
 
+                // fixme don't work with 2 inputs phone[]
                 this.data = {
                     ...this.data,
                     ...inputData,

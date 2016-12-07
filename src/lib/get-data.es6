@@ -69,10 +69,12 @@ export function getValueByName(name, data) {
 /**
  * Get value from radio group
  * @param {Array} inputs - array of radio inputs
- * @returns {string} - value of checked input
+ * @returns {string|Array.<string>} - value of checked input
  */
 export function getRadioGroupValue(inputs) {
-    return [...inputs].map(radio => getInputValue(radio)).filter(Boolean)[0];
+    const values = [...inputs].map(radio => getInputValue(radio)).filter(Boolean);
+
+    return values.length > 1 ? values : values[0];
 }
 
 /**
@@ -110,13 +112,8 @@ export function getInputValue(input) {
  * @returns {object} - data
  */
 export function getInputData(input) {
-    let name = input.name;
-    if (!name && Array.isArray(input) && input[0]) {
-        name = input[0].name;
-    }
-
     const value = getInputValue(input);
-    const path = convertNameToPath(name);
+    const path = convertNameToPath(input.name);
 
     return createObject(path, value);
 }

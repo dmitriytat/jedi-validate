@@ -52,4 +52,10 @@ describe('Validate data', function () {
             assert.deepEqual(validateData(rules, methods, data, errorMessages), { phone: undefined, phone2: [errorMessages.phone2.regexp] });
         });
     });
+
+    describe('Depends data', function () {
+        it('Validate values', function () {
+            assert.deepEqual(validateData(rules, methods, data, errorMessages), { phone: undefined, phone2: [errorMessages.phone2.regexp] });
+        });
+    });
 });
