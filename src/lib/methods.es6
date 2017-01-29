@@ -1,12 +1,11 @@
 export default {
     required: {
         func: (value) => {
-            console.log('required', value)
             if (!value) return false;
             if (Array.isArray(value) && value.length === 0) return false;
             if (value instanceof FileList && value.length === 0) return false;
             if (typeof value === 'string' && value.trim() === '') return false;
-            
+
             return true;
         },
         message: 'This field is required',

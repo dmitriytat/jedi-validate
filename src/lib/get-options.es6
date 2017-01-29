@@ -8,9 +8,9 @@ export function getFormOptions(form) {
 
     return {
         ajax: {
+            enctype,
             url: form.getAttribute('action'),
             method: form.getAttribute('method'),
-            enctype: enctype,
             sendType: enctype === 'multipart/form-data' ? 'formData' : undefined,
         },
     };

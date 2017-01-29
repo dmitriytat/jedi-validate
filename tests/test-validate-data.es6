@@ -36,25 +36,25 @@ const errorMessages = {
     },
 };
 
-describe('Validate data', function () {
-    describe('Validate Field', function () {
-        it('Pass correct value', function () {
+describe('Validate data', () => {
+    describe('Validate Field', () => {
+        it('Pass correct value', () => {
             assert.deepEqual(validateField(rules.phone, methods, data.phone, 'phone', errorMessages), []);
         });
 
-        it('Pass incorrect value', function () {
+        it('Pass incorrect value', () => {
             assert.deepEqual(validateField(rules.phone2, methods, data.phone2, 'phone2', errorMessages), [errorMessages.phone2.regexp]);
         });
     });
 
-    describe('Validate data', function () {
-        it('Validate values', function () {
+    describe('Validate data', () => {
+        it('Validate values', () => {
             assert.deepEqual(validateData(rules, methods, data, errorMessages), { phone: undefined, phone2: [errorMessages.phone2.regexp] });
         });
     });
 
-    describe('Depends data', function () {
-        it('Validate values', function () {
+    describe('Depends data', () => {
+        it('Validate values', () => {
             assert.deepEqual(validateData(rules, methods, data, errorMessages), { phone: undefined, phone2: [errorMessages.phone2.regexp] });
         });
     });

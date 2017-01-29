@@ -43,16 +43,18 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// expose the module cache
 /******/ 	__webpack_require__.c = installedModules;
 /******/
-/******/ 	// identity function for calling harmory imports with the correct context
+/******/ 	// identity function for calling harmony imports with the correct context
 /******/ 	__webpack_require__.i = function(value) { return value; };
 /******/
-/******/ 	// define getter function for harmory exports
+/******/ 	// define getter function for harmony exports
 /******/ 	__webpack_require__.d = function(exports, name, getter) {
-/******/ 		Object.defineProperty(exports, name, {
-/******/ 			configurable: false,
-/******/ 			enumerable: true,
-/******/ 			get: getter
-/******/ 		});
+/******/ 		if(!__webpack_require__.o(exports, name)) {
+/******/ 			Object.defineProperty(exports, name, {
+/******/ 				configurable: false,
+/******/ 				enumerable: true,
+/******/ 				get: getter
+/******/ 			});
+/******/ 		}
 /******/ 	};
 /******/
 /******/ 	// getDefaultExport function for compatibility with non-harmony modules
@@ -76,10 +78,58 @@ return /******/ (function(modules) { // webpackBootstrap
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-'use strict';
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.translate = translate;
+exports.addTranslation = addTranslation;
+var dictionary = __webpack_require__(7);
+
+/**
+ * Default language
+ * @type {string}
+ */
+var defaultLanguage = 'en';
+
+/**
+ * Translate phrase
+ * @param {string} text - phrase to translate
+ * @param {string} language - language token
+ * @returns {string} - translated text
+ */
+function translate(text) {
+  var language = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : defaultLanguage;
+
+  return dictionary[language] && dictionary[language][text] || text;
+}
+
+/**
+ * Add translation pair to dictionary
+ * @param {string} sourceText - phrase
+ * @param {string} translatedText - translated phrase
+ * @param {string} language - language token
+ */
+function addTranslation(sourceText, translatedText) {
+  var language = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : defaultLanguage;
+
+  if (dictionary[language] === undefined) {
+    dictionary[language] = {};
+  }
+
+  dictionary[language][sourceText] = translatedText;
+}
+
+/***/ }),
+/* 1 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
 
 Object.defineProperty(exports, "__esModule", {
     value: true
@@ -93,12 +143,13 @@ exports.getValueByPath = getValueByPath;
 exports.getValueByName = getValueByName;
 exports.getRadioGroupValue = getRadioGroupValue;
 exports.getInputValue = getInputValue;
+exports.getInputName = getInputName;
 exports.getInputData = getInputData;
 exports.getData = getData;
 exports.getQueryPart = getQueryPart;
 exports.convertData = convertData;
 
-var _deepmerge = __webpack_require__(1);
+var _deepmerge = __webpack_require__(2);
 
 var _deepmerge2 = _interopRequireDefault(_deepmerge);
 
@@ -179,12 +230,14 @@ function getValueByName(name, data) {
 /**
  * Get value from radio group
  * @param {Array} inputs - array of radio inputs
- * @returns {string} - value of checked input
+ * @returns {string|Array.<string>} - value of checked input
  */
 function getRadioGroupValue(inputs) {
-    return [].concat(_toConsumableArray(inputs)).map(function (radio) {
+    var values = [].concat(_toConsumableArray(inputs)).map(function (radio) {
         return getInputValue(radio);
-    }).filter(Boolean)[0];
+    }).filter(Boolean);
+
+    return values.length > 1 ? values : values[0];
 }
 
 /**
@@ -222,17 +275,22 @@ function getInputValue(input) {
 }
 
 /**
+ * Get name from input or array of inputs
+ * @param {HTMLInputElement|Array} input - input element or Array of HTMLInputElements
+ * @returns {string} - input name
+ */
+function getInputName(input) {
+    return Array.isArray(input) ? input[0].name : input.name;
+}
+
+/**
  * Get object which key is name of input and value is value of input
- * @param {HTMLInputElement|array} input - input element or Array of HTMLInputElements
+ * @param {HTMLInputElement|Array} input - input element or Array of HTMLInputElements
  * @returns {object} - data
  */
 function getInputData(input) {
-    var name = input.name;
-    if (!name && Array.isArray(input) && input[0]) {
-        name = input[0].name;
-    }
-
     var value = getInputValue(input);
+    var name = getInputName(input);
     var path = convertNameToPath(name);
 
     return createObject(path, value);
@@ -310,13 +368,17 @@ function convertData(data, type) {
     }
 }
 
-/***/ },
-/* 1 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 2 */
+/***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;(function (root, factory) {
     if (true) {
-        !(__WEBPACK_AMD_DEFINE_FACTORY__ = (factory), __WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ? (__WEBPACK_AMD_DEFINE_FACTORY__.call(exports, __webpack_require__, exports, module)) : __WEBPACK_AMD_DEFINE_FACTORY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+        !(__WEBPACK_AMD_DEFINE_FACTORY__ = (factory),
+				__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?
+				(__WEBPACK_AMD_DEFINE_FACTORY__.call(exports, __webpack_require__, exports, module)) :
+				__WEBPACK_AMD_DEFINE_FACTORY__),
+				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
     } else if (typeof exports === 'object') {
         module.exports = factory();
     } else {
@@ -400,60 +462,127 @@ return deepmerge
 }));
 
 
-/***/ },
-/* 2 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 3 */
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-'use strict';
+
 
 Object.defineProperty(exports, "__esModule", {
-  value: true
+    value: true
 });
-exports.translate = translate;
-exports.addTranslation = addTranslation;
-var dictionary = __webpack_require__(7);
+exports.ajax = ajax;
+
+var _jediValidateI18n = __webpack_require__(0);
 
 /**
- * Default language
- * @type {string}
+ * Sending request
+ * @param {{url: string, enctype: string, sendType: string, method: string, data: string|FormData}} options - Sending options
+ * @returns {Promise}
+ * todo rewrite to fetch
  */
-var defaultLanguage = 'en';
+function ajax(options) {
+    return new Promise(function (resolve, reject) {
+        var xhr = new XMLHttpRequest();
 
-/**
- * Translate phrase
- * @param {string} text - phrase to translate
- * @param {string} language - language token
- * @returns {string} - translated text
- */
-function translate(text) {
-  var language = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : defaultLanguage;
+        xhr.open(options.method, options.url + (options.method.toUpperCase() === 'GET' ? '?' + options.data : ''), true);
 
-  return dictionary[language] && dictionary[language][text] || text;
+        if (options.sendType === 'serialize') {
+            xhr.setRequestHeader('Content-type', options.enctype);
+        } else if (options.sendType === 'json') {
+            xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+        }
+
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4) {
+                if (xhr.status === 200) {
+                    var response = {};
+
+                    try {
+                        response = JSON.parse(xhr.responseText);
+                    } catch (e) {
+                        response.validationErrors = { base: [(0, _jediValidateI18n.translate)('JSON parsing error')] }; // todo rewrite translate now dont work
+                    }
+
+                    resolve(response);
+                } else {
+                    reject({
+                        xhr: xhr,
+                        method: options.method,
+                        url: options.url,
+                        status: xhr.status,
+                        statusText: xhr.statusText
+                    });
+                }
+            }
+        };
+
+        xhr.send(options.method.toUpperCase() === 'POST' ? options.data : '');
+    });
 }
 
-/**
- * Add translation pair to dictionary
- * @param {string} sourceText - phrase
- * @param {string} translatedText - translated phrase
- * @param {string} language - language token
- */
-function addTranslation(sourceText, translatedText) {
-  var language = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : defaultLanguage;
+exports.default = ajax;
 
-  if (dictionary[language] === undefined) {
-    dictionary[language] = {};
-  }
-
-  dictionary[language][sourceText] = translatedText;
-}
-
-/***/ },
-/* 3 */
-/***/ function(module, exports) {
+/***/ }),
+/* 4 */
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-'use strict';
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+exports.getFormOptions = getFormOptions;
+exports.getInputRules = getInputRules;
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+/**
+ * Get ajax options from form
+ * @param {HTMLFormElement} form - form element
+ * @returns {{ajax: {url: string, method: string, enctype: string, sendType: *}}} - object with options for sending
+ */
+function getFormOptions(form) {
+    var enctype = form.getAttribute('enctype');
+
+    return {
+        ajax: {
+            enctype: enctype,
+            url: form.getAttribute('action'),
+            method: form.getAttribute('method'),
+            sendType: enctype === 'multipart/form-data' ? 'formData' : undefined
+        }
+    };
+}
+
+/**
+ * Get validate options from input attribute of className
+ * @param {HTMLInputElement|HTMLSelectElement} input - input for validation
+ * @returns {object} - rules
+ */
+function getInputRules(input) {
+    var defaultRules = ['required', 'email', 'tel', 'url'];
+
+    var rules = defaultRules.reduce(function (inputRules, rule) {
+        return _extends({}, inputRules, _defineProperty({}, rule, input.hasAttribute(rule) || input.type === rule || input.classList.contains(rule)));
+    }, {});
+
+    return _extends({}, rules, {
+        regexp: input.hasAttribute('pattern') ? new RegExp(input.getAttribute('pattern')) : undefined
+    });
+}
+
+/***/ }),
+/* 5 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
 
 Object.defineProperty(exports, "__esModule", {
     value: true
@@ -518,12 +647,12 @@ exports.default = {
     }
 };
 
-/***/ },
-/* 4 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 6 */
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-'use strict';
+
 
 Object.defineProperty(exports, "__esModule", {
     value: true
@@ -534,7 +663,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 exports.validateField = validateField;
 exports.validateData = validateData;
 
-var _getData = __webpack_require__(0);
+var _getData = __webpack_require__(1);
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
@@ -592,123 +721,9 @@ function validateData(rules, methods, data, errorMessages) {
     }, {});
 }
 
-/***/ },
-/* 5 */
-/***/ function(module, exports, __webpack_require__) {
-
-"use strict";
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-exports.ajax = ajax;
-
-var _jediValidateI18n = __webpack_require__(2);
-
-/**
- * Sending request
- * @param {{url: string, enctype: string, sendType: string, method: string, data: string|FormData}} options - Sending options
- * @returns {Promise}
- */
-function ajax(options) {
-    return new Promise(function (resolve, reject) {
-        var xhr = new XMLHttpRequest();
-
-        xhr.open(options.method, options.url + (options.method.toUpperCase() === 'GET' ? '?' + options.data : ''), true);
-
-        if (options.sendType === 'serialize') {
-            xhr.setRequestHeader('Content-type', options.enctype);
-        } else if (options.sendType === 'json') {
-            xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
-        }
-
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState === 4) {
-                if (xhr.status === 200) {
-                    var response = {};
-
-                    try {
-                        response = JSON.parse(xhr.responseText);
-                    } catch (e) {
-                        response.validationErrors = { base: [(0, _jediValidateI18n.translate)('JSON parsing error')] }; // todo rewrite translate now dont work
-                    }
-
-                    resolve(response);
-                } else {
-                    reject({
-                        xhr: xhr,
-                        method: options.method,
-                        url: options.url,
-                        status: xhr.status,
-                        statusText: xhr.statusText
-                    });
-                }
-            }
-        };
-
-        xhr.send(options.method.toUpperCase() === 'POST' ? options.data : '');
-    });
-}
-
-exports.default = ajax;
-
-/***/ },
-/* 6 */
-/***/ function(module, exports) {
-
-"use strict";
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
-exports.getFormOptions = getFormOptions;
-exports.getInputRules = getInputRules;
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
-/**
- * Get ajax options from form
- * @param {HTMLFormElement} form - form element
- * @returns {{ajax: {url: string, method: string, enctype: string, sendType: *}}} - object with options for sending
- */
-function getFormOptions(form) {
-    var enctype = form.getAttribute('enctype');
-
-    return {
-        ajax: {
-            url: form.getAttribute('action'),
-            method: form.getAttribute('method'),
-            enctype: enctype,
-            sendType: enctype === 'multipart/form-data' ? 'formData' : undefined
-        }
-    };
-}
-
-/**
- * Get validate options from input attribute of className
- * @param {HTMLInputElement|HTMLSelectElement} input - input for validation
- * @returns {object} - rules
- */
-function getInputRules(input) {
-    var defaultRules = ['required', 'email', 'tel', 'url'];
-
-    var rules = defaultRules.reduce(function (inputRules, rule) {
-        return _extends({}, inputRules, _defineProperty({}, rule, input.hasAttribute(rule) || input.type === rule || input.classList.contains(rule)));
-    }, {});
-
-    return _extends({}, rules, {
-        regexp: input.hasAttribute('pattern') ? new RegExp(input.getAttribute('pattern')) : undefined
-    });
-}
-
-/***/ },
+/***/ }),
 /* 7 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 module.exports = {
 	"ru": {
@@ -724,32 +739,32 @@ module.exports = {
 	}
 };
 
-/***/ },
+/***/ }),
 /* 8 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-'use strict';
+
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _deepmerge = __webpack_require__(1);
+var _deepmerge = __webpack_require__(2);
 
 var _deepmerge2 = _interopRequireDefault(_deepmerge);
 
-var _getData = __webpack_require__(0);
+var _getData = __webpack_require__(1);
 
-var _jediValidateI18n = __webpack_require__(2);
+var _jediValidateI18n = __webpack_require__(0);
 
-var _getOptions = __webpack_require__(6);
+var _getOptions = __webpack_require__(4);
 
-var _validateData = __webpack_require__(4);
+var _validateData = __webpack_require__(6);
 
-var _ajax = __webpack_require__(5);
+var _ajax = __webpack_require__(3);
 
-var _methods = __webpack_require__(3);
+var _methods = __webpack_require__(5);
 
 var _methods2 = _interopRequireDefault(_methods);
 
@@ -935,6 +950,9 @@ var JediValidate = function () {
             });
 
             this.nodes.inputs.forEach(function (input) {
+                // fixme "name" and "name in data" not the same
+                // name === "phone[]",
+                // data: { phone: [] } - name === "phone"
                 var name = input.name;
 
                 if (_this2.inputs[name]) {
@@ -992,6 +1010,7 @@ var JediValidate = function () {
                     var inputData = (0, _getData.getInputData)(input);
                     var value = (0, _getData.getValueByName)(name, inputData);
 
+                    // fixme don't work with 2 inputs phone[]
                     _this2.data = _extends({}, _this2.data, inputData);
 
                     var errors = (0, _validateData.validateField)(_this2.rules[name], _this2.methods, value, input.name, _this2.errorMessages);
@@ -1201,7 +1220,7 @@ var JediValidate = function () {
 
 module.exports = JediValidate;
 
-/***/ }
+/***/ })
 /******/ ]);
 });
 //# sourceMappingURL=jedi-validate.js.map

@@ -106,20 +106,18 @@ class JediValidate {
                 addTranslation(
                     translation,
                     this.options.translations[language][translation],
-                    language
+                    language,
                 );
             });
         });
 
         this.ready();
 
-        console.log('this.inputs', this.inputs)
-
         this.errorMessages = JediValidate.initErrorMessages(
             this.rules,
             this.options.messages,
             this.methods,
-            this.options.language
+            this.options.language,
         );
     }
 
@@ -153,13 +151,12 @@ class JediValidate {
         this.nodes.form.addEventListener('submit', (event) => {
             event.preventDefault();
             this.data = getData(this.inputs);
-            console.log('this.data', this.data)
 
             const errors = validateData(
                 this.rules,
                 this.methods,
                 this.data,
-                this.errorMessages
+                this.errorMessages,
             );
 
             if (errors && Object.keys(errors).filter(name => errors[name]).length !== 0) {
@@ -168,8 +165,8 @@ class JediValidate {
                         this.fields[name],
                         this.messages[name],
                         this.options.states,
-                        errors[name]
-                    )
+                        errors[name],
+                    ),
                 );
 
                 try {
@@ -273,14 +270,14 @@ class JediValidate {
                     this.methods,
                     value,
                     input.name,
-                    this.errorMessages
+                    this.errorMessages,
                 );
 
                 JediValidate.markField(
                     this.fields[name],
                     this.messages[name],
                     this.options.states,
-                    errors
+                    errors,
                 );
             });
 
@@ -323,8 +320,8 @@ class JediValidate {
                         this.fields[name],
                         this.messages[name],
                         this.options.states,
-                        response.validationErrors[name]
-                    )
+                        response.validationErrors[name],
+                    ),
                 );
             } else {
                 try {

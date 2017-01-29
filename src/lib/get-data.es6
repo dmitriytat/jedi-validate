@@ -107,13 +107,23 @@ export function getInputValue(input) {
 }
 
 /**
+ * Get name from input or array of inputs
+ * @param {HTMLInputElement|Array} input - input element or Array of HTMLInputElements
+ * @returns {string} - input name
+ */
+export function getInputName(input) {
+    return Array.isArray(input) ? input[0].name : input.name;
+}
+
+/**
  * Get object which key is name of input and value is value of input
- * @param {HTMLInputElement|array} input - input element or Array of HTMLInputElements
+ * @param {HTMLInputElement|Array} input - input element or Array of HTMLInputElements
  * @returns {object} - data
  */
 export function getInputData(input) {
     const value = getInputValue(input);
-    const path = convertNameToPath(input.name);
+    const name = getInputName(input);
+    const path = convertNameToPath(name);
 
     return createObject(path, value);
 }
@@ -126,7 +136,7 @@ export function getInputData(input) {
 export function getData(inputs) {
     return Object.keys(inputs).reduce(
         (data, name) => deepmerge(data, getInputData(inputs[name])),
-        {}
+        {},
     );
 }
 
