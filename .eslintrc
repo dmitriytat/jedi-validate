@@ -30,6 +30,9 @@
     "XMLHttpRequest": true,
     "document": true,
     "FormData": true,
-    "FileList": true
+    "FileList": true,
+    "describe": true,
+    "it": true,
+    "assert": true
   }
 }

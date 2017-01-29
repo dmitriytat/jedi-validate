@@ -16,8 +16,8 @@ const data = {
     phone2: 'sdfsefef',
     radio: '2',
     parent: {
-        child: 'value'
-    }
+        child: 'value',
+    },
 };
 
 const inputs = {
@@ -27,8 +27,8 @@ const inputs = {
     radio: [
         createRadioElement('radio', 1),
         createRadioElement('radio', 2, true),
-        createRadioElement('radio', 3)
-    ]
+        createRadioElement('radio', 3),
+    ],
 };
 
 inputs.phone.name = 'phone';
@@ -38,45 +38,45 @@ inputs.phone2.value = data.phone2;
 inputs['parent[child]'].name = 'parent[child]';
 inputs['parent[child]'].value = data.parent.child;
 
-describe('Get data', function () {
-    it('createObject', function () {
+describe('Get data', () => {
+    it('createObject', () => {
         assert.deepEqual(createObject(['parent', 'child', ''], 'value'), { parent: { child: 'value' } });
     });
 
-    it('convertNameToPath', function () {
+    it('convertNameToPath', () => {
         assert.deepEqual(convertNameToPath('parent[child]'), ['parent', 'child', '']);
     });
 
-    it('getValueByPath', function () {
+    it('getValueByPath', () => {
         assert.deepEqual(getValueByPath(['parent', 'child'], data), 'value');
     });
 
-    it('getValueByName', function () {
+    it('getValueByName', () => {
         assert.deepEqual(getValueByName('radio', data), '2');
     });
 
-    it('getRadioGroupValue', function () {
+    it('getRadioGroupValue', () => {
         assert.deepEqual(getRadioGroupValue(inputs.radio), data.radio);
     });
 
-    it('getInputValue', function () {
+    it('getInputValue', () => {
         assert.deepEqual(getInputValue(inputs.phone), data.phone);
     });
 
-    it('getInputData', function () {
+    it('getInputData', () => {
         assert.deepEqual(getInputData(inputs.phone), { phone: data.phone });
     });
 
-    it('getData', function () {
+    it('getData', () => {
         assert.deepEqual(getData(inputs), data);
     });
 
-    it('getQueryPart', function () {
+    it('getQueryPart', () => {
         assert.deepEqual(getQueryPart('phone', data.phone), `phone=${data.phone}&`);
     });
 
-    describe('convertData', function () {
-        it('serialize', function () {
+    describe('convertData', () => {
+        it('serialize', () => {
             assert.deepEqual(convertData(data, 'serialize'), 'phone=92356234&phone2=sdfsefef&radio=2&parent[child]=value');
         });
     });

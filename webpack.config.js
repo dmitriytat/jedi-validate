@@ -4,7 +4,6 @@ module.exports = {
     entry: {
         'jedi-validate': './src/jedi-validate.es6',
         'jedi-validate.min': './src/jedi-validate.es6',
-        'tests': './tests/tests.es6',
     },
     devtool: 'source-map',
     output: {
@@ -13,14 +12,14 @@ module.exports = {
         libraryTarget: 'umd',
         library: 'JediValidate',
         sourceMapFilename: '[name].js.map',
-        publicPath: '/dist/'
+        publicPath: '/dist/',
     },
     module: {
         rules: [
             // {
             //     enforce: 'pre',
             //     test: /\.es6$/,
-            //     exclude: /node_modules/,
+            //     exclude: /(node_modules|bower_components|tests)/,
             //     loader: 'eslint-loader',
             // },
             {
@@ -31,13 +30,13 @@ module.exports = {
             {
                 test: /\.json$/,
                 loader: 'json-loader',
-            }
+            },
         ],
     },
     plugins: [
         new webpack.optimize.UglifyJsPlugin({
             include: /\.min\.js$/,
-            minimize: true
-        })
-    ]
+            minimize: true,
+        }),
+    ],
 };

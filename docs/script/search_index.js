@@ -48,6 +48,12 @@ window.esdocSearchIndex = [
     "function"
   ],
   [
+    "jedi-validate/src/lib/get-data.es6~getinputname",
+    "function/index.html#static-function-getInputName",
+    "<span>getInputName</span> <span class=\"search-result-import-path\">jedi-validate/src/lib/get-data.es6</span>",
+    "function"
+  ],
+  [
     "jedi-validate/src/lib/get-options.es6~getinputrules",
     "function/index.html#static-function-getInputRules",
     "<span>getInputRules</span> <span class=\"search-result-import-path\">jedi-validate/src/lib/get-options.es6</span>",

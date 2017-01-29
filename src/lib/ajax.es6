@@ -4,6 +4,7 @@ import { translate } from '../i18n/jedi-validate-i18n.es6';
  * Sending request
  * @param {{url: string, enctype: string, sendType: string, method: string, data: string|FormData}} options - Sending options
  * @returns {Promise}
+ * todo rewrite to fetch
  */
 export function ajax(options) {
     return new Promise((resolve, reject) => {
@@ -42,7 +43,7 @@ export function ajax(options) {
         };
 
         xhr.send(options.method.toUpperCase() === 'POST' ? options.data : '');
-    }
+    },
     );
 }
 

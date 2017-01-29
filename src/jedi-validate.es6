@@ -106,7 +106,7 @@ class JediValidate {
                 addTranslation(
                     translation,
                     this.options.translations[language][translation],
-                    language
+                    language,
                 );
             });
         });
@@ -117,7 +117,7 @@ class JediValidate {
             this.rules,
             this.options.messages,
             this.methods,
-            this.options.language
+            this.options.language,
         );
     }
 
@@ -156,7 +156,7 @@ class JediValidate {
                 this.rules,
                 this.methods,
                 this.data,
-                this.errorMessages
+                this.errorMessages,
             );
 
             if (errors && Object.keys(errors).filter(name => errors[name]).length !== 0) {
@@ -165,8 +165,8 @@ class JediValidate {
                         this.fields[name],
                         this.messages[name],
                         this.options.states,
-                        errors[name]
-                    )
+                        errors[name],
+                    ),
                 );
 
                 try {
@@ -199,6 +199,9 @@ class JediValidate {
         });
 
         this.nodes.inputs.forEach((input) => {
+            // fixme "name" and "name in data" not the same
+            // name === "phone[]",
+            // data: { phone: [] } - name === "phone"
             const name = input.name;
 
             if (this.inputs[name]) {
@@ -256,6 +259,7 @@ class JediValidate {
                 const inputData = getInputData(input);
                 const value = getValueByName(name, inputData);
 
+                // fixme don't work with 2 inputs phone[]
                 this.data = {
                     ...this.data,
                     ...inputData,
@@ -266,14 +270,14 @@ class JediValidate {
                     this.methods,
                     value,
                     input.name,
-                    this.errorMessages
+                    this.errorMessages,
                 );
 
                 JediValidate.markField(
                     this.fields[name],
                     this.messages[name],
                     this.options.states,
-                    errors
+                    errors,
                 );
             });
 
@@ -316,8 +320,8 @@ class JediValidate {
                         this.fields[name],
                         this.messages[name],
                         this.options.states,
-                        response.validationErrors[name]
-                    )
+                        response.validationErrors[name],
+                    ),
                 );
             } else {
                 try {
