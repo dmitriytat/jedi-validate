@@ -7,7 +7,7 @@ module.exports = {
     },
     devtool: 'source-map',
     output: {
-        path: './dist',
+        path: __dirname + '/dist',
         filename: '[name].js',
         libraryTarget: 'umd',
         library: 'JediValidate',

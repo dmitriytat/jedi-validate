@@ -1,5 +1,6 @@
 import deepmerge from 'deepmerge';
-import { getData, getInputData, convertData, getValueByName } from './lib/get-data.es6';
+import { getData, getInputData, getValueByName } from './lib/get-data.es6';
+import { convertData } from './lib/convert-data.es6';
 import { addTranslation, translate } from './i18n/jedi-validate-i18n.es6';
 import { getFormOptions, getInputRules } from './lib/get-options.es6';
 import { validateData, validateField } from './lib/validate-data.es6';
@@ -47,6 +48,7 @@ class JediValidate {
      * @type {object}
      */
     rules = {};
+
     /**
      * JediValidate
      * @param {HTMLElement} root - element which wrap form element
@@ -244,7 +246,7 @@ class JediValidate {
 
                 this.rules[name] = this.rules[name] || {};
                 const inputRules = getInputRules(input);
-                this.rules[name] = deepmerge(this.rules[name], inputRules);
+                this.rules[name] = deepmerge(inputRules, this.rules[name]);
 
                 Object.keys(this.rules[name]).forEach((rule) => {
                     if (this.rules[name][rule]) {
@@ -269,8 +271,9 @@ class JediValidate {
                     this.rules[name],
                     this.methods,
                     value,
-                    input.name,
+                    name,
                     this.errorMessages,
+                    this.data,
                 );
 
                 JediValidate.markField(

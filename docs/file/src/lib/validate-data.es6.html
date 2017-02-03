@@ -37,17 +37,18 @@
 <li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">lib</div><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-ajax">ajax</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-convertData">convertData</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-convertNameToPath">convertNameToPath</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getQueryPart">getQueryPart</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-createObject">createObject</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getData">getData</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getInputData">getInputData</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getInputName">getInputName</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getInputValue">getInputValue</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getQueryPart">getQueryPart</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getRadioGroupValue">getRadioGroupValue</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getValueByName">getValueByName</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getValueByPath">getValueByPath</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getFormOptions">getFormOptions</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getInputRules">getInputRules</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-isCheckable">isCheckable</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-validateData">validateData</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-validateField">validateField</a></span></span></li>
 </ul>
@@ -58,18 +59,46 @@
 <pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import { getValueByName } from &apos;./get-data.es6&apos;;
 
 /**
+ * Check rule for dependencies
+ * @param {*} params - params of validation
+ * @param {object} data - data of form
+ * @returns {*} - params of validation or null if rule not checkable
+ */
+export function isCheckable(params, data) {
+    if (!params) return null;
+
+    let checkable = true;
+    let param = params;
+
+    if (Array.isArray(params)) {
+        let dependencies = [];
+        [param, ...dependencies] = params;
+        if (!param) return null;
+
+
+        checkable = dependencies
+            .reduce((required, dependency) =&gt; (required &amp;&amp; !!data[dependency]), checkable);
+    }
+
+    return checkable ? param : null;
+}
+
+/**
  * Validate field
  * @param {object} rules - object with rules for validation
  * @param {object} methods - validation methods
  * @param {string|FileList|Array} value - value of input
  * @param {string} name - name on input
  * @param {object} errorMessages - object with error messages
+ * @param {object} data - data of form
  * @returns {Array.&lt;string&gt;} - array of field errors
  */
-export function validateField(rules, methods, value, name, errorMessages) {
+export function validateField(rules, methods, value, name, errorMessages, data) {
     const isEmpty = !methods.required.func(value);
 
-    if (isEmpty &amp;&amp; rules.required) {
+    const isRequired = isCheckable(rules.required, data);
+
+    if (isEmpty &amp;&amp; isRequired) {
         return [errorMessages[name].required];
     }
 
@@ -78,8 +107,9 @@ export function validateField(rules, methods, value, name, errorMessages) {
     }
 
     return Object.keys(rules).reduce((errors, method) =&gt; {
-        const params = rules[method];
-        if (!params) return errors;
+        const params = isCheckable(rules[method], data);
+
+        if (params === null) return errors;
 
         if (methods[method]) {
             const valid = methods[method].func(value, params);
@@ -106,7 +136,7 @@ export function validateField(rules, methods, value, name, errorMessages) {
 export function validateData(rules, methods, data, errorMessages) {
     return Object.keys(rules).reduce((obj, name) =&gt; {
         const value = getValueByName(name, data);
-        const errors = validateField(rules[name], methods, value, name, errorMessages);
+        const errors = validateField(rules[name], methods, value, name, errorMessages, data);
         return {
             ...obj,
             [name]: errors.length ? errors : undefined,

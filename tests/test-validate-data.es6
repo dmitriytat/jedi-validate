@@ -1,6 +1,9 @@
+import { createCheckableElement } from '../test-utils/utils.es6';
+
 import { validateField, validateData } from '../src/lib/validate-data.es6';
 import methods from '../src/lib/methods.es6';
 
+// todo move to test context
 const rules = {
     phone: {
         required: true,
@@ -34,6 +37,9 @@ const errorMessages = {
     phone2: {
         regexp: 'Only digits available',
     },
+    dependedInput: {
+        required: 'It is required',
+    },
 };
 
 describe('Validate data', () => {
@@ -54,8 +60,34 @@ describe('Validate data', () => {
     });
 
     describe('Depends data', () => {
-        it('Validate values', () => {
-            assert.deepEqual(validateData(rules, methods, data, errorMessages), { phone: undefined, phone2: [errorMessages.phone2.regexp] });
+        it('Validate invalid values', () => {
+            const rules = {
+                dependedInput: {
+                    required: [true, 'checkbox'],
+                },
+            };
+
+            const data = {
+                checkbox: 'true',
+                dependedInput: '',
+            };
+
+            assert.deepEqual(validateData(rules, methods, data, errorMessages), { dependedInput: ['It is required'] });
+        });
+
+        it('Validate valid values', () => {
+            const rules = {
+                dependedInput: {
+                    required: [true, 'checkbox'],
+                },
+            };
+
+            const data = {
+                checkbox: '',
+                dependedInput: '',
+            };
+
+            assert.deepEqual(validateData(rules, methods, data, errorMessages), { dependedInput: undefined });
         });
     });
 });

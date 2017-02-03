@@ -37,17 +37,18 @@
 <li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">lib</div><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-ajax">ajax</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-convertData">convertData</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-convertNameToPath">convertNameToPath</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getQueryPart">getQueryPart</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-createObject">createObject</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getData">getData</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getInputData">getInputData</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getInputName">getInputName</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getInputValue">getInputValue</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getQueryPart">getQueryPart</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getRadioGroupValue">getRadioGroupValue</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getValueByName">getValueByName</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getValueByPath">getValueByPath</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getFormOptions">getFormOptions</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getInputRules">getInputRules</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-isCheckable">isCheckable</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-validateData">validateData</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-validateField">validateField</a></span></span></li>
 </ul>
@@ -56,7 +57,8 @@
 
 <div class="content" data-ice="content"><h1 data-ice="title">src/jedi-validate.es6</h1>
 <pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import deepmerge from &apos;deepmerge&apos;;
-import { getData, getInputData, convertData, getValueByName } from &apos;./lib/get-data.es6&apos;;
+import { getData, getInputData, getValueByName } from &apos;./lib/get-data.es6&apos;;
+import { convertData } from &apos;./lib/convert-data.es6&apos;;
 import { addTranslation, translate } from &apos;./i18n/jedi-validate-i18n.es6&apos;;
 import { getFormOptions, getInputRules } from &apos;./lib/get-options.es6&apos;;
 import { validateData, validateField } from &apos;./lib/validate-data.es6&apos;;
@@ -104,6 +106,7 @@ class JediValidate {
      * @type {object}
      */
     rules = {};
+
     /**
      * JediValidate
      * @param {HTMLElement} root - element which wrap form element
@@ -301,7 +304,7 @@ class JediValidate {
 
                 this.rules[name] = this.rules[name] || {};
                 const inputRules = getInputRules(input);
-                this.rules[name] = deepmerge(this.rules[name], inputRules);
+                this.rules[name] = deepmerge(inputRules, this.rules[name]);
 
                 Object.keys(this.rules[name]).forEach((rule) =&gt; {
                     if (this.rules[name][rule]) {
@@ -326,8 +329,9 @@ class JediValidate {
                     this.rules[name],
                     this.methods,
                     value,
-                    input.name,
+                    name,
                     this.errorMessages,
+                    this.data,
                 );
 
                 JediValidate.markField(
