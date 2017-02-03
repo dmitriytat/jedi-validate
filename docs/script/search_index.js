@@ -12,15 +12,15 @@ window.esdocSearchIndex = [
     "function"
   ],
   [
-    "jedi-validate/src/lib/get-data.es6~convertdata",
+    "jedi-validate/src/lib/convert-data.es6~convertdata",
     "function/index.html#static-function-convertData",
-    "<span>convertData</span> <span class=\"search-result-import-path\">jedi-validate/src/lib/get-data.es6</span>",
+    "<span>convertData</span> <span class=\"search-result-import-path\">jedi-validate/src/lib/convert-data.es6</span>",
     "function"
   ],
   [
-    "jedi-validate/src/lib/get-data.es6~convertnametopath",
+    "jedi-validate/src/lib/convert-data.es6~convertnametopath",
     "function/index.html#static-function-convertNameToPath",
-    "<span>convertNameToPath</span> <span class=\"search-result-import-path\">jedi-validate/src/lib/get-data.es6</span>",
+    "<span>convertNameToPath</span> <span class=\"search-result-import-path\">jedi-validate/src/lib/convert-data.es6</span>",
     "function"
   ],
   [
@@ -66,9 +66,9 @@ window.esdocSearchIndex = [
     "function"
   ],
   [
-    "jedi-validate/src/lib/get-data.es6~getquerypart",
+    "jedi-validate/src/lib/convert-data.es6~getquerypart",
     "function/index.html#static-function-getQueryPart",
-    "<span>getQueryPart</span> <span class=\"search-result-import-path\">jedi-validate/src/lib/get-data.es6</span>",
+    "<span>getQueryPart</span> <span class=\"search-result-import-path\">jedi-validate/src/lib/convert-data.es6</span>",
     "function"
   ],
   [
@@ -87,6 +87,12 @@ window.esdocSearchIndex = [
     "jedi-validate/src/lib/get-data.es6~getvaluebypath",
     "function/index.html#static-function-getValueByPath",
     "<span>getValueByPath</span> <span class=\"search-result-import-path\">jedi-validate/src/lib/get-data.es6</span>",
+    "function"
+  ],
+  [
+    "jedi-validate/src/lib/validate-data.es6~ischeckable",
+    "function/index.html#static-function-isCheckable",
+    "<span>isCheckable</span> <span class=\"search-result-import-path\">jedi-validate/src/lib/validate-data.es6</span>",
     "function"
   ],
   [
@@ -453,6 +459,12 @@ window.esdocSearchIndex = [
     "src/lib/ajax.es6",
     "file/src/lib/ajax.es6.html",
     "src/lib/ajax.es6",
+    "file"
+  ],
+  [
+    "src/lib/convert-data.es6",
+    "file/src/lib/convert-data.es6.html",
+    "src/lib/convert-data.es6",
     "file"
   ],
   [

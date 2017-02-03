@@ -243,6 +243,10 @@ Add rules as part of your options object when initializing:
                 filesize: 10000,
                 extension: "html|css|txt"
             }
+            file: {
+                filesize: [10000, "two-files-checkbox"], // check only if checkbox checked
+                extension: ["html|css|txt", "two-files-checkbox"],
+            }
         }
     });
 ```
@@ -282,3 +286,5 @@ You can define your own error messages in case validation fails. In case a form 
     - fix select value
     - add examples
     - add jsdoc
+- 1.1.3 fix radio input data
+- 1.2.0 add support of dependencies for field (see example)

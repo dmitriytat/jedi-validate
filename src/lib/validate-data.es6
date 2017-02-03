@@ -1,18 +1,46 @@
 import { getValueByName } from './get-data.es6';
 
 /**
+ * Check rule for dependencies
+ * @param {*} params - params of validation
+ * @param {object} data - data of form
+ * @returns {*} - params of validation or null if rule not checkable
+ */
+export function isCheckable(params, data) {
+    if (!params) return null;
+
+    let checkable = true;
+    let param = params;
+
+    if (Array.isArray(params)) {
+        let dependencies = [];
+        [param, ...dependencies] = params;
+        if (!param) return null;
+
+
+        checkable = dependencies
+            .reduce((required, dependency) => (required && !!data[dependency]), checkable);
+    }
+
+    return checkable ? param : null;
+}
+
+/**
  * Validate field
  * @param {object} rules - object with rules for validation
  * @param {object} methods - validation methods
  * @param {string|FileList|Array} value - value of input
  * @param {string} name - name on input
  * @param {object} errorMessages - object with error messages
+ * @param {object} data - data of form
  * @returns {Array.<string>} - array of field errors
  */
-export function validateField(rules, methods, value, name, errorMessages) {
+export function validateField(rules, methods, value, name, errorMessages, data) {
     const isEmpty = !methods.required.func(value);
 
-    if (isEmpty && rules.required) {
+    const isRequired = isCheckable(rules.required, data);
+
+    if (isEmpty && isRequired) {
         return [errorMessages[name].required];
     }
 
@@ -21,8 +49,9 @@ export function validateField(rules, methods, value, name, errorMessages) {
     }
 
     return Object.keys(rules).reduce((errors, method) => {
-        const params = rules[method];
-        if (!params) return errors;
+        const params = isCheckable(rules[method], data);
+
+        if (params === null) return errors;
 
         if (methods[method]) {
             const valid = methods[method].func(value, params);
@@ -49,7 +78,7 @@ export function validateField(rules, methods, value, name, errorMessages) {
 export function validateData(rules, methods, data, errorMessages) {
     return Object.keys(rules).reduce((obj, name) => {
         const value = getValueByName(name, data);
-        const errors = validateField(rules[name], methods, value, name, errorMessages);
+        const errors = validateField(rules[name], methods, value, name, errorMessages, data);
         return {
             ...obj,
             [name]: errors.length ? errors : undefined,

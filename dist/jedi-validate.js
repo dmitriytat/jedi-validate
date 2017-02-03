@@ -73,7 +73,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "/dist/";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 8);
+/******/ 	return __webpack_require__(__webpack_require__.s = 9);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -88,7 +88,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.translate = translate;
 exports.addTranslation = addTranslation;
-var dictionary = __webpack_require__(7);
+var dictionary = __webpack_require__(8);
 
 /**
  * Default language
@@ -137,44 +137,27 @@ Object.defineProperty(exports, "__esModule", {
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
-exports.createObject = createObject;
-exports.convertNameToPath = convertNameToPath;
-exports.getValueByPath = getValueByPath;
-exports.getValueByName = getValueByName;
-exports.getRadioGroupValue = getRadioGroupValue;
-exports.getInputValue = getInputValue;
-exports.getInputName = getInputName;
-exports.getInputData = getInputData;
-exports.getData = getData;
 exports.getQueryPart = getQueryPart;
+exports.convertNameToPath = convertNameToPath;
 exports.convertData = convertData;
-
-var _deepmerge = __webpack_require__(2);
-
-var _deepmerge2 = _interopRequireDefault(_deepmerge);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
 /**
- * Create object by path and value
- * @param {Array} path - path array
- * @param {string|FileList} value - value on input
- * @returns {object} - data object
+ * Create part url for serialize method
+ * @param {string} name
+ * @param {object|Array|string} data
+ * @returns {string} - part of url
  */
-function createObject(path, value) {
-    var segment = path[0];
-
-    if (segment.length === 0) {
-        return value;
-    } else if (segment === '[]') {
-        return [createObject(path.slice(1), value)];
+function getQueryPart(name, data) {
+    if (Array.isArray(data)) {
+        return data.reduce(function (part, index) {
+            return part + getQueryPart(name + '[' + index + ']', data[index]);
+        }, '');
+    } else if ((typeof data === 'undefined' ? 'undefined' : _typeof(data)) === 'object') {
+        return Object.keys(data).reduce(function (part, index) {
+            return part + getQueryPart(name + '[' + index + ']', data[index]);
+        }, '');
     }
 
-    return _defineProperty({}, segment, createObject(path.slice(1), value));
+    return name + '=' + encodeURIComponent(data) + '&';
 }
 
 /**
@@ -206,6 +189,96 @@ function convertNameToPath(name) {
 }
 
 /**
+ * Convert data object to value for sending
+ * @param {object} data - data object
+ * @param {string} type - type of conversion
+ * @returns {string|FormData} - output value
+ */
+function convertData(data, type) {
+    var convertedData = void 0;
+
+    switch (type) {
+        case 'serialize':
+            convertedData = Object.keys(data).reduce(function (query, name) {
+                return '' + query + getQueryPart(name, data[name]);
+            }, '');
+            return convertedData.length ? convertedData.slice(0, -1) : '';
+        case 'formData':
+            return Object.keys(data).reduce(function (formData, name) {
+                if (data[name] instanceof FileList) {
+                    if (data[name].length > 1) {
+                        for (var i = 0; i < data[name].length; i += 1) {
+                            formData.append(name + '[' + i + ']', data[name][i]);
+                        }
+                    } else if (data[name].length === 1) {
+                        formData.append(name, data[name][0]);
+                    }
+                } else if (_typeof(data[name]) === 'object') {
+                    Object.keys(data[name]).forEach(function (key) {
+                        return formData.append(name + '[' + key + ']', data[name][key]);
+                    });
+                } else {
+                    formData.append(name, data[name]);
+                }
+
+                return formData;
+            }, new FormData());
+        case 'json':
+        default:
+            return JSON.stringify(data);
+    }
+}
+
+/***/ }),
+/* 2 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.createObject = createObject;
+exports.getValueByPath = getValueByPath;
+exports.getValueByName = getValueByName;
+exports.getRadioGroupValue = getRadioGroupValue;
+exports.getInputValue = getInputValue;
+exports.getInputName = getInputName;
+exports.getInputData = getInputData;
+exports.getData = getData;
+
+var _deepmerge = __webpack_require__(3);
+
+var _deepmerge2 = _interopRequireDefault(_deepmerge);
+
+var _convertData = __webpack_require__(1);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+/**
+ * Create object by path and value
+ * @param {Array} path - path array
+ * @param {string|FileList} value - value on input
+ * @returns {object} - data object
+ */
+function createObject(path, value) {
+    var segment = path[0];
+
+    if (segment.length === 0) {
+        return value;
+    } else if (segment === '[]') {
+        return [createObject(path.slice(1), value)];
+    }
+
+    return _defineProperty({}, segment, createObject(path.slice(1), value));
+}
+
+/**
  * Get value from data object by path
  * @param {Array} path - value path
  * @param {object} data - data object
@@ -223,7 +296,7 @@ function getValueByPath(path, data) {
  * @param {object} data - data object
  */
 function getValueByName(name, data) {
-    var path = convertNameToPath(name);
+    var path = (0, _convertData.convertNameToPath)(name);
     return getValueByPath(path, data);
 }
 
@@ -291,7 +364,7 @@ function getInputName(input) {
 function getInputData(input) {
     var value = getInputValue(input);
     var name = getInputName(input);
-    var path = convertNameToPath(name);
+    var path = (0, _convertData.convertNameToPath)(name);
 
     return createObject(path, value);
 }
@@ -307,69 +380,8 @@ function getData(inputs) {
     }, {});
 }
 
-/**
- * Create part url for serialize method
- * @param {string} name
- * @param {object|Array|string} data
- * @returns {string} - part of url
- */
-function getQueryPart(name, data) {
-    if (Array.isArray(data)) {
-        return data.reduce(function (part, index) {
-            return part + getQueryPart(name + '[' + index + ']', data[index]);
-        }, '');
-    } else if ((typeof data === 'undefined' ? 'undefined' : _typeof(data)) === 'object') {
-        return Object.keys(data).reduce(function (part, index) {
-            return part + getQueryPart(name + '[' + index + ']', data[index]);
-        }, '');
-    }
-
-    return name + '=' + encodeURIComponent(data) + '&';
-}
-
-/**
- * Convert data object to value for sending
- * @param {object} data - data object
- * @param {string} type - type of conversion
- * @returns {string|FormData} - output value
- */
-function convertData(data, type) {
-    var convertedData = void 0;
-
-    switch (type) {
-        case 'serialize':
-            convertedData = Object.keys(data).reduce(function (query, name) {
-                return '' + query + getQueryPart(name, data[name]);
-            }, '');
-            return convertedData.length ? convertedData.slice(0, -1) : '';
-        case 'formData':
-            return Object.keys(data).reduce(function (formData, name) {
-                if (data[name] instanceof FileList) {
-                    if (data[name].length > 1) {
-                        for (var i = 0; i < data[name].length; i += 1) {
-                            formData.append(name + '[' + i + ']', data[name][i]);
-                        }
-                    } else if (data[name].length === 1) {
-                        formData.append(name, data[name][0]);
-                    }
-                } else if (_typeof(data[name]) === 'object') {
-                    Object.keys(data[name]).forEach(function (key) {
-                        return formData.append(name + '[' + key + ']', data[name][key]);
-                    });
-                } else {
-                    formData.append(name, data[name]);
-                }
-
-                return formData;
-            }, new FormData());
-        case 'json':
-        default:
-            return JSON.stringify(data);
-    }
-}
-
 /***/ }),
-/* 2 */
+/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;(function (root, factory) {
@@ -463,7 +475,7 @@ return deepmerge
 
 
 /***/ }),
-/* 3 */
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -525,7 +537,7 @@ function ajax(options) {
 exports.default = ajax;
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -578,7 +590,7 @@ function getInputRules(input) {
 }
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -648,7 +660,7 @@ exports.default = {
 };
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -660,12 +672,45 @@ Object.defineProperty(exports, "__esModule", {
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
+exports.isCheckable = isCheckable;
 exports.validateField = validateField;
 exports.validateData = validateData;
 
-var _getData = __webpack_require__(1);
+var _getData = __webpack_require__(2);
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function _toArray(arr) { return Array.isArray(arr) ? arr : Array.from(arr); }
+
+/**
+ * Check rule for dependencies
+ * @param {*} params - params of validation
+ * @param {object} data - data of form
+ * @returns {*} - params of validation or null if rule not checkable
+ */
+function isCheckable(params, data) {
+    if (!params) return null;
+
+    var checkable = true;
+    var param = params;
+
+    if (Array.isArray(params)) {
+        var dependencies = [];
+
+        var _params = _toArray(params);
+
+        param = _params[0];
+        dependencies = _params.slice(1);
+
+        if (!param) return null;
+
+        checkable = dependencies.reduce(function (required, dependency) {
+            return required && !!data[dependency];
+        }, checkable);
+    }
+
+    return checkable ? param : null;
+}
 
 /**
  * Validate field
@@ -674,12 +719,15 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
  * @param {string|FileList|Array} value - value of input
  * @param {string} name - name on input
  * @param {object} errorMessages - object with error messages
+ * @param {object} data - data of form
  * @returns {Array.<string>} - array of field errors
  */
-function validateField(rules, methods, value, name, errorMessages) {
+function validateField(rules, methods, value, name, errorMessages, data) {
     var isEmpty = !methods.required.func(value);
 
-    if (isEmpty && rules.required) {
+    var isRequired = isCheckable(rules.required, data);
+
+    if (isEmpty && isRequired) {
         return [errorMessages[name].required];
     }
 
@@ -688,8 +736,9 @@ function validateField(rules, methods, value, name, errorMessages) {
     }
 
     return Object.keys(rules).reduce(function (errors, method) {
-        var params = rules[method];
-        if (!params) return errors;
+        var params = isCheckable(rules[method], data);
+
+        if (params === null) return errors;
 
         if (methods[method]) {
             var valid = methods[method].func(value, params);
@@ -716,13 +765,13 @@ function validateField(rules, methods, value, name, errorMessages) {
 function validateData(rules, methods, data, errorMessages) {
     return Object.keys(rules).reduce(function (obj, name) {
         var value = (0, _getData.getValueByName)(name, data);
-        var errors = validateField(rules[name], methods, value, name, errorMessages);
+        var errors = validateField(rules[name], methods, value, name, errorMessages, data);
         return _extends({}, obj, _defineProperty({}, name, errors.length ? errors : undefined));
     }, {});
 }
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -740,7 +789,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -750,21 +799,23 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _deepmerge = __webpack_require__(2);
+var _deepmerge = __webpack_require__(3);
 
 var _deepmerge2 = _interopRequireDefault(_deepmerge);
 
-var _getData = __webpack_require__(1);
+var _getData = __webpack_require__(2);
+
+var _convertData = __webpack_require__(1);
 
 var _jediValidateI18n = __webpack_require__(0);
 
-var _getOptions = __webpack_require__(4);
+var _getOptions = __webpack_require__(5);
 
-var _validateData = __webpack_require__(6);
+var _validateData = __webpack_require__(7);
 
-var _ajax = __webpack_require__(3);
+var _ajax = __webpack_require__(4);
 
-var _methods = __webpack_require__(5);
+var _methods = __webpack_require__(6);
 
 var _methods2 = _interopRequireDefault(_methods);
 
@@ -775,6 +826,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var JediValidate = function () {
+
     /**
      * JediValidate
      * @param {HTMLElement} root - element which wrap form element
@@ -943,7 +995,7 @@ var JediValidate = function () {
                     return;
                 }
 
-                var convertedData = (0, _getData.convertData)(_this2.data, _this2.options.ajax.sendType);
+                var convertedData = (0, _convertData.convertData)(_this2.data, _this2.options.ajax.sendType);
                 _this2.send(_extends({}, _this2.options.ajax, {
                     data: convertedData
                 }));
@@ -995,7 +1047,7 @@ var JediValidate = function () {
 
                     _this2.rules[name] = _this2.rules[name] || {};
                     var inputRules = (0, _getOptions.getInputRules)(input);
-                    _this2.rules[name] = (0, _deepmerge2.default)(_this2.rules[name], inputRules);
+                    _this2.rules[name] = (0, _deepmerge2.default)(inputRules, _this2.rules[name]);
 
                     Object.keys(_this2.rules[name]).forEach(function (rule) {
                         if (_this2.rules[name][rule]) {
@@ -1013,7 +1065,7 @@ var JediValidate = function () {
                     // fixme don't work with 2 inputs phone[]
                     _this2.data = _extends({}, _this2.data, inputData);
 
-                    var errors = (0, _validateData.validateField)(_this2.rules[name], _this2.methods, value, input.name, _this2.errorMessages);
+                    var errors = (0, _validateData.validateField)(_this2.rules[name], _this2.methods, value, name, _this2.errorMessages, _this2.data);
 
                     JediValidate.markField(_this2.fields[name], _this2.messages[name], _this2.options.states, errors);
                 });

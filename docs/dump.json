@@ -167,7 +167,7 @@
     "access": null,
     "description": null,
     "lineNumber": 1,
-    "content": "import deepmerge from 'deepmerge';\nimport { getData, getInputData, convertData, getValueByName } from './lib/get-data.es6';\nimport { addTranslation, translate } from './i18n/jedi-validate-i18n.es6';\nimport { getFormOptions, getInputRules } from './lib/get-options.es6';\nimport { validateData, validateField } from './lib/validate-data.es6';\nimport { ajax } from './lib/ajax.es6';\nimport defaultMethods from './lib/methods.es6';\n\nclass JediValidate {\n    /**\n     * Object with fields\n     * @type {Object.<string, Element>}\n     */\n    fields = {};\n    /**\n     * Object with inputs nodes\n     * @type {Object.<string, HTMLInputElement|HTMLSelectElement|Array>}\n     */\n    inputs = {};\n    /**\n     * Object with message nodes\n     * @type {Object.<string, Element>}\n     */\n    messages = {};\n    /**\n     * Object with error message\n     * @type {Object.<string, Object.<string, string>>}\n     */\n    errorMessages = {};\n    /**\n     * Object with error message\n     * @type {object} - data object\n     */\n    data = {};\n    /**\n     * Validate methods\n     * @type {Object.<string, {func: Function, message: string}>}\n     */\n    methods = { ...defaultMethods };\n    /**\n     * Validator options\n     * @type {{ajax: {url: string, enctype: string, sendType: string, method: string}, rules: {}, messages: {}, containers: {parent: string, message: string, baseMessage: string}, states: {error: string, valid: string, pristine: string, dirty: string}, formStatePrefix: string, callbacks: {success: (function(object)), error: (function(object.<string, Array.<string>>))}, clean: boolean, redirect: boolean, language: string, translations: {}}}\n     */\n    options = {};\n    /**\n     * Validator rules\n     * @type {object}\n     */\n    rules = {};\n    /**\n     * JediValidate\n     * @param {HTMLElement} root - element which wrap form element\n     * @param {object} options - object with options\n     */\n    constructor(root, options = {}) {\n        const defaultOptions = {\n            ajax: {\n                url: null,\n                enctype: 'application/x-www-form-urlencoded',\n                sendType: 'serialize', // 'serialize', 'formData', 'json'\n                method: 'GET',\n            },\n            rules: {},\n            messages: {},\n            containers: {\n                parent: 'form-group',\n                message: 'help-block',\n                baseMessage: 'base-error',\n            },\n            states: {\n                error: 'error',\n                valid: 'valid',\n                pristine: 'pristine',\n                dirty: 'dirty',\n            },\n            formStatePrefix: 'jedi-',\n            callbacks: {\n                success() {\n                },\n                error() {\n                },\n            },\n            clean: true,\n            redirect: true,\n            language: 'en',\n            translations: {},\n        };\n\n        this.root = root;\n\n        this.options = deepmerge(defaultOptions, options);\n\n        this.nodes = JediValidate.cacheNodes(this.root, this.options);\n\n        const formOptions = getFormOptions(this.nodes.form);\n\n        this.options = deepmerge(this.options, defaultOptions);\n        this.options = deepmerge(this.options, formOptions);\n        this.options = deepmerge(this.options, options);\n\n        this.rules = { ...this.options.rules };\n\n        // todo rewrite translations\n        Object.keys(this.options.translations).forEach((language) => {\n            Object.keys(this.options.translations[language]).forEach((translation) => {\n                addTranslation(\n                    translation,\n                    this.options.translations[language][translation],\n                    language,\n                );\n            });\n        });\n\n        this.ready();\n\n        this.errorMessages = JediValidate.initErrorMessages(\n            this.rules,\n            this.options.messages,\n            this.methods,\n            this.options.language,\n        );\n    }\n\n    /**\n     * Add localisation to JediValidate\n     * @param {string} sourceText - text on english\n     * @param {string} translatedText - text on needed language\n     * @param {string} language - language\n     */\n    static addToDictionary(sourceText, translatedText, language) {\n        addTranslation(sourceText, translatedText, language);\n    }\n\n    /**\n     * Return object with working elements\n     * @param root Root element for search\n     * @param options Object with selectors\n     * @returns {{form: Element, inputs: NodeList, baseMessage: Element}}\n     */\n    static cacheNodes(root, options) {\n        return {\n            form: root.querySelector('form'),\n            inputs: root.querySelectorAll('[name]'),\n            baseMessage: root.querySelector(`.${options.containers.baseMessage}`),\n        };\n    }\n\n    ready() {\n        this.nodes.form.setAttribute('novalidate', 'novalidate');\n\n        this.nodes.form.addEventListener('submit', (event) => {\n            event.preventDefault();\n            this.data = getData(this.inputs);\n\n            const errors = validateData(\n                this.rules,\n                this.methods,\n                this.data,\n                this.errorMessages,\n            );\n\n            if (errors && Object.keys(errors).filter(name => errors[name]).length !== 0) {\n                Object.keys(errors).forEach(name =>\n                    JediValidate.markField(\n                        this.fields[name],\n                        this.messages[name],\n                        this.options.states,\n                        errors[name],\n                    ),\n                );\n\n                try {\n                    this.options.callbacks.error(errors);\n                } catch (e) {\n                    console.error(e);\n                }\n\n                event.preventDefault();\n                return;\n            }\n\n            if (this.options.ajax && this.options.ajax.url) {\n                event.preventDefault();\n            } else {\n                try {\n                    this.options.callbacks.success(null);\n                } catch (e) {\n                    console.error(e);\n                }\n\n                return;\n            }\n\n            const convertedData = convertData(this.data, this.options.ajax.sendType);\n            this.send({\n                ...this.options.ajax,\n                data: convertedData,\n            });\n        });\n\n        this.nodes.inputs.forEach((input) => {\n            // fixme \"name\" and \"name in data\" not the same\n            // name === \"phone[]\",\n            // data: { phone: [] } - name === \"phone\"\n            const name = input.name;\n\n            if (this.inputs[name]) {\n                if (Array.isArray(this.inputs[name])) {\n                    this.inputs[name].push(input);\n                } else {\n                    const groupInput = [this.inputs[name], input];\n                    groupInput.name = name;\n                    this.inputs[name] = groupInput;\n                }\n            } else {\n                this.inputs[name] = input;\n\n                let field = input.parentNode;\n\n                do {\n                    if (field.classList.contains(this.options.containers.parent)) {\n                        this.fields[name] = field;\n                        break;\n                    }\n\n                    field = field.parentNode;\n                } while (field);\n\n                if (!this.fields[name]) {\n                    throw new Error('Have no parent field');\n                }\n\n                this.fields[name].classList.add(this.options.states.pristine);\n\n                const messageElement = this.fields[name].querySelector(`.${this.options.containers.message}`);\n\n                if (messageElement) {\n                    this.messages[name] = messageElement;\n                } else {\n                    this.messages[name] = document.createElement('div');\n                    this.messages[name].classList.add(this.options.containers.message);\n                    this.fields[name].appendChild(this.messages[name]);\n                }\n\n                this.rules[name] = this.rules[name] || {};\n                const inputRules = getInputRules(input);\n                this.rules[name] = deepmerge(this.rules[name], inputRules);\n\n                Object.keys(this.rules[name]).forEach((rule) => {\n                    if (this.rules[name][rule]) {\n                        this.fields[name].classList.add(rule);\n                    }\n                });\n            }\n\n            input.addEventListener('change', () => {\n                this.fields[name].classList.remove(this.options.states.dirty);\n\n                const inputData = getInputData(input);\n                const value = getValueByName(name, inputData);\n\n                // fixme don't work with 2 inputs phone[]\n                this.data = {\n                    ...this.data,\n                    ...inputData,\n                };\n\n                const errors = validateField(\n                    this.rules[name],\n                    this.methods,\n                    value,\n                    input.name,\n                    this.errorMessages,\n                );\n\n                JediValidate.markField(\n                    this.fields[name],\n                    this.messages[name],\n                    this.options.states,\n                    errors,\n                );\n            });\n\n            input.addEventListener('input', () => {\n                this.fields[name].classList.remove(this.options.states.pristine);\n                this.fields[name].classList.add(this.options.states.dirty);\n            });\n        });\n    }\n\n    /**\n     * Send form\n     * @param {object} options - object with options for sending\n     * @param {string} options.url\n     * @param {string} options.enctype\n     * @param {string} options.sendType\n     * @param {string} options.method\n     * @param {string|FormData} options.data\n     */\n    send(options) {\n        ajax(options).then((response) => {\n            if (response.validationErrors) {\n                try {\n                    this.options.callbacks.error(response.validationErrors);\n                } catch (e) {\n                    console.error(e);\n                }\n\n                if (response.validationErrors.base) {\n                    this.nodes.baseMessage.innerHTML = response.validationErrors.base.join(', ');\n                    this.root.classList.add(this.options.formStatePrefix + this.options.states.error); // eslint-disable-line max-len\n                    this.root.classList.remove(this.options.formStatePrefix + this.options.states.valid); // eslint-disable-line max-len\n                    delete response.validationErrors.base; // eslint-disable-line no-param-reassign\n                } else {\n                    this.nodes.baseMessage.innerHTML = '';\n                }\n\n                Object.keys(response.validationErrors).forEach(name =>\n                    JediValidate.markField(\n                        this.fields[name],\n                        this.messages[name],\n                        this.options.states,\n                        response.validationErrors[name],\n                    ),\n                );\n            } else {\n                try {\n                    this.options.callbacks.success(response);\n                } catch (e) {\n                    console.error(e);\n                }\n\n                if (this.options.redirect && response.redirect) {\n                    window.location.href = response.redirect;\n                    return;\n                }\n\n                if (this.options.clean) {\n                    this.nodes.form.reset();\n                }\n            }\n        }).catch(({ method, url, status, statusText }) => {\n            console.warn(`${method} ${url} ${status} (${statusText})`);\n\n            this.nodes.baseMessage.innerHTML = translate('Can not send form!', this.options.language);\n            this.root.classList.add(this.options.formStatePrefix + this.options.states.error); // eslint-disable-line max-len\n            this.root.classList.remove(this.options.formStatePrefix + this.options.states.valid); // eslint-disable-line max-len\n        });\n    }\n\n    /**\n     *\n     * @param {Element} field\n     * @param message\n     * @param states\n     * @param errors\n     */\n    static markField(field, message, states, errors) {\n        if (errors && errors.length) {\n            JediValidate.markError(field, message, states, errors);\n        } else {\n            JediValidate.markValid(field, message, states);\n        }\n    }\n\n    /**\n     *\n     * @param {Element} field\n     * @param {Element} message\n     * @param {string} error\n     * @param {string} valid\n     * @param {Array.<string>} errors\n     */\n    static markError(field, message, { error, valid }, errors) {\n        if (!field || !message) {\n            return;\n        }\n\n        field.classList.add(error);\n        field.classList.remove(valid);\n\n        message.innerHTML = errors.join(', '); // eslint-disable-line no-param-reassign\n    }\n\n    /**\n     *\n     * @param {Element} field\n     * @param {Element} message\n     * @param {string} error\n     * @param {string} valid\n     */\n    static markValid(field, message, { error, valid }) {\n        if (!field || !message) {\n            return;\n        }\n\n        field.classList.add(valid);\n        field.classList.remove(error);\n\n        message.innerHTML = ''; // eslint-disable-line no-param-reassign\n    }\n\n    /**\n     * Add rule to validator\n     * @param {string} rule - rule name\n     * @param {Function} func - function\n     * @param {string} message - error message\n     */\n    addMethod(rule, func, message) {\n        this.methods[rule] = {\n            func,\n            message,\n        };\n    }\n\n    /**\n     * Init error messages\n     * @param {object} rules\n     * @param {object} messages\n     * @param {object} methods\n     * @param {string} language\n     * @returns {Object.<string, Object.<string, string>>}\n     */\n    static initErrorMessages(rules, messages, methods, language) {\n        return Object.keys(rules).reduce((names, name) => ({\n            ...names,\n            [name]: Object.keys(rules[name]).reduce((ruleNames, method) => ({\n                ...ruleNames,\n                [method]: translate((messages[name] && messages[name][method]) || (methods[method] && methods[method].message) || '', language),\n            }), {}),\n        }), {});\n    }\n}\n\nmodule.exports = JediValidate;\n"
+    "content": "import deepmerge from 'deepmerge';\nimport { getData, getInputData, getValueByName } from './lib/get-data.es6';\nimport { convertData } from './lib/convert-data.es6';\nimport { addTranslation, translate } from './i18n/jedi-validate-i18n.es6';\nimport { getFormOptions, getInputRules } from './lib/get-options.es6';\nimport { validateData, validateField } from './lib/validate-data.es6';\nimport { ajax } from './lib/ajax.es6';\nimport defaultMethods from './lib/methods.es6';\n\nclass JediValidate {\n    /**\n     * Object with fields\n     * @type {Object.<string, Element>}\n     */\n    fields = {};\n    /**\n     * Object with inputs nodes\n     * @type {Object.<string, HTMLInputElement|HTMLSelectElement|Array>}\n     */\n    inputs = {};\n    /**\n     * Object with message nodes\n     * @type {Object.<string, Element>}\n     */\n    messages = {};\n    /**\n     * Object with error message\n     * @type {Object.<string, Object.<string, string>>}\n     */\n    errorMessages = {};\n    /**\n     * Object with error message\n     * @type {object} - data object\n     */\n    data = {};\n    /**\n     * Validate methods\n     * @type {Object.<string, {func: Function, message: string}>}\n     */\n    methods = { ...defaultMethods };\n    /**\n     * Validator options\n     * @type {{ajax: {url: string, enctype: string, sendType: string, method: string}, rules: {}, messages: {}, containers: {parent: string, message: string, baseMessage: string}, states: {error: string, valid: string, pristine: string, dirty: string}, formStatePrefix: string, callbacks: {success: (function(object)), error: (function(object.<string, Array.<string>>))}, clean: boolean, redirect: boolean, language: string, translations: {}}}\n     */\n    options = {};\n    /**\n     * Validator rules\n     * @type {object}\n     */\n    rules = {};\n\n    /**\n     * JediValidate\n     * @param {HTMLElement} root - element which wrap form element\n     * @param {object} options - object with options\n     */\n    constructor(root, options = {}) {\n        const defaultOptions = {\n            ajax: {\n                url: null,\n                enctype: 'application/x-www-form-urlencoded',\n                sendType: 'serialize', // 'serialize', 'formData', 'json'\n                method: 'GET',\n            },\n            rules: {},\n            messages: {},\n            containers: {\n                parent: 'form-group',\n                message: 'help-block',\n                baseMessage: 'base-error',\n            },\n            states: {\n                error: 'error',\n                valid: 'valid',\n                pristine: 'pristine',\n                dirty: 'dirty',\n            },\n            formStatePrefix: 'jedi-',\n            callbacks: {\n                success() {\n                },\n                error() {\n                },\n            },\n            clean: true,\n            redirect: true,\n            language: 'en',\n            translations: {},\n        };\n\n        this.root = root;\n\n        this.options = deepmerge(defaultOptions, options);\n\n        this.nodes = JediValidate.cacheNodes(this.root, this.options);\n\n        const formOptions = getFormOptions(this.nodes.form);\n\n        this.options = deepmerge(this.options, defaultOptions);\n        this.options = deepmerge(this.options, formOptions);\n        this.options = deepmerge(this.options, options);\n\n        this.rules = { ...this.options.rules };\n\n        // todo rewrite translations\n        Object.keys(this.options.translations).forEach((language) => {\n            Object.keys(this.options.translations[language]).forEach((translation) => {\n                addTranslation(\n                    translation,\n                    this.options.translations[language][translation],\n                    language,\n                );\n            });\n        });\n\n        this.ready();\n\n        this.errorMessages = JediValidate.initErrorMessages(\n            this.rules,\n            this.options.messages,\n            this.methods,\n            this.options.language,\n        );\n    }\n\n    /**\n     * Add localisation to JediValidate\n     * @param {string} sourceText - text on english\n     * @param {string} translatedText - text on needed language\n     * @param {string} language - language\n     */\n    static addToDictionary(sourceText, translatedText, language) {\n        addTranslation(sourceText, translatedText, language);\n    }\n\n    /**\n     * Return object with working elements\n     * @param root Root element for search\n     * @param options Object with selectors\n     * @returns {{form: Element, inputs: NodeList, baseMessage: Element}}\n     */\n    static cacheNodes(root, options) {\n        return {\n            form: root.querySelector('form'),\n            inputs: root.querySelectorAll('[name]'),\n            baseMessage: root.querySelector(`.${options.containers.baseMessage}`),\n        };\n    }\n\n    ready() {\n        this.nodes.form.setAttribute('novalidate', 'novalidate');\n\n        this.nodes.form.addEventListener('submit', (event) => {\n            event.preventDefault();\n            this.data = getData(this.inputs);\n\n            const errors = validateData(\n                this.rules,\n                this.methods,\n                this.data,\n                this.errorMessages,\n            );\n\n            if (errors && Object.keys(errors).filter(name => errors[name]).length !== 0) {\n                Object.keys(errors).forEach(name =>\n                    JediValidate.markField(\n                        this.fields[name],\n                        this.messages[name],\n                        this.options.states,\n                        errors[name],\n                    ),\n                );\n\n                try {\n                    this.options.callbacks.error(errors);\n                } catch (e) {\n                    console.error(e);\n                }\n\n                event.preventDefault();\n                return;\n            }\n\n            if (this.options.ajax && this.options.ajax.url) {\n                event.preventDefault();\n            } else {\n                try {\n                    this.options.callbacks.success(null);\n                } catch (e) {\n                    console.error(e);\n                }\n\n                return;\n            }\n\n            const convertedData = convertData(this.data, this.options.ajax.sendType);\n            this.send({\n                ...this.options.ajax,\n                data: convertedData,\n            });\n        });\n\n        this.nodes.inputs.forEach((input) => {\n            // fixme \"name\" and \"name in data\" not the same\n            // name === \"phone[]\",\n            // data: { phone: [] } - name === \"phone\"\n            const name = input.name;\n\n            if (this.inputs[name]) {\n                if (Array.isArray(this.inputs[name])) {\n                    this.inputs[name].push(input);\n                } else {\n                    const groupInput = [this.inputs[name], input];\n                    groupInput.name = name;\n                    this.inputs[name] = groupInput;\n                }\n            } else {\n                this.inputs[name] = input;\n\n                let field = input.parentNode;\n\n                do {\n                    if (field.classList.contains(this.options.containers.parent)) {\n                        this.fields[name] = field;\n                        break;\n                    }\n\n                    field = field.parentNode;\n                } while (field);\n\n                if (!this.fields[name]) {\n                    throw new Error('Have no parent field');\n                }\n\n                this.fields[name].classList.add(this.options.states.pristine);\n\n                const messageElement = this.fields[name].querySelector(`.${this.options.containers.message}`);\n\n                if (messageElement) {\n                    this.messages[name] = messageElement;\n                } else {\n                    this.messages[name] = document.createElement('div');\n                    this.messages[name].classList.add(this.options.containers.message);\n                    this.fields[name].appendChild(this.messages[name]);\n                }\n\n                this.rules[name] = this.rules[name] || {};\n                const inputRules = getInputRules(input);\n                this.rules[name] = deepmerge(inputRules, this.rules[name]);\n\n                Object.keys(this.rules[name]).forEach((rule) => {\n                    if (this.rules[name][rule]) {\n                        this.fields[name].classList.add(rule);\n                    }\n                });\n            }\n\n            input.addEventListener('change', () => {\n                this.fields[name].classList.remove(this.options.states.dirty);\n\n                const inputData = getInputData(input);\n                const value = getValueByName(name, inputData);\n\n                // fixme don't work with 2 inputs phone[]\n                this.data = {\n                    ...this.data,\n                    ...inputData,\n                };\n\n                const errors = validateField(\n                    this.rules[name],\n                    this.methods,\n                    value,\n                    name,\n                    this.errorMessages,\n                    this.data,\n                );\n\n                JediValidate.markField(\n                    this.fields[name],\n                    this.messages[name],\n                    this.options.states,\n                    errors,\n                );\n            });\n\n            input.addEventListener('input', () => {\n                this.fields[name].classList.remove(this.options.states.pristine);\n                this.fields[name].classList.add(this.options.states.dirty);\n            });\n        });\n    }\n\n    /**\n     * Send form\n     * @param {object} options - object with options for sending\n     * @param {string} options.url\n     * @param {string} options.enctype\n     * @param {string} options.sendType\n     * @param {string} options.method\n     * @param {string|FormData} options.data\n     */\n    send(options) {\n        ajax(options).then((response) => {\n            if (response.validationErrors) {\n                try {\n                    this.options.callbacks.error(response.validationErrors);\n                } catch (e) {\n                    console.error(e);\n                }\n\n                if (response.validationErrors.base) {\n                    this.nodes.baseMessage.innerHTML = response.validationErrors.base.join(', ');\n                    this.root.classList.add(this.options.formStatePrefix + this.options.states.error); // eslint-disable-line max-len\n                    this.root.classList.remove(this.options.formStatePrefix + this.options.states.valid); // eslint-disable-line max-len\n                    delete response.validationErrors.base; // eslint-disable-line no-param-reassign\n                } else {\n                    this.nodes.baseMessage.innerHTML = '';\n                }\n\n                Object.keys(response.validationErrors).forEach(name =>\n                    JediValidate.markField(\n                        this.fields[name],\n                        this.messages[name],\n                        this.options.states,\n                        response.validationErrors[name],\n                    ),\n                );\n            } else {\n                try {\n                    this.options.callbacks.success(response);\n                } catch (e) {\n                    console.error(e);\n                }\n\n                if (this.options.redirect && response.redirect) {\n                    window.location.href = response.redirect;\n                    return;\n                }\n\n                if (this.options.clean) {\n                    this.nodes.form.reset();\n                }\n            }\n        }).catch(({ method, url, status, statusText }) => {\n            console.warn(`${method} ${url} ${status} (${statusText})`);\n\n            this.nodes.baseMessage.innerHTML = translate('Can not send form!', this.options.language);\n            this.root.classList.add(this.options.formStatePrefix + this.options.states.error); // eslint-disable-line max-len\n            this.root.classList.remove(this.options.formStatePrefix + this.options.states.valid); // eslint-disable-line max-len\n        });\n    }\n\n    /**\n     *\n     * @param {Element} field\n     * @param message\n     * @param states\n     * @param errors\n     */\n    static markField(field, message, states, errors) {\n        if (errors && errors.length) {\n            JediValidate.markError(field, message, states, errors);\n        } else {\n            JediValidate.markValid(field, message, states);\n        }\n    }\n\n    /**\n     *\n     * @param {Element} field\n     * @param {Element} message\n     * @param {string} error\n     * @param {string} valid\n     * @param {Array.<string>} errors\n     */\n    static markError(field, message, { error, valid }, errors) {\n        if (!field || !message) {\n            return;\n        }\n\n        field.classList.add(error);\n        field.classList.remove(valid);\n\n        message.innerHTML = errors.join(', '); // eslint-disable-line no-param-reassign\n    }\n\n    /**\n     *\n     * @param {Element} field\n     * @param {Element} message\n     * @param {string} error\n     * @param {string} valid\n     */\n    static markValid(field, message, { error, valid }) {\n        if (!field || !message) {\n            return;\n        }\n\n        field.classList.add(valid);\n        field.classList.remove(error);\n\n        message.innerHTML = ''; // eslint-disable-line no-param-reassign\n    }\n\n    /**\n     * Add rule to validator\n     * @param {string} rule - rule name\n     * @param {Function} func - function\n     * @param {string} message - error message\n     */\n    addMethod(rule, func, message) {\n        this.methods[rule] = {\n            func,\n            message,\n        };\n    }\n\n    /**\n     * Init error messages\n     * @param {object} rules\n     * @param {object} messages\n     * @param {object} methods\n     * @param {string} language\n     * @returns {Object.<string, Object.<string, string>>}\n     */\n    static initErrorMessages(rules, messages, methods, language) {\n        return Object.keys(rules).reduce((names, name) => ({\n            ...names,\n            [name]: Object.keys(rules[name]).reduce((ruleNames, method) => ({\n                ...ruleNames,\n                [method]: translate((messages[name] && messages[name][method]) || (methods[method] && methods[method].message) || '', language),\n            }), {}),\n        }), {});\n    }\n}\n\nmodule.exports = JediValidate;\n"
   },
   {
     "__docId__": 6,
@@ -182,7 +182,7 @@
     "importPath": "jedi-validate/src/jedi-validate.es6",
     "importStyle": null,
     "description": null,
-    "lineNumber": 9,
+    "lineNumber": 10,
     "undocument": true,
     "interface": false
   },
@@ -196,7 +196,7 @@
     "longname": "src/jedi-validate.es6~JediValidate#constructor",
     "access": null,
     "description": "JediValidate",
-    "lineNumber": 55,
+    "lineNumber": 57,
     "params": [
       {
         "nullable": null,
@@ -231,7 +231,7 @@
     "longname": "src/jedi-validate.es6~JediValidate#root",
     "access": null,
     "description": null,
-    "lineNumber": 89,
+    "lineNumber": 91,
     "undocument": true,
     "type": {
       "types": [
@@ -249,7 +249,7 @@
     "longname": "src/jedi-validate.es6~JediValidate#options",
     "access": null,
     "description": null,
-    "lineNumber": 91,
+    "lineNumber": 93,
     "undocument": true,
     "type": {
       "types": [
@@ -267,7 +267,7 @@
     "longname": "src/jedi-validate.es6~JediValidate#nodes",
     "access": null,
     "description": null,
-    "lineNumber": 93,
+    "lineNumber": 95,
     "undocument": true,
     "type": {
       "types": [
@@ -285,7 +285,7 @@
     "longname": "src/jedi-validate.es6~JediValidate#options",
     "access": null,
     "description": null,
-    "lineNumber": 97,
+    "lineNumber": 99,
     "undocument": true,
     "type": {
       "types": [
@@ -303,7 +303,7 @@
     "longname": "src/jedi-validate.es6~JediValidate#options",
     "access": null,
     "description": null,
-    "lineNumber": 98,
+    "lineNumber": 100,
     "undocument": true,
     "type": {
       "types": [
@@ -321,7 +321,7 @@
     "longname": "src/jedi-validate.es6~JediValidate#options",
     "access": null,
     "description": null,
-    "lineNumber": 99,
+    "lineNumber": 101,
     "undocument": true,
     "type": {
       "types": [
@@ -339,7 +339,7 @@
     "longname": "src/jedi-validate.es6~JediValidate#rules",
     "access": null,
     "description": null,
-    "lineNumber": 101,
+    "lineNumber": 103,
     "undocument": true,
     "type": {
       "types": [
@@ -357,7 +357,7 @@
     "longname": "src/jedi-validate.es6~JediValidate#errorMessages",
     "access": null,
     "description": null,
-    "lineNumber": 116,
+    "lineNumber": 118,
     "undocument": true,
     "type": {
       "types": [
@@ -375,7 +375,7 @@
     "longname": "src/jedi-validate.es6~JediValidate.addToDictionary",
     "access": null,
     "description": "Add localisation to JediValidate",
-    "lineNumber": 130,
+    "lineNumber": 132,
     "params": [
       {
         "nullable": null,
@@ -420,7 +420,7 @@
     "longname": "src/jedi-validate.es6~JediValidate.cacheNodes",
     "access": null,
     "description": "Return object with working elements",
-    "lineNumber": 140,
+    "lineNumber": 142,
     "unknown": [
       {
         "tagName": "@returns",
@@ -469,7 +469,7 @@
     "longname": "src/jedi-validate.es6~JediValidate#ready",
     "access": null,
     "description": null,
-    "lineNumber": 148,
+    "lineNumber": 150,
     "undocument": true,
     "params": [],
     "generator": false
@@ -484,7 +484,7 @@
     "longname": "src/jedi-validate.es6~JediValidate#data",
     "access": null,
     "description": null,
-    "lineNumber": 153,
+    "lineNumber": 155,
     "undocument": true,
     "type": {
       "types": [
@@ -502,7 +502,7 @@
     "longname": "src/jedi-validate.es6~JediValidate#data",
     "access": null,
     "description": null,
-    "lineNumber": 263,
+    "lineNumber": 265,
     "undocument": true,
     "type": {
       "types": [
@@ -520,7 +520,7 @@
     "longname": "src/jedi-validate.es6~JediValidate#send",
     "access": null,
     "description": "Send form",
-    "lineNumber": 300,
+    "lineNumber": 303,
     "params": [
       {
         "nullable": null,
@@ -596,7 +596,7 @@
     "longname": "src/jedi-validate.es6~JediValidate.markField",
     "access": null,
     "description": "",
-    "lineNumber": 358,
+    "lineNumber": 361,
     "params": [
       {
         "nullable": null,
@@ -651,7 +651,7 @@
     "longname": "src/jedi-validate.es6~JediValidate.markError",
     "access": null,
     "description": "",
-    "lineNumber": 374,
+    "lineNumber": 377,
     "params": [
       {
         "nullable": null,
@@ -716,7 +716,7 @@
     "longname": "src/jedi-validate.es6~JediValidate.markValid",
     "access": null,
     "description": "",
-    "lineNumber": 392,
+    "lineNumber": 395,
     "params": [
       {
         "nullable": null,
@@ -771,7 +771,7 @@
     "longname": "src/jedi-validate.es6~JediValidate#addMethod",
     "access": null,
     "description": "Add rule to validator",
-    "lineNumber": 409,
+    "lineNumber": 412,
     "params": [
       {
         "nullable": null,
@@ -816,7 +816,7 @@
     "longname": "src/jedi-validate.es6~JediValidate.initErrorMessages",
     "access": null,
     "description": "Init error messages",
-    "lineNumber": 424,
+    "lineNumber": 427,
     "unknown": [
       {
         "tagName": "@returns",
@@ -935,458 +935,28 @@
     "kind": "file",
     "static": true,
     "variation": null,
-    "name": "src/lib/get-data.es6",
+    "name": "src/lib/convert-data.es6",
     "memberof": null,
-    "longname": "src/lib/get-data.es6",
+    "longname": "src/lib/convert-data.es6",
     "access": null,
     "description": null,
     "lineNumber": 1,
-    "content": "import deepmerge from 'deepmerge';\n\n/**\n * Create object by path and value\n * @param {Array} path - path array\n * @param {string|FileList} value - value on input\n * @returns {object} - data object\n */\nexport function createObject(path, value) {\n    const segment = path[0];\n\n    if (segment.length === 0) {\n        return value;\n    } else if (segment === '[]') {\n        return [createObject(path.slice(1), value)];\n    }\n\n    return { [segment]: createObject(path.slice(1), value) };\n}\n\n/**\n * Name regexp for conversion to path\n * @type {RegExp}\n */\nconst NAME = /(\\[(\\w*)\\]|\\w*)/gi;\n\n/**\n * Convert name of input to path array\n * @param {string} name - name of input\n * @returns {Array} - path to value in data object\n */\nexport function convertNameToPath(name) {\n    const path = [];\n\n    let matches = NAME.exec(name);\n    while (matches !== null) {\n        if (matches.index === NAME.lastIndex) {\n            NAME.lastIndex += 1;\n        }\n\n        path.push(matches[2] || matches[1]);\n\n        matches = NAME.exec(name);\n    }\n\n    return path;\n}\n\n/**\n * Get value from data object by path\n * @param {Array} path - value path\n * @param {object} data - data object\n * @returns {string} - value\n */\nexport function getValueByPath(path, data) {\n    return path.reduce((value, segment) => (segment && value ? value[segment] : value), data || '');\n}\n\n/**\n * Get value from data object by name\n * @param {string} name - input name\n * @param {object} data - data object\n */\nexport function getValueByName(name, data) {\n    const path = convertNameToPath(name);\n    return getValueByPath(path, data);\n}\n\n/**\n * Get value from radio group\n * @param {Array} inputs - array of radio inputs\n * @returns {string|Array.<string>} - value of checked input\n */\nexport function getRadioGroupValue(inputs) {\n    const values = [...inputs].map(radio => getInputValue(radio)).filter(Boolean);\n\n    return values.length > 1 ? values : values[0];\n}\n\n/**\n * Get value form input\n * @param {HTMLInputElement|HTMLSelectElement|Array} input - input element or array of HTMLInputElements\n * @returns {string|FileList|Array} - value of input, or array of value if input is select\n */\nexport function getInputValue(input) {\n    if (!input) return '';\n\n    const { type } = input;\n\n    if (Array.isArray(input)) {\n        return getRadioGroupValue(input);\n    }\n\n    switch (type) {\n    case 'select-one':\n        return input.options.length ? input.options[input.selectedIndex].value : '';\n    case 'select-multiple':\n        return [...input.options].filter(option => option.selected).map(option => option.value);\n    case 'checkbox':\n    case 'radio':\n        return input.checked ? input.value : '';\n    case 'file':\n        return input.files;\n    default:\n        return input.value;\n    }\n}\n\n/**\n * Get name from input or array of inputs\n * @param {HTMLInputElement|Array} input - input element or Array of HTMLInputElements\n * @returns {string} - input name\n */\nexport function getInputName(input) {\n    return Array.isArray(input) ? input[0].name : input.name;\n}\n\n/**\n * Get object which key is name of input and value is value of input\n * @param {HTMLInputElement|Array} input - input element or Array of HTMLInputElements\n * @returns {object} - data\n */\nexport function getInputData(input) {\n    const value = getInputValue(input);\n    const name = getInputName(input);\n    const path = convertNameToPath(name);\n\n    return createObject(path, value);\n}\n\n/**\n * Get data object with values from inputs object\n * @param {object} inputs - inputs object\n * @returns {object} - data object\n */\nexport function getData(inputs) {\n    return Object.keys(inputs).reduce(\n        (data, name) => deepmerge(data, getInputData(inputs[name])),\n        {},\n    );\n}\n\n/**\n * Create part url for serialize method\n * @param {string} name\n * @param {object|Array|string} data\n * @returns {string} - part of url\n */\nexport function getQueryPart(name, data) {\n    if (Array.isArray(data)) {\n        return data.reduce((part, index) => part + getQueryPart(`${name}[${index}]`, data[index]), '');\n    } else if (typeof data === 'object') {\n        return Object.keys(data).reduce((part, index) => part + getQueryPart(`${name}[${index}]`, data[index]), '');\n    }\n\n    return `${name}=${encodeURIComponent(data)}&`;\n}\n\n/**\n * Convert data object to value for sending\n * @param {object} data - data object\n * @param {string} type - type of conversion\n * @returns {string|FormData} - output value\n */\nexport function convertData(data, type) {\n    let convertedData;\n\n    switch (type) {\n    case 'serialize':\n        convertedData = Object.keys(data)\n                .reduce((query, name) => `${query}${getQueryPart(name, data[name])}`, '');\n        return convertedData.length ? convertedData.slice(0, -1) : '';\n    case 'formData':\n        return Object.keys(data).reduce((formData, name) => {\n            if (data[name] instanceof FileList) {\n                if (data[name].length > 1) {\n                    for (let i = 0; i < data[name].length; i += 1) {\n                        formData.append(`${name}[${i}]`, data[name][i]);\n                    }\n                } else if (data[name].length === 1) {\n                    formData.append(name, data[name][0]);\n                }\n            } else if (typeof data[name] === 'object') {\n                Object.keys(data[name]).forEach(key => formData.append(`${name}[${key}]`, data[name][key]));\n            } else {\n                formData.append(name, data[name]);\n            }\n\n            return formData;\n        }, new FormData());\n    case 'json':\n    default:\n        return JSON.stringify(data);\n    }\n}\n"
+    "content": "/**\n * Create part url for serialize method\n * @param {string} name\n * @param {object|Array|string} data\n * @returns {string} - part of url\n */\nexport function getQueryPart(name, data) {\n    if (Array.isArray(data)) {\n        return data.reduce((part, index) => part + getQueryPart(`${name}[${index}]`, data[index]), '');\n    } else if (typeof data === 'object') {\n        return Object.keys(data).reduce((part, index) => part + getQueryPart(`${name}[${index}]`, data[index]), '');\n    }\n\n    return `${name}=${encodeURIComponent(data)}&`;\n}\n\n/**\n * Name regexp for conversion to path\n * @type {RegExp}\n */\nconst NAME = /(\\[(\\w*)\\]|\\w*)/gi;\n\n/**\n * Convert name of input to path array\n * @param {string} name - name of input\n * @returns {Array} - path to value in data object\n */\nexport function convertNameToPath(name) {\n    const path = [];\n\n    let matches = NAME.exec(name);\n    while (matches !== null) {\n        if (matches.index === NAME.lastIndex) {\n            NAME.lastIndex += 1;\n        }\n\n        path.push(matches[2] || matches[1]);\n\n        matches = NAME.exec(name);\n    }\n\n    return path;\n}\n\n/**\n * Convert data object to value for sending\n * @param {object} data - data object\n * @param {string} type - type of conversion\n * @returns {string|FormData} - output value\n */\nexport function convertData(data, type) {\n    let convertedData;\n\n    switch (type) {\n    case 'serialize':\n        convertedData = Object.keys(data)\n                .reduce((query, name) => `${query}${getQueryPart(name, data[name])}`, '');\n        return convertedData.length ? convertedData.slice(0, -1) : '';\n    case 'formData':\n        return Object.keys(data).reduce((formData, name) => {\n            if (data[name] instanceof FileList) {\n                if (data[name].length > 1) {\n                    for (let i = 0; i < data[name].length; i += 1) {\n                        formData.append(`${name}[${i}]`, data[name][i]);\n                    }\n                } else if (data[name].length === 1) {\n                    formData.append(name, data[name][0]);\n                }\n            } else if (typeof data[name] === 'object') {\n                Object.keys(data[name]).forEach(key => formData.append(`${name}[${key}]`, data[name][key]));\n            } else {\n                formData.append(name, data[name]);\n            }\n\n            return formData;\n        }, new FormData());\n    case 'json':\n    default:\n        return JSON.stringify(data);\n    }\n}\n"
   },
   {
     "__docId__": 30,
     "kind": "function",
     "static": true,
     "variation": null,
-    "name": "createObject",
-    "memberof": "src/lib/get-data.es6",
-    "longname": "src/lib/get-data.es6~createObject",
-    "access": null,
-    "export": true,
-    "importPath": "jedi-validate/src/lib/get-data.es6",
-    "importStyle": "{createObject}",
-    "description": "Create object by path and value",
-    "lineNumber": 9,
-    "unknown": [
-      {
-        "tagName": "@returns",
-        "tagValue": "{object} - data object"
-      }
-    ],
-    "params": [
-      {
-        "nullable": null,
-        "types": [
-          "Array"
-        ],
-        "spread": false,
-        "optional": false,
-        "name": "path",
-        "description": "path array"
-      },
-      {
-        "nullable": null,
-        "types": [
-          "string",
-          "FileList"
-        ],
-        "spread": false,
-        "optional": false,
-        "name": "value",
-        "description": "value on input"
-      }
-    ],
-    "return": {
-      "nullable": null,
-      "types": [
-        "object"
-      ],
-      "spread": false,
-      "description": "data object"
-    },
-    "generator": false
-  },
-  {
-    "__docId__": 31,
-    "kind": "variable",
-    "static": true,
-    "variation": null,
-    "name": "NAME",
-    "memberof": "src/lib/get-data.es6",
-    "longname": "src/lib/get-data.es6~NAME",
-    "access": null,
-    "export": false,
-    "importPath": "jedi-validate/src/lib/get-data.es6",
-    "importStyle": null,
-    "description": "Name regexp for conversion to path",
-    "lineNumber": 25,
-    "type": {
-      "nullable": null,
-      "types": [
-        "RegExp"
-      ],
-      "spread": false,
-      "description": null
-    }
-  },
-  {
-    "__docId__": 32,
-    "kind": "function",
-    "static": true,
-    "variation": null,
-    "name": "convertNameToPath",
-    "memberof": "src/lib/get-data.es6",
-    "longname": "src/lib/get-data.es6~convertNameToPath",
-    "access": null,
-    "export": true,
-    "importPath": "jedi-validate/src/lib/get-data.es6",
-    "importStyle": "{convertNameToPath}",
-    "description": "Convert name of input to path array",
-    "lineNumber": 32,
-    "unknown": [
-      {
-        "tagName": "@returns",
-        "tagValue": "{Array} - path to value in data object"
-      }
-    ],
-    "params": [
-      {
-        "nullable": null,
-        "types": [
-          "string"
-        ],
-        "spread": false,
-        "optional": false,
-        "name": "name",
-        "description": "name of input"
-      }
-    ],
-    "return": {
-      "nullable": null,
-      "types": [
-        "Array"
-      ],
-      "spread": false,
-      "description": "path to value in data object"
-    },
-    "generator": false
-  },
-  {
-    "__docId__": 33,
-    "kind": "function",
-    "static": true,
-    "variation": null,
-    "name": "getValueByPath",
-    "memberof": "src/lib/get-data.es6",
-    "longname": "src/lib/get-data.es6~getValueByPath",
-    "access": null,
-    "export": true,
-    "importPath": "jedi-validate/src/lib/get-data.es6",
-    "importStyle": "{getValueByPath}",
-    "description": "Get value from data object by path",
-    "lineNumber": 55,
-    "unknown": [
-      {
-        "tagName": "@returns",
-        "tagValue": "{string} - value"
-      }
-    ],
-    "params": [
-      {
-        "nullable": null,
-        "types": [
-          "Array"
-        ],
-        "spread": false,
-        "optional": false,
-        "name": "path",
-        "description": "value path"
-      },
-      {
-        "nullable": null,
-        "types": [
-          "object"
-        ],
-        "spread": false,
-        "optional": false,
-        "name": "data",
-        "description": "data object"
-      }
-    ],
-    "return": {
-      "nullable": null,
-      "types": [
-        "string"
-      ],
-      "spread": false,
-      "description": "value"
-    },
-    "generator": false
-  },
-  {
-    "__docId__": 34,
-    "kind": "function",
-    "static": true,
-    "variation": null,
-    "name": "getValueByName",
-    "memberof": "src/lib/get-data.es6",
-    "longname": "src/lib/get-data.es6~getValueByName",
-    "access": null,
-    "export": true,
-    "importPath": "jedi-validate/src/lib/get-data.es6",
-    "importStyle": "{getValueByName}",
-    "description": "Get value from data object by name",
-    "lineNumber": 64,
-    "params": [
-      {
-        "nullable": null,
-        "types": [
-          "string"
-        ],
-        "spread": false,
-        "optional": false,
-        "name": "name",
-        "description": "input name"
-      },
-      {
-        "nullable": null,
-        "types": [
-          "object"
-        ],
-        "spread": false,
-        "optional": false,
-        "name": "data",
-        "description": "data object"
-      }
-    ],
-    "return": {
-      "types": [
-        "*"
-      ]
-    },
-    "generator": false
-  },
-  {
-    "__docId__": 35,
-    "kind": "function",
-    "static": true,
-    "variation": null,
-    "name": "getRadioGroupValue",
-    "memberof": "src/lib/get-data.es6",
-    "longname": "src/lib/get-data.es6~getRadioGroupValue",
-    "access": null,
-    "export": true,
-    "importPath": "jedi-validate/src/lib/get-data.es6",
-    "importStyle": "{getRadioGroupValue}",
-    "description": "Get value from radio group",
-    "lineNumber": 74,
-    "unknown": [
-      {
-        "tagName": "@returns",
-        "tagValue": "{string|Array.<string>} - value of checked input"
-      }
-    ],
-    "params": [
-      {
-        "nullable": null,
-        "types": [
-          "Array"
-        ],
-        "spread": false,
-        "optional": false,
-        "name": "inputs",
-        "description": "array of radio inputs"
-      }
-    ],
-    "return": {
-      "nullable": null,
-      "types": [
-        "string",
-        "Array.<string>"
-      ],
-      "spread": false,
-      "description": "value of checked input"
-    },
-    "generator": false
-  },
-  {
-    "__docId__": 36,
-    "kind": "function",
-    "static": true,
-    "variation": null,
-    "name": "getInputValue",
-    "memberof": "src/lib/get-data.es6",
-    "longname": "src/lib/get-data.es6~getInputValue",
-    "access": null,
-    "export": true,
-    "importPath": "jedi-validate/src/lib/get-data.es6",
-    "importStyle": "{getInputValue}",
-    "description": "Get value form input",
-    "lineNumber": 85,
-    "unknown": [
-      {
-        "tagName": "@returns",
-        "tagValue": "{string|FileList|Array} - value of input, or array of value if input is select"
-      }
-    ],
-    "params": [
-      {
-        "nullable": null,
-        "types": [
-          "HTMLInputElement",
-          "HTMLSelectElement",
-          "Array"
-        ],
-        "spread": false,
-        "optional": false,
-        "name": "input",
-        "description": "input element or array of HTMLInputElements"
-      }
-    ],
-    "return": {
-      "nullable": null,
-      "types": [
-        "string",
-        "FileList",
-        "Array"
-      ],
-      "spread": false,
-      "description": "value of input, or array of value if input is select"
-    },
-    "generator": false
-  },
-  {
-    "__docId__": 37,
-    "kind": "function",
-    "static": true,
-    "variation": null,
-    "name": "getInputName",
-    "memberof": "src/lib/get-data.es6",
-    "longname": "src/lib/get-data.es6~getInputName",
-    "access": null,
-    "export": true,
-    "importPath": "jedi-validate/src/lib/get-data.es6",
-    "importStyle": "{getInputName}",
-    "description": "Get name from input or array of inputs",
-    "lineNumber": 114,
-    "unknown": [
-      {
-        "tagName": "@returns",
-        "tagValue": "{string} - input name"
-      }
-    ],
-    "params": [
-      {
-        "nullable": null,
-        "types": [
-          "HTMLInputElement",
-          "Array"
-        ],
-        "spread": false,
-        "optional": false,
-        "name": "input",
-        "description": "input element or Array of HTMLInputElements"
-      }
-    ],
-    "return": {
-      "nullable": null,
-      "types": [
-        "string"
-      ],
-      "spread": false,
-      "description": "input name"
-    },
-    "generator": false
-  },
-  {
-    "__docId__": 38,
-    "kind": "function",
-    "static": true,
-    "variation": null,
-    "name": "getInputData",
-    "memberof": "src/lib/get-data.es6",
-    "longname": "src/lib/get-data.es6~getInputData",
-    "access": null,
-    "export": true,
-    "importPath": "jedi-validate/src/lib/get-data.es6",
-    "importStyle": "{getInputData}",
-    "description": "Get object which key is name of input and value is value of input",
-    "lineNumber": 123,
-    "unknown": [
-      {
-        "tagName": "@returns",
-        "tagValue": "{object} - data"
-      }
-    ],
-    "params": [
-      {
-        "nullable": null,
-        "types": [
-          "HTMLInputElement",
-          "Array"
-        ],
-        "spread": false,
-        "optional": false,
-        "name": "input",
-        "description": "input element or Array of HTMLInputElements"
-      }
-    ],
-    "return": {
-      "nullable": null,
-      "types": [
-        "object"
-      ],
-      "spread": false,
-      "description": "data"
-    },
-    "generator": false
-  },
-  {
-    "__docId__": 39,
-    "kind": "function",
-    "static": true,
-    "variation": null,
-    "name": "getData",
-    "memberof": "src/lib/get-data.es6",
-    "longname": "src/lib/get-data.es6~getData",
-    "access": null,
-    "export": true,
-    "importPath": "jedi-validate/src/lib/get-data.es6",
-    "importStyle": "{getData}",
-    "description": "Get data object with values from inputs object",
-    "lineNumber": 136,
-    "unknown": [
-      {
-        "tagName": "@returns",
-        "tagValue": "{object} - data object"
-      }
-    ],
-    "params": [
-      {
-        "nullable": null,
-        "types": [
-          "object"
-        ],
-        "spread": false,
-        "optional": false,
-        "name": "inputs",
-        "description": "inputs object"
-      }
-    ],
-    "return": {
-      "nullable": null,
-      "types": [
-        "object"
-      ],
-      "spread": false,
-      "description": "data object"
-    },
-    "generator": false
-  },
-  {
-    "__docId__": 40,
-    "kind": "function",
-    "static": true,
-    "variation": null,
     "name": "getQueryPart",
-    "memberof": "src/lib/get-data.es6",
-    "longname": "src/lib/get-data.es6~getQueryPart",
+    "memberof": "src/lib/convert-data.es6",
+    "longname": "src/lib/convert-data.es6~getQueryPart",
     "access": null,
     "export": true,
-    "importPath": "jedi-validate/src/lib/get-data.es6",
+    "importPath": "jedi-validate/src/lib/convert-data.es6",
     "importStyle": "{getQueryPart}",
     "description": "Create part url for serialize method",
-    "lineNumber": 149,
+    "lineNumber": 7,
     "unknown": [
       {
         "tagName": "@returns",
@@ -1428,19 +998,84 @@
     "generator": false
   },
   {
-    "__docId__": 41,
+    "__docId__": 31,
+    "kind": "variable",
+    "static": true,
+    "variation": null,
+    "name": "NAME",
+    "memberof": "src/lib/convert-data.es6",
+    "longname": "src/lib/convert-data.es6~NAME",
+    "access": null,
+    "export": false,
+    "importPath": "jedi-validate/src/lib/convert-data.es6",
+    "importStyle": null,
+    "description": "Name regexp for conversion to path",
+    "lineNumber": 21,
+    "type": {
+      "nullable": null,
+      "types": [
+        "RegExp"
+      ],
+      "spread": false,
+      "description": null
+    }
+  },
+  {
+    "__docId__": 32,
+    "kind": "function",
+    "static": true,
+    "variation": null,
+    "name": "convertNameToPath",
+    "memberof": "src/lib/convert-data.es6",
+    "longname": "src/lib/convert-data.es6~convertNameToPath",
+    "access": null,
+    "export": true,
+    "importPath": "jedi-validate/src/lib/convert-data.es6",
+    "importStyle": "{convertNameToPath}",
+    "description": "Convert name of input to path array",
+    "lineNumber": 28,
+    "unknown": [
+      {
+        "tagName": "@returns",
+        "tagValue": "{Array} - path to value in data object"
+      }
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "name",
+        "description": "name of input"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "Array"
+      ],
+      "spread": false,
+      "description": "path to value in data object"
+    },
+    "generator": false
+  },
+  {
+    "__docId__": 33,
     "kind": "function",
     "static": true,
     "variation": null,
     "name": "convertData",
-    "memberof": "src/lib/get-data.es6",
-    "longname": "src/lib/get-data.es6~convertData",
+    "memberof": "src/lib/convert-data.es6",
+    "longname": "src/lib/convert-data.es6~convertData",
     "access": null,
     "export": true,
-    "importPath": "jedi-validate/src/lib/get-data.es6",
+    "importPath": "jedi-validate/src/lib/convert-data.es6",
     "importStyle": "{convertData}",
     "description": "Convert data object to value for sending",
-    "lineNumber": 165,
+    "lineNumber": 51,
     "unknown": [
       {
         "tagName": "@returns",
@@ -1481,7 +1116,385 @@
     "generator": false
   },
   {
+    "__docId__": 34,
+    "kind": "file",
+    "static": true,
+    "variation": null,
+    "name": "src/lib/get-data.es6",
+    "memberof": null,
+    "longname": "src/lib/get-data.es6",
+    "access": null,
+    "description": null,
+    "lineNumber": 1,
+    "content": "import deepmerge from 'deepmerge';\n\nimport { convertNameToPath } from './convert-data.es6';\n\n/**\n * Create object by path and value\n * @param {Array} path - path array\n * @param {string|FileList} value - value on input\n * @returns {object} - data object\n */\nexport function createObject(path, value) {\n    const segment = path[0];\n\n    if (segment.length === 0) {\n        return value;\n    } else if (segment === '[]') {\n        return [createObject(path.slice(1), value)];\n    }\n\n    return { [segment]: createObject(path.slice(1), value) };\n}\n\n/**\n * Get value from data object by path\n * @param {Array} path - value path\n * @param {object} data - data object\n * @returns {string} - value\n */\nexport function getValueByPath(path, data) {\n    return path.reduce((value, segment) => (segment && value ? value[segment] : value), data || '');\n}\n\n/**\n * Get value from data object by name\n * @param {string} name - input name\n * @param {object} data - data object\n */\nexport function getValueByName(name, data) {\n    const path = convertNameToPath(name);\n    return getValueByPath(path, data);\n}\n\n/**\n * Get value from radio group\n * @param {Array} inputs - array of radio inputs\n * @returns {string|Array.<string>} - value of checked input\n */\nexport function getRadioGroupValue(inputs) {\n    const values = [...inputs].map(radio => getInputValue(radio)).filter(Boolean);\n\n    return values.length > 1 ? values : values[0];\n}\n\n/**\n * Get value form input\n * @param {HTMLInputElement|HTMLSelectElement|Array} input - input element or array of HTMLInputElements\n * @returns {string|FileList|Array} - value of input, or array of value if input is select\n */\nexport function getInputValue(input) {\n    if (!input) return '';\n\n    const { type } = input;\n\n    if (Array.isArray(input)) {\n        return getRadioGroupValue(input);\n    }\n\n    switch (type) {\n    case 'select-one':\n        return input.options.length ? input.options[input.selectedIndex].value : '';\n    case 'select-multiple':\n        return [...input.options].filter(option => option.selected).map(option => option.value);\n    case 'checkbox':\n    case 'radio':\n        return input.checked ? input.value : '';\n    case 'file':\n        return input.files;\n    default:\n        return input.value;\n    }\n}\n\n/**\n * Get name from input or array of inputs\n * @param {HTMLInputElement|Array} input - input element or Array of HTMLInputElements\n * @returns {string} - input name\n */\nexport function getInputName(input) {\n    return Array.isArray(input) ? input[0].name : input.name;\n}\n\n/**\n * Get object which key is name of input and value is value of input\n * @param {HTMLInputElement|Array} input - input element or Array of HTMLInputElements\n * @returns {object} - data\n */\nexport function getInputData(input) {\n    const value = getInputValue(input);\n    const name = getInputName(input);\n    const path = convertNameToPath(name);\n\n    return createObject(path, value);\n}\n\n/**\n * Get data object with values from inputs object\n * @param {object} inputs - inputs object\n * @returns {object} - data object\n */\nexport function getData(inputs) {\n    return Object.keys(inputs).reduce(\n        (data, name) => deepmerge(data, getInputData(inputs[name])),\n        {},\n    );\n}\n"
+  },
+  {
+    "__docId__": 35,
+    "kind": "function",
+    "static": true,
+    "variation": null,
+    "name": "createObject",
+    "memberof": "src/lib/get-data.es6",
+    "longname": "src/lib/get-data.es6~createObject",
+    "access": null,
+    "export": true,
+    "importPath": "jedi-validate/src/lib/get-data.es6",
+    "importStyle": "{createObject}",
+    "description": "Create object by path and value",
+    "lineNumber": 11,
+    "unknown": [
+      {
+        "tagName": "@returns",
+        "tagValue": "{object} - data object"
+      }
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "Array"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "path",
+        "description": "path array"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "string",
+          "FileList"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "value",
+        "description": "value on input"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "object"
+      ],
+      "spread": false,
+      "description": "data object"
+    },
+    "generator": false
+  },
+  {
+    "__docId__": 36,
+    "kind": "function",
+    "static": true,
+    "variation": null,
+    "name": "getValueByPath",
+    "memberof": "src/lib/get-data.es6",
+    "longname": "src/lib/get-data.es6~getValueByPath",
+    "access": null,
+    "export": true,
+    "importPath": "jedi-validate/src/lib/get-data.es6",
+    "importStyle": "{getValueByPath}",
+    "description": "Get value from data object by path",
+    "lineNumber": 29,
+    "unknown": [
+      {
+        "tagName": "@returns",
+        "tagValue": "{string} - value"
+      }
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "Array"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "path",
+        "description": "value path"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "object"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "data",
+        "description": "data object"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "string"
+      ],
+      "spread": false,
+      "description": "value"
+    },
+    "generator": false
+  },
+  {
+    "__docId__": 37,
+    "kind": "function",
+    "static": true,
+    "variation": null,
+    "name": "getValueByName",
+    "memberof": "src/lib/get-data.es6",
+    "longname": "src/lib/get-data.es6~getValueByName",
+    "access": null,
+    "export": true,
+    "importPath": "jedi-validate/src/lib/get-data.es6",
+    "importStyle": "{getValueByName}",
+    "description": "Get value from data object by name",
+    "lineNumber": 38,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "name",
+        "description": "input name"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "object"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "data",
+        "description": "data object"
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    },
+    "generator": false
+  },
+  {
+    "__docId__": 38,
+    "kind": "function",
+    "static": true,
+    "variation": null,
+    "name": "getRadioGroupValue",
+    "memberof": "src/lib/get-data.es6",
+    "longname": "src/lib/get-data.es6~getRadioGroupValue",
+    "access": null,
+    "export": true,
+    "importPath": "jedi-validate/src/lib/get-data.es6",
+    "importStyle": "{getRadioGroupValue}",
+    "description": "Get value from radio group",
+    "lineNumber": 48,
+    "unknown": [
+      {
+        "tagName": "@returns",
+        "tagValue": "{string|Array.<string>} - value of checked input"
+      }
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "Array"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "inputs",
+        "description": "array of radio inputs"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "string",
+        "Array.<string>"
+      ],
+      "spread": false,
+      "description": "value of checked input"
+    },
+    "generator": false
+  },
+  {
+    "__docId__": 39,
+    "kind": "function",
+    "static": true,
+    "variation": null,
+    "name": "getInputValue",
+    "memberof": "src/lib/get-data.es6",
+    "longname": "src/lib/get-data.es6~getInputValue",
+    "access": null,
+    "export": true,
+    "importPath": "jedi-validate/src/lib/get-data.es6",
+    "importStyle": "{getInputValue}",
+    "description": "Get value form input",
+    "lineNumber": 59,
+    "unknown": [
+      {
+        "tagName": "@returns",
+        "tagValue": "{string|FileList|Array} - value of input, or array of value if input is select"
+      }
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "HTMLInputElement",
+          "HTMLSelectElement",
+          "Array"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "input",
+        "description": "input element or array of HTMLInputElements"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "string",
+        "FileList",
+        "Array"
+      ],
+      "spread": false,
+      "description": "value of input, or array of value if input is select"
+    },
+    "generator": false
+  },
+  {
+    "__docId__": 40,
+    "kind": "function",
+    "static": true,
+    "variation": null,
+    "name": "getInputName",
+    "memberof": "src/lib/get-data.es6",
+    "longname": "src/lib/get-data.es6~getInputName",
+    "access": null,
+    "export": true,
+    "importPath": "jedi-validate/src/lib/get-data.es6",
+    "importStyle": "{getInputName}",
+    "description": "Get name from input or array of inputs",
+    "lineNumber": 88,
+    "unknown": [
+      {
+        "tagName": "@returns",
+        "tagValue": "{string} - input name"
+      }
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "HTMLInputElement",
+          "Array"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "input",
+        "description": "input element or Array of HTMLInputElements"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "string"
+      ],
+      "spread": false,
+      "description": "input name"
+    },
+    "generator": false
+  },
+  {
+    "__docId__": 41,
+    "kind": "function",
+    "static": true,
+    "variation": null,
+    "name": "getInputData",
+    "memberof": "src/lib/get-data.es6",
+    "longname": "src/lib/get-data.es6~getInputData",
+    "access": null,
+    "export": true,
+    "importPath": "jedi-validate/src/lib/get-data.es6",
+    "importStyle": "{getInputData}",
+    "description": "Get object which key is name of input and value is value of input",
+    "lineNumber": 97,
+    "unknown": [
+      {
+        "tagName": "@returns",
+        "tagValue": "{object} - data"
+      }
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "HTMLInputElement",
+          "Array"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "input",
+        "description": "input element or Array of HTMLInputElements"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "object"
+      ],
+      "spread": false,
+      "description": "data"
+    },
+    "generator": false
+  },
+  {
     "__docId__": 42,
+    "kind": "function",
+    "static": true,
+    "variation": null,
+    "name": "getData",
+    "memberof": "src/lib/get-data.es6",
+    "longname": "src/lib/get-data.es6~getData",
+    "access": null,
+    "export": true,
+    "importPath": "jedi-validate/src/lib/get-data.es6",
+    "importStyle": "{getData}",
+    "description": "Get data object with values from inputs object",
+    "lineNumber": 110,
+    "unknown": [
+      {
+        "tagName": "@returns",
+        "tagValue": "{object} - data object"
+      }
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "object"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "inputs",
+        "description": "inputs object"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "object"
+      ],
+      "spread": false,
+      "description": "data object"
+    },
+    "generator": false
+  },
+  {
+    "__docId__": 43,
     "kind": "file",
     "static": true,
     "variation": null,
@@ -1494,7 +1507,7 @@
     "content": "/**\n * Get ajax options from form\n * @param {HTMLFormElement} form - form element\n * @returns {{ajax: {url: string, method: string, enctype: string, sendType: *}}} - object with options for sending\n */\nexport function getFormOptions(form) {\n    const enctype = form.getAttribute('enctype');\n\n    return {\n        ajax: {\n            enctype,\n            url: form.getAttribute('action'),\n            method: form.getAttribute('method'),\n            sendType: enctype === 'multipart/form-data' ? 'formData' : undefined,\n        },\n    };\n}\n\n/**\n * Get validate options from input attribute of className\n * @param {HTMLInputElement|HTMLSelectElement} input - input for validation\n * @returns {object} - rules\n */\nexport function getInputRules(input) {\n    const defaultRules = ['required', 'email', 'tel', 'url'];\n\n    const rules = defaultRules.reduce((inputRules, rule) => ({\n        ...inputRules,\n        [rule]: input.hasAttribute(rule) || input.type === rule || input.classList.contains(rule),\n    }), {});\n\n    return {\n        ...rules,\n        regexp: input.hasAttribute('pattern') ? new RegExp(input.getAttribute('pattern')) : undefined,\n    };\n}\n"
   },
   {
-    "__docId__": 43,
+    "__docId__": 44,
     "kind": "function",
     "static": true,
     "variation": null,
@@ -1536,7 +1549,7 @@
     "generator": false
   },
   {
-    "__docId__": 44,
+    "__docId__": 45,
     "kind": "function",
     "static": true,
     "variation": null,
@@ -1579,7 +1592,7 @@
     "generator": false
   },
   {
-    "__docId__": 45,
+    "__docId__": 46,
     "kind": "file",
     "static": true,
     "variation": null,
@@ -1592,7 +1605,7 @@
     "content": "export default {\n    required: {\n        func: (value) => {\n            if (!value) return false;\n            if (Array.isArray(value) && value.length === 0) return false;\n            if (value instanceof FileList && value.length === 0) return false;\n            if (typeof value === 'string' && value.trim() === '') return false;\n\n            return true;\n        },\n        message: 'This field is required',\n    },\n    regexp: {\n        func: (value, regexp) => regexp.test(value),\n        message: 'Please, provide correct value',\n    },\n    email: {\n        func: value => /[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}/i.test(value),\n        message: 'This email is incorrect',\n    },\n    filesize: {\n        func: (value, size) => [...value].reduce((r, file) => file.size < size && r, true), // eslint-disable-line max-len\n        message: 'This file is too large',\n    },\n    extension: {\n        func: (value, extensions) => [...value].reduce((r, file) => extensions.indexOf(file.name.split('.').pop()) !== -1 && r, true), // eslint-disable-line max-len\n        message: 'This extension is not supported',\n    },\n    tel: {\n        func: value => /^([\\+]+)*[0-9\\x20\\x28\\x29\\-]{5,20}$/.test(value),\n        message: 'This phone number is incorrect',\n    },\n    url: {\n        func: value => /[-a-zA-Z0-9@:%_\\+.~#?&//=]{2,256}\\.[a-z]{2,4}\\b(\\/[-a-zA-Z0-9@:%_\\+.~#?&//=]*)?/gi.test(value), // eslint-disable-line max-len\n        message: 'Wrong url',\n    },\n};\n"
   },
   {
-    "__docId__": 46,
+    "__docId__": 47,
     "kind": "file",
     "static": true,
     "variation": null,
@@ -1602,10 +1615,62 @@
     "access": null,
     "description": null,
     "lineNumber": 1,
-    "content": "import { getValueByName } from './get-data.es6';\n\n/**\n * Validate field\n * @param {object} rules - object with rules for validation\n * @param {object} methods - validation methods\n * @param {string|FileList|Array} value - value of input\n * @param {string} name - name on input\n * @param {object} errorMessages - object with error messages\n * @returns {Array.<string>} - array of field errors\n */\nexport function validateField(rules, methods, value, name, errorMessages) {\n    const isEmpty = !methods.required.func(value);\n\n    if (isEmpty && rules.required) {\n        return [errorMessages[name].required];\n    }\n\n    if (isEmpty) {\n        return [];\n    }\n\n    return Object.keys(rules).reduce((errors, method) => {\n        const params = rules[method];\n        if (!params) return errors;\n\n        if (methods[method]) {\n            const valid = methods[method].func(value, params);\n\n            if (!valid) {\n                errors.push(errorMessages[name][method]);\n            }\n        } else {\n            errors.push(`Method \"${method}\" not found`);\n        }\n\n        return errors;\n    }, []);\n}\n\n/**\n * Validate data object\n * @param {object} rules - object with rules for validation\n * @param {object} methods - validation methods\n * @param {object} data - data object\n * @param {object} errorMessages - object with error messages\n * @returns {object.<string, Array.<string>>} - object of fields error arrays\n */\nexport function validateData(rules, methods, data, errorMessages) {\n    return Object.keys(rules).reduce((obj, name) => {\n        const value = getValueByName(name, data);\n        const errors = validateField(rules[name], methods, value, name, errorMessages);\n        return {\n            ...obj,\n            [name]: errors.length ? errors : undefined,\n        };\n    }, {});\n}\n"
+    "content": "import { getValueByName } from './get-data.es6';\n\n/**\n * Check rule for dependencies\n * @param {*} params - params of validation\n * @param {object} data - data of form\n * @returns {*} - params of validation or null if rule not checkable\n */\nexport function isCheckable(params, data) {\n    if (!params) return null;\n\n    let checkable = true;\n    let param = params;\n\n    if (Array.isArray(params)) {\n        let dependencies = [];\n        [param, ...dependencies] = params;\n        if (!param) return null;\n\n\n        checkable = dependencies\n            .reduce((required, dependency) => (required && !!data[dependency]), checkable);\n    }\n\n    return checkable ? param : null;\n}\n\n/**\n * Validate field\n * @param {object} rules - object with rules for validation\n * @param {object} methods - validation methods\n * @param {string|FileList|Array} value - value of input\n * @param {string} name - name on input\n * @param {object} errorMessages - object with error messages\n * @param {object} data - data of form\n * @returns {Array.<string>} - array of field errors\n */\nexport function validateField(rules, methods, value, name, errorMessages, data) {\n    const isEmpty = !methods.required.func(value);\n\n    const isRequired = isCheckable(rules.required, data);\n\n    if (isEmpty && isRequired) {\n        return [errorMessages[name].required];\n    }\n\n    if (isEmpty) {\n        return [];\n    }\n\n    return Object.keys(rules).reduce((errors, method) => {\n        const params = isCheckable(rules[method], data);\n\n        if (params === null) return errors;\n\n        if (methods[method]) {\n            const valid = methods[method].func(value, params);\n\n            if (!valid) {\n                errors.push(errorMessages[name][method]);\n            }\n        } else {\n            errors.push(`Method \"${method}\" not found`);\n        }\n\n        return errors;\n    }, []);\n}\n\n/**\n * Validate data object\n * @param {object} rules - object with rules for validation\n * @param {object} methods - validation methods\n * @param {object} data - data object\n * @param {object} errorMessages - object with error messages\n * @returns {object.<string, Array.<string>>} - object of fields error arrays\n */\nexport function validateData(rules, methods, data, errorMessages) {\n    return Object.keys(rules).reduce((obj, name) => {\n        const value = getValueByName(name, data);\n        const errors = validateField(rules[name], methods, value, name, errorMessages, data);\n        return {\n            ...obj,\n            [name]: errors.length ? errors : undefined,\n        };\n    }, {});\n}\n"
   },
   {
-    "__docId__": 47,
+    "__docId__": 48,
+    "kind": "function",
+    "static": true,
+    "variation": null,
+    "name": "isCheckable",
+    "memberof": "src/lib/validate-data.es6",
+    "longname": "src/lib/validate-data.es6~isCheckable",
+    "access": null,
+    "export": true,
+    "importPath": "jedi-validate/src/lib/validate-data.es6",
+    "importStyle": "{isCheckable}",
+    "description": "Check rule for dependencies",
+    "lineNumber": 9,
+    "unknown": [
+      {
+        "tagName": "@returns",
+        "tagValue": "{*} - params of validation or null if rule not checkable"
+      }
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "*"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "params",
+        "description": "params of validation"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "object"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "data",
+        "description": "data of form"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "*"
+      ],
+      "spread": false,
+      "description": "params of validation or null if rule not checkable"
+    },
+    "generator": false
+  },
+  {
+    "__docId__": 49,
     "kind": "function",
     "static": true,
     "variation": null,
@@ -1617,7 +1682,7 @@
     "importPath": "jedi-validate/src/lib/validate-data.es6",
     "importStyle": "{validateField}",
     "description": "Validate field",
-    "lineNumber": 12,
+    "lineNumber": 38,
     "unknown": [
       {
         "tagName": "@returns",
@@ -1676,6 +1741,16 @@
         "optional": false,
         "name": "errorMessages",
         "description": "object with error messages"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "object"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "data",
+        "description": "data of form"
       }
     ],
     "return": {
@@ -1689,7 +1764,7 @@
     "generator": false
   },
   {
-    "__docId__": 48,
+    "__docId__": 50,
     "kind": "function",
     "static": true,
     "variation": null,
@@ -1701,7 +1776,7 @@
     "importPath": "jedi-validate/src/lib/validate-data.es6",
     "importStyle": "{validateData}",
     "description": "Validate data object",
-    "lineNumber": 49,
+    "lineNumber": 78,
     "unknown": [
       {
         "tagName": "@returns",
@@ -1761,7 +1836,7 @@
     "generator": false
   },
   {
-    "__docId__": 50,
+    "__docId__": 52,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1774,7 +1849,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 51,
+    "__docId__": 53,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1787,7 +1862,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 52,
+    "__docId__": 54,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1800,7 +1875,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 53,
+    "__docId__": 55,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1813,7 +1888,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 54,
+    "__docId__": 56,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1826,7 +1901,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 55,
+    "__docId__": 57,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1839,7 +1914,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 56,
+    "__docId__": 58,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1852,7 +1927,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 57,
+    "__docId__": 59,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1865,7 +1940,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 58,
+    "__docId__": 60,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1878,7 +1953,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 59,
+    "__docId__": 61,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1891,7 +1966,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 60,
+    "__docId__": 62,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1904,7 +1979,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 61,
+    "__docId__": 63,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1917,7 +1992,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 62,
+    "__docId__": 64,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1930,7 +2005,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 63,
+    "__docId__": 65,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1943,7 +2018,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 64,
+    "__docId__": 66,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1956,7 +2031,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 65,
+    "__docId__": 67,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1969,7 +2044,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 66,
+    "__docId__": 68,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1982,7 +2057,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 67,
+    "__docId__": 69,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -1995,7 +2070,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 68,
+    "__docId__": 70,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -2008,7 +2083,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 69,
+    "__docId__": 71,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -2021,7 +2096,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 70,
+    "__docId__": 72,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -2034,7 +2109,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 71,
+    "__docId__": 73,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -2047,7 +2122,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 72,
+    "__docId__": 74,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -2060,7 +2135,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 73,
+    "__docId__": 75,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -2073,7 +2148,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 74,
+    "__docId__": 76,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -2086,7 +2161,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 75,
+    "__docId__": 77,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -2099,7 +2174,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 76,
+    "__docId__": 78,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -2112,7 +2187,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 77,
+    "__docId__": 79,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -2125,7 +2200,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 78,
+    "__docId__": 80,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -2138,7 +2213,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 79,
+    "__docId__": 81,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -2151,7 +2226,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 80,
+    "__docId__": 82,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -2164,7 +2239,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 81,
+    "__docId__": 83,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -2177,7 +2252,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 82,
+    "__docId__": 84,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -2190,7 +2265,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 83,
+    "__docId__": 85,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -2203,7 +2278,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 84,
+    "__docId__": 86,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -2216,7 +2291,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 85,
+    "__docId__": 87,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -2229,7 +2304,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 86,
+    "__docId__": 88,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -2242,7 +2317,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 87,
+    "__docId__": 89,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -2255,7 +2330,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 88,
+    "__docId__": 90,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -2268,7 +2343,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 89,
+    "__docId__": 91,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -2281,7 +2356,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 90,
+    "__docId__": 92,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -2294,7 +2369,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 91,
+    "__docId__": 93,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -2307,7 +2382,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 92,
+    "__docId__": 94,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -2320,7 +2395,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 93,
+    "__docId__": 95,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -2333,7 +2408,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 94,
+    "__docId__": 96,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -2346,7 +2421,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 95,
+    "__docId__": 97,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -2359,7 +2434,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 96,
+    "__docId__": 98,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -2372,7 +2447,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 98,
+    "__docId__": 100,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -2385,7 +2460,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 99,
+    "__docId__": 101,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -2398,7 +2473,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 100,
+    "__docId__": 102,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -2411,7 +2486,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 101,
+    "__docId__": 103,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -2424,7 +2499,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 102,
+    "__docId__": 104,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -2437,7 +2512,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 103,
+    "__docId__": 105,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -2450,7 +2525,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 104,
+    "__docId__": 106,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -2463,7 +2538,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 105,
+    "__docId__": 107,
     "kind": "external",
     "static": true,
     "variation": null,
