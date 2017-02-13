@@ -257,7 +257,7 @@ Content-Disposition: form-data; name=&quot;email&quot;
 }, &apos;Error message&apos;);</code>
 </code></pre><h3 id="initialization-options-example">Initialization Options Example</h3>
 <p>Add rules as part of your options object when initializing:</p>
-<pre><code class="lang-javascript"><code class="source-code prettyprint">    new JediValidate(formWrapper, {
+<pre><code class="lang-javascript"><code class="source-code prettyprint">    const validator = new JediValidate(formWrapper, {
         rules: {
             name: {
                 required: true
@@ -272,10 +272,21 @@ Content-Disposition: form-data; name=&quot;email&quot;
                 filesize: 10000,
                 extension: &quot;html|css|txt&quot;
             }
+            file2: {
+                filesize: [10000, &quot;two-files-checkbox&quot;], // check only if checkbox checked
+                extension: [&quot;html|css|txt&quot;, &quot;two-files-checkbox&quot;], // without recollect by default
+                another: [&apos;param&apos;, function(oldData) {
+                   const newData = validator.collect(&apos;two-files-checkbox&apos;); // manual data recollect for concrete field
+                   return !!newData[&apos;two-files-checkbox&apos;];
+               }];
+            }
         }
     });</code>
 </code></pre>
-<p></p><h1>
+<p>You can recollect data of all form or just input by name. Method return new data.</p>
+<pre><code><code class="source-code prettyprint">validator.collect(); // all form
+validator.collect(&apos;two-files-checkbox&apos;); // one field</code>
+</code></pre><p></p><h1>
   <a name="error"></a>
   Error Messages
 </h1>
@@ -313,6 +324,8 @@ Content-Disposition: form-data; name=&quot;email&quot;
 <li>add jsdoc</li>
 </ul>
 </li>
+<li>1.1.3 fix radio input data</li>
+<li>1.2.0 add support of dependencies for field (see example)</li>
 </ul>
 </div>
 </div>

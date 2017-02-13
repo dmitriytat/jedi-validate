@@ -260,11 +260,29 @@
 
     new JediValidate(document.querySelector('#form4'), Object.assign({}, options));
 
+    var validator = new JediValidate(document.querySelector('#form5'), Object.assign({}, {
+        rules: {
+            phone: {
+                required: [true, function(oldData) {
+                    const newData = validator.collect('two-files-checkbox'); // manual data recollect for concrete field
+                    return !!newData['two-files-checkbox'];
+                }],
+                tel: [true, 'checkbox'], // without recollect
+            }
+        },
+    }));
+
     new JediValidate(document.querySelector('#form5'), Object.assign({}, {
         rules: {
             phone: {
-                required:  [true, 'checkbox'],
-                tel: [true, 'checkbox'],
+                tel: {
+                    params: true,
+                    dependencies: [function(data) {
+                        validator.collect();
+                        return !!data['checkbox'];
+                    }],
+                    level: 'input',
+                }
             }
         },
     }));

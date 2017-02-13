@@ -75,9 +75,12 @@ export function isCheckable(params, data) {
         [param, ...dependencies] = params;
         if (!param) return null;
 
-
-        checkable = dependencies
-            .reduce((required, dependency) =&gt; (required &amp;&amp; !!data[dependency]), checkable);
+        try {
+            checkable = dependencies
+                .reduce((required, dependency) =&gt; (required &amp;&amp; ((typeof dependency === &apos;function&apos; &amp;&amp; dependency(data)) || !!data[dependency])), checkable);
+        } catch (e) {
+            console.warn(`Dependency function error: ${e.toString()}`);
+        }
     }
 
     return checkable ? param : null;

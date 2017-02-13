@@ -351,6 +351,27 @@ class JediValidate {
         });
     }
 
+
+    /**
+     * Collect data
+     * @param {string} name - field name
+     */
+    collect(name = '') {
+        if (name) {
+            const inputData = getInputData(this.inputs[name]);
+
+            // fixme don't work with 2 inputs phone[]
+            this.data = {
+                ...this.data,
+                ...inputData,
+            };
+        } else {
+            this.data = getData(this.inputs);
+        }
+
+        return this.data;
+    }
+
     /**
      *
      * @param {Element} field
