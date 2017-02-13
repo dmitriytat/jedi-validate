@@ -228,7 +228,7 @@ JediValidate.addMethod('methodName', function (value, options) {
 Add rules as part of your options object when initializing:
 
 ```javascript
-    new JediValidate(formWrapper, {
+    const validator = new JediValidate(formWrapper, {
         rules: {
             name: {
                 required: true
@@ -243,13 +243,25 @@ Add rules as part of your options object when initializing:
                 filesize: 10000,
                 extension: "html|css|txt"
             }
-            file: {
+            file2: {
                 filesize: [10000, "two-files-checkbox"], // check only if checkbox checked
-                extension: ["html|css|txt", "two-files-checkbox"],
+                extension: ["html|css|txt", "two-files-checkbox"], // without recollect by default
+                another: ['param', function(oldData) {
+                   const newData = validator.collect('two-files-checkbox'); // manual data recollect for concrete field
+                   return !!newData['two-files-checkbox'];
+               }];
             }
         }
     });
 ```
+
+You can recollect data of all form or just input by name. Method return new data.
+
+```
+validator.collect(); // all form
+validator.collect('two-files-checkbox'); // one field
+```
+
 
 <h1>
   <a name="error"></a>

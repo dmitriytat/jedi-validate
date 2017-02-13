@@ -704,9 +704,13 @@ function isCheckable(params, data) {
 
         if (!param) return null;
 
-        checkable = dependencies.reduce(function (required, dependency) {
-            return required && !!data[dependency];
-        }, checkable);
+        try {
+            checkable = dependencies.reduce(function (required, dependency) {
+                return required && (typeof dependency === 'function' && dependency(data) || !!data[dependency]);
+            }, checkable);
+        } catch (e) {
+            console.warn('Dependency function error: ' + e.toString());
+        }
     }
 
     return checkable ? param : null;
@@ -1140,6 +1144,28 @@ var JediValidate = function () {
                 _this3.root.classList.add(_this3.options.formStatePrefix + _this3.options.states.error); // eslint-disable-line max-len
                 _this3.root.classList.remove(_this3.options.formStatePrefix + _this3.options.states.valid); // eslint-disable-line max-len
             });
+        }
+
+        /**
+         * Collect data
+         * @param {string} name - field name
+         */
+
+    }, {
+        key: 'collect',
+        value: function collect() {
+            var name = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
+
+            if (name) {
+                var inputData = (0, _getData.getInputData)(this.inputs[name]);
+
+                // fixme don't work with 2 inputs phone[]
+                this.data = _extends({}, this.data, inputData);
+            } else {
+                this.data = (0, _getData.getData)(this.inputs);
+            }
+
+            return this.data;
         }
 
         /**
