@@ -165,7 +165,7 @@ export default class JediValidate {
             // fixme "name" and "name in data" not the same
             // name === "phone[]",
             // data: { phone: [] } - name === "phone"
-            const name = input.name;
+            const name = input.name; // eslint-disable-line prefer-destructuring
 
             if (this.inputs[name]) {
                 if (Array.isArray(this.inputs[name])) {
@@ -293,8 +293,7 @@ export default class JediValidate {
                     this.messages[name],
                     this.options.states,
                     errors[name],
-                ),
-            );
+                ));
         }
 
         const errorFieldNames = fieldNames.filter(name => errors[name]);
@@ -370,8 +369,7 @@ export default class JediValidate {
                         this.messages[name],
                         this.options.states,
                         response.validationErrors[name],
-                    ),
-                );
+                    ));
             } else {
                 try {
                     this.options.callbacks.success({ response });
@@ -388,7 +386,9 @@ export default class JediValidate {
                     this.nodes.form.reset();
                 }
             }
-        }).catch(({ method, url, status, statusText }) => {
+        }).catch(({
+            method, url, status, statusText,
+        }) => {
             console.warn(`${method} ${url} ${status} (${statusText})`);
 
             this.nodes.baseMessage.innerHTML = this.translate('Can not send form!');

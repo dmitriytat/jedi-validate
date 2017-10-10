@@ -10,6 +10,8 @@ import {
     url,
     min,
     max,
+    minDate,
+    maxDate,
     step,
 } from '../src/lib/methods';
 
@@ -131,6 +133,7 @@ describe('Methods', () => {
         it('Should pass correct data', () => {
             should(max(10, 50)).be.true();
             should(max(5, 5)).be.true();
+            should(max(5, 5)).be.true();
         });
 
         it('Should not pass incorrect value', () => {
@@ -148,6 +151,26 @@ describe('Methods', () => {
         it('Should not pass incorrect value', () => {
             should(step(5, 12)).be.false();
             should(step(4, 3)).be.false();
+        });
+    });
+
+    describe('min date', () => {
+        it('Should pass correct data', () => {
+            should(minDate(new Date('2017/10/12'), new Date('2017/10/10'))).be.true();
+        });
+
+        it('Should not pass incorrect value', () => {
+            should(minDate(new Date('2017/10/12'), new Date('2017/10/13'))).be.false();
+        });
+    });
+
+    describe('max date', () => {
+        it('Should pass correct data', () => {
+            should(maxDate(new Date('2017/10/12'), new Date('2017/10/12'))).be.true();
+        });
+
+        it('Should not pass incorrect value', () => {
+            should(maxDate(new Date('2017/10/12'), new Date('2017/10/10'))).be.false();
         });
     });
 });

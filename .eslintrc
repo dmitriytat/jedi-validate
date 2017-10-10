@@ -37,7 +37,8 @@
                     "invalidHref"
                 ]
             }
-        ]
+        ],
+        "prefer-promise-reject-errors": "off"
     },
     "env": {
         "browser": true,

@@ -78,5 +78,29 @@ describe('Get options', () => {
 
             should(getInputRules(input)).be.deepEqual({ regexp: new RegExp('123') });
         });
+
+        it('Should return number input rules', () => {
+            input.setAttribute('type', 'number');
+            input.setAttribute('min', '10');
+            input.setAttribute('max', '20');
+            input.setAttribute('step', '5');
+
+            should(getInputRules(input)).be.deepEqual({
+                min: 10,
+                max: 20,
+                step: 5,
+            });
+        });
+
+        it('Should return date input rules', () => {
+            input.setAttribute('type', 'date');
+            input.setAttribute('min', '2017/04/01');
+            input.setAttribute('max', '2019/04/01');
+
+            should(getInputRules(input)).be.deepEqual({
+                minDate: new Date('2017/04/01'),
+                maxDate: new Date('2019/04/01'),
+            });
+        });
     });
 });
