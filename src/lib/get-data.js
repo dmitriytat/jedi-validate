@@ -54,7 +54,7 @@ export function getRadioGroupValue(inputs) {
 /**
  * Get value form input
  * @param {Element|HTMLInputElement|HTMLSelectElement|Array} input - input
- * @returns {string|FileList|Array} - value of input, or array of value if input is select
+ * @returns {string|Date|FileList|Array} - value of input, or array of value if input is select
  */
 export function getInputValue(input) {
     if (!input) return '';
@@ -75,6 +75,8 @@ export function getInputValue(input) {
             return input.checked ? input.value : '';
         case 'file':
             return input.files;
+        case 'date':
+            return input.value ? new Date(input.value) : '';
         default:
             return input.value;
     }

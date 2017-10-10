@@ -79,7 +79,7 @@ export function min(value, number) {
 }
 
 /**
- * Check value is greater than max number
+ * Check value is less than max number
  * @param {number} value - number
  * @param {number} number - max number
  * @returns {boolean} - true == valid, false == invalid
@@ -96,6 +96,27 @@ export function max(value, number) {
  */
 export function step(value, number) {
     return value % number === 0;
+}
+
+
+/**
+ * Check value is greater than min date
+ * @param {Date} date - current date
+ * @param {Date} mindate - max date
+ * @returns {boolean} - true == valid, false == invalid
+ */
+export function minDate(date, mindate) {
+    return mindate <= date;
+}
+
+/**
+ * Check date is less than max date
+ * @param {Date} date - current date
+ * @param {Date} maxdate - max date
+ * @returns {boolean} - true == valid, false == invalid
+ */
+export function maxDate(date, maxdate) {
+    return date <= maxdate;
 }
 
 
@@ -139,5 +160,13 @@ export default {
     step: {
         func: step,
         message: 'This value is not a multiple of the specified step value',
+    },
+    minDate: {
+        func: minDate,
+        message: 'This date is too early',
+    },
+    maxDate: {
+        func: maxDate,
+        message: 'This date is too late',
     },
 };

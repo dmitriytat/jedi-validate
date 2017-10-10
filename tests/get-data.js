@@ -11,6 +11,7 @@ import {
 } from '../src/lib/get-data';
 
 const data = {
+    date: new Date('2017-10-12'),
     phone: '92356234',
     phone2: 'sdfsefef',
     radio: '2',
@@ -19,7 +20,9 @@ const data = {
     },
 };
 
+
 const inputs = {
+    date: document.createElement('input'),
     phone: document.createElement('input'),
     phone2: document.createElement('input'),
     'parent[child]': document.createElement('input'),
@@ -36,6 +39,10 @@ inputs.phone2.name = 'phone2';
 inputs.phone2.value = data.phone2;
 inputs['parent[child]'].name = 'parent[child]';
 inputs['parent[child]'].value = data.parent.child;
+
+inputs.date.name = 'date';
+inputs.date.type = 'date';
+inputs.date.value = '2017-10-12';
 
 describe('Get data', () => {
     it('createObject', () => {
@@ -94,6 +101,15 @@ describe('Get data', () => {
             `;
 
             assert.deepEqual(getInputValue(select), ['12', '34']);
+        });
+
+        it('date', () => {
+            const dateInput = document.createElement('date');
+            dateInput.type = 'date';
+            dateInput.value = '2017-10-12';
+            assert.deepEqual(getInputValue(dateInput), new Date('2017-10-12'));
+            dateInput.value = '';
+            assert.deepEqual(getInputValue(dateInput), '');
         });
     });
 
