@@ -161,7 +161,7 @@ export default class JediValidate {
 
         this.nodes.form.addEventListener('submit', this.handleSubmit);
 
-        this.nodes.inputs.forEach((input) => {
+        Array.from(this.nodes.inputs).forEach((input) => {
             // fixme "name" and "name in data" not the same
             // name === "phone[]",
             // data: { phone: [] } - name === "phone"
