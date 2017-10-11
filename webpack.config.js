@@ -6,8 +6,8 @@ const NODE_ENV = process.env.NODE_ENV || 'development';
 
 const config = {
     entry: {
-        'jedi-validate': './src/index.js',
-        'jedi-validate.min': './src/index.js',
+        'jedi-validate': ['babel-polyfill', './src/index.js'],
+        'jedi-validate.min': ['babel-polyfill', './src/index.js'],
     },
     devtool: 'source-map',
     output: {
@@ -55,14 +55,14 @@ if (NODE_ENV === 'production') {
             {
                 test: /\.min\.js$/,
                 comments: false,
-            },
-        ),
+            }
+        )
     );
 
     config.plugins.push(
         new CompressionPlugin({
             test: /\.min\.js$/,
-        }),
+        })
     );
 }
 
