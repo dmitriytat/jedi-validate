@@ -7,7 +7,9 @@ import { getValueByName } from './get-data';
  * @returns {*} - params of validation or null if rule not checkable
  */
 export function isCheckable(params, data) {
-    if (!params) return null;
+    if (!params) {
+        return null;
+    }
 
     let checkable = true;
     let param = params;
@@ -15,13 +17,17 @@ export function isCheckable(params, data) {
     if (Array.isArray(params)) {
         let dependencies = [];
         [param, ...dependencies] = params;
-        if (!param) return null;
+        if (!param) {
+            return null;
+        }
 
         try {
             checkable = dependencies
                 .reduce((required, dependency) => (required && (typeof dependency === 'function' ? dependency(data) : !!data[dependency])), checkable);
         } catch (e) {
-            console.warn(`Dependency function error: ${e.toString()}`);
+            if (process.env.DEBUG) {
+                console.warn(`Dependency function error: ${e.toString()}`);
+            }
         }
     }
 
@@ -55,7 +61,9 @@ export function validateField(rules, methods, value, name, errorMessages, data, 
     return Object.keys(rules).reduce((errors, method) => {
         const params = isCheckable(rules[method], data);
 
-        if (params === null) return errors;
+        if (params === null) {
+            return errors;
+        }
 
         if (methods[method]) {
             const valid = methods[method].func(value, params);

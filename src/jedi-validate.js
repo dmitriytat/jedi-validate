@@ -5,7 +5,7 @@ import Dictionary from './i18n/jedi-validate-i18n';
 import { getFormOptions, getInputRules } from './lib/get-options';
 import { validateData, validateField } from './lib/validate-data';
 import { ajax } from './lib/ajax';
-import { markField, initErrorMessages } from './lib/utils';
+import { initErrorMessages, markField } from './lib/utils';
 import defaultMethods from './lib/methods';
 
 /**
@@ -302,7 +302,9 @@ export default class JediValidate {
             try {
                 this.options.callbacks.error({ errors });
             } catch (e) {
-                console.error(e);
+                if (process.env.DEBUG) {
+                    console.error(e);
+                }
             }
 
             event.preventDefault();
@@ -315,7 +317,9 @@ export default class JediValidate {
             try {
                 this.options.callbacks.success({ event });
             } catch (e) {
-                console.error(e);
+                if (process.env.DEBUG) {
+                    console.error(e);
+                }
             }
 
             return;
@@ -351,7 +355,9 @@ export default class JediValidate {
                 try {
                     this.options.callbacks.error({ errors: response.validationErrors });
                 } catch (e) {
-                    console.error(e);
+                    if (process.env.DEBUG) {
+                        console.error(e);
+                    }
                 }
 
                 if (response.validationErrors.base) {
@@ -374,7 +380,9 @@ export default class JediValidate {
                 try {
                     this.options.callbacks.success({ response });
                 } catch (e) {
-                    console.error(e);
+                    if (process.env.DEBUG) {
+                        console.error(e);
+                    }
                 }
 
                 if (this.options.redirect && response.redirect) {

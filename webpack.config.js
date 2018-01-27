@@ -6,8 +6,8 @@ const NODE_ENV = process.env.NODE_ENV || 'development';
 
 const config = {
     entry: {
-        'jedi-validate': ['babel-polyfill', './src/index.js'],
-        'jedi-validate.min': ['babel-polyfill', './src/index.js'],
+        'jedi-validate': ['./src/polyfills.js', './src/index.js'],
+        'jedi-validate.min': ['./src/polyfills.js', './src/index.js'],
     },
     devtool: 'source-map',
     output: {
@@ -29,7 +29,7 @@ const config = {
             {
                 test: /\.js$/,
                 exclude: /(node_modules|bower_components)/,
-                loader: 'babel-loader?cacheDirectory=cache',
+                loader: 'babel-loader?cacheDirectory=true',
             },
             {
                 test: /\.json$/,
@@ -47,23 +47,19 @@ const config = {
 };
 
 if (NODE_ENV === 'production') {
-    config.plugins.push(
-        new MinifyPlugin(
-            {
-                removeDebugger: true,
-            },
-            {
-                test: /\.min\.js$/,
-                comments: false,
-            }
-        )
-    );
-
-    config.plugins.push(
-        new CompressionPlugin({
+    config.plugins.push(new MinifyPlugin(
+        {
+            removeDebugger: true,
+        },
+        {
             test: /\.min\.js$/,
-        })
-    );
+            comments: false,
+        },
+    ));
+
+    config.plugins.push(new CompressionPlugin({
+        test: /\.min\.js$/,
+    }));
 }
 
 module.exports = config;

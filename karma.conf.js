@@ -1,6 +1,14 @@
+process.env.CHROME_BIN = require('puppeteer').executablePath();
+
 module.exports = function (config) {
     config.set({
-        browsers: ['ChromeHeadless'],
+        browsers: ['ChromeHeadlessNoSandbox'],
+        customLaunchers: {
+            ChromeHeadlessNoSandbox: {
+                base: 'ChromeHeadless',
+                flags: ['--no-sandbox'],
+            },
+        },
         frameworks: ['mocha', 'chai'],
         files: [
             'tests/**/*.js',
@@ -22,7 +30,7 @@ module.exports = function (config) {
                     {
                         test: /\.js$/,
                         exclude: /(node_modules|bower_components)/,
-                        loader: 'babel-loader?cacheDirectory=cache',
+                        loader: 'babel-loader?cacheDirectory=true',
                     },
                     {
                         test: /\.json$/,
