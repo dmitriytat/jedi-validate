@@ -1,10 +1,11 @@
 const webpack = require('webpack');
-const MinifyPlugin = require('babel-minify-webpack-plugin');
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const CompressionPlugin = require('compression-webpack-plugin');
 
 const NODE_ENV = process.env.NODE_ENV || 'development';
 
 const config = {
+    mode: 'none',
     entry: {
         'jedi-validate': ['./src/polyfills.js', './src/index.js'],
         'jedi-validate.min': ['./src/polyfills.js', './src/index.js'],
@@ -31,10 +32,6 @@ const config = {
                 exclude: /(node_modules|bower_components)/,
                 loader: 'babel-loader?cacheDirectory=true',
             },
-            {
-                test: /\.json$/,
-                loader: 'json-loader',
-            },
         ],
     },
     plugins: [
@@ -47,19 +44,22 @@ const config = {
 };
 
 if (NODE_ENV === 'production') {
-    config.plugins.push(new MinifyPlugin(
-        {
-            removeDebugger: true,
-        },
-        {
-            test: /\.min\.js$/,
-            comments: false,
-        },
-    ));
+    config.plugins.push(new UglifyJsPlugin({
+        cache: true,
+        parallel: true,
+        test: /\.min\.js$/,
+        sourceMap: true,
+        extractComments: true,
+    }));
+
+    config.plugins.push(new webpack.optimize.ModuleConcatenationPlugin());
+    config.plugins.push(new webpack.NoEmitOnErrorsPlugin());
 
     config.plugins.push(new CompressionPlugin({
         test: /\.min\.js$/,
     }));
+} else {
+    config.plugins.push(new webpack.NamedModulesPlugin());
 }
 
 module.exports = config;

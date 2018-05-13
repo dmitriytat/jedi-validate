@@ -4,8 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Jedi Validate - Lightweight form validation component.</title>
-    <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css"/>
-    <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap-theme.min.css"/>
+    <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap-theme.min.css" />
 </head>
 
 <body>
@@ -34,14 +34,16 @@
                             <label for="number" class="col-sm-2 control-label">Number:</label>
 
                             <div class="col-sm-4">
-                                <input name="number" type="number" class="form-control" step="2" min="4" max="30" id="number" placeholder="Number" required>
+                                <input name="number" type="number" class="form-control" step="2" min="4" max="30"
+                                       id="number" placeholder="Number" required>
                             </div>
                         </div>
                         <div class="form-group">
                             <label for="date" class="col-sm-2 control-label">Date:</label>
 
                             <div class="col-sm-4">
-                                <input name="date" type="date" class="form-control" min="2017/10/10" max="2017/10/20" id="date" placeholder="Date" required>
+                                <input name="date" type="date" class="form-control" min="2017/10/10" max="2017/10/20"
+                                       id="date" placeholder="Date" required>
                             </div>
                         </div>
                         <div class="form-group">
@@ -98,7 +100,7 @@
                                 </div>
                             </div>
                         </div>
-                        <hr/>
+                        <hr />
                         <button type="submit" class="btn  btn-lg btn-success pull-right">Send</button>
 
                     </form>
@@ -118,7 +120,7 @@
                                 <textarea name="text" id="text" cols="30" rows="10" required></textarea>
                             </div>
                         </div>
-                        <hr/>
+                        <hr />
                         <button type="submit" class="btn  btn-lg btn-success pull-right">Send</button>
                     </form>
                     <div class="base-error alert alert-danger" role="alert" style="display: none"></div>
@@ -151,7 +153,7 @@
                                 </select>
                             </div>
                         </div>
-                        <hr/>
+                        <hr />
                         <button type="submit" class="btn  btn-lg btn-success pull-right">Send</button>
                     </form>
                     <div class="base-error alert alert-danger" role="alert" style="display: none"></div>
@@ -177,7 +179,7 @@
                                        placeholder="Phone #2" value="2">
                             </div>
                         </div>
-                        <hr/>
+                        <hr />
                         <button type="submit" class="btn  btn-lg btn-success pull-right">Send</button>
                     </form>
                     <div class="base-error alert alert-danger" role="alert" style="display: none"></div>
@@ -203,7 +205,7 @@
                                 <input name="phone" type="text" class="form-control" id="phonedv2" placeholder="Phone">
                             </div>
                         </div>
-                        <hr/>
+                        <hr />
                         <button type="submit" class="btn  btn-lg btn-success pull-right">Send</button>
                     </form>
                     <div class="base-error alert alert-danger" role="alert" style="display: none"></div>
@@ -232,7 +234,7 @@
                             </div>
                             <div class="field__error"></div>
                         </div>
-                        <hr/>
+                        <hr />
                         <button type="submit" class="btn  btn-lg btn-success pull-right">Send</button>
                     </form>
                     <div class="base-error alert alert-danger" role="alert" style="display: none"></div>
@@ -254,31 +256,31 @@
         states: {
             error: 'has-error',
             valid: 'has-success',
-            dirty: 'has-warning'
+            dirty: 'has-warning',
         },
         rules: {
             file: {
                 filesize: 2 * 1024 * 1024,
-                extension: "html|css|txt"
-            }
+                extension: 'html|css|txt',
+            },
         },
         messages: {
             name: {
-                regexp: "Two words with space"
+                regexp: 'Two words with space',
             },
             file: {
-                filesize: "File is too big"
+                filesize: 'File is too big',
             },
             check: {
-                required: "Check it, please!"
-            }
+                required: 'Check it, please!',
+            },
         },
         callbacks: {
             success: function (response) {
             },
             error: function (errors) {
-            }
-        }
+            },
+        },
     };
 
     var formWrapper = document.querySelector('#form1');
@@ -286,15 +288,15 @@
 
     new JediValidate(document.querySelector('#form2'), Object.assign({}, options, {
         translations: {
-            "it": {
-                "This field is required": "Questo campo è obbligatorio"
-            }
+            'it': {
+                'This field is required': 'Questo campo è obbligatorio',
+            },
         },
-        language: "it"
+        language: 'it',
     }));
 
     new JediValidate(document.querySelector('#form3'), Object.assign({}, options, {
-        language: "ru"
+        language: 'ru',
     }));
 
     new JediValidate(document.querySelector('#form4'), Object.assign({}, options));
@@ -303,7 +305,7 @@
         states: {
             error: 'has-error',
             valid: 'has-success',
-            dirty: 'has-warning'
+            dirty: 'has-warning',
         },
         rules: {
             phone: {
@@ -312,7 +314,7 @@
                     return !!newData['checkbox'];
                 }],
                 tel: [true, 'checkbox'], // without recollect
-            }
+            },
         },
     }));
 
@@ -320,7 +322,7 @@
         states: {
             error: 'has-error',
             valid: 'has-success',
-            dirty: 'has-warning'
+            dirty: 'has-warning',
         },
         rules: {
             complicated1: {
@@ -338,20 +340,19 @@
             alternative: {
                 required: [true, checkAlter.bind(null, ['complicated1', 'complicated2', 'complicated3'])],
                 alternative: [true, checkAlter.bind(null, ['complicated1', 'complicated2', 'complicated3'])],
-            }
-        }
+            },
+        },
     });
 
     formValidator6.addMethod('alternative', function (value) {
             if (value === '0') return false;
 
             return true;
-        }, 'At least one field must be filled'
+        }, 'At least one field must be filled',
     );
 
     function checkAlter(names) {
         var values = formValidator6.collect(names);
-        console.log(values)
 
         return Object.keys(values)
             .map(function (key) {
@@ -361,7 +362,7 @@
                 value = typeof value === 'string' ? value.trim() : value;
 
                 var isNotEmpty = !!value;
-                var isNotZero = value !== "0";
+                var isNotZero = value !== '0';
 
                 return check && !(isNotEmpty && isNotZero);
             }, true);

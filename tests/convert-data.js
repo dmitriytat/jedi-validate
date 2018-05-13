@@ -56,13 +56,37 @@ describe('Get data', () => {
             assert.deepEqual(convertData(data, 'json'), JSON.stringify(data));
         });
 
-        it('formData', () => { // fixme
-            const fd = new FormData();
-            const fileInput = document.createElement('input');
-            fileInput.type = 'file';
+        it('formData', () => {
+            function FD() {
+                this.data = {};
+            }
 
-            assert.deepEqual(convertData({ file: fileInput.fileList }, 'formData'), fd);
-            assert.deepEqual(convertData({ file: { lol: 'lal' } }, 'formData'), fd);
+            FD.prototype.append = function (name, item) {
+                this.data = {
+                    ...this.data,
+                    [name]: item,
+                };
+            };
+
+            const files0 = [];
+            const files1 = [42];
+            const files2 = [23, 42];
+            const files3 = [23, 42, 42];
+
+            assert.deepEqual(convertData({ file: files0 }, 'formData', Array, FD).data, {});
+            assert.deepEqual(convertData({ file: files1 }, 'formData', Array, FD).data, { file: 42 });
+            assert.deepEqual(convertData({ file: files2 }, 'formData', Array, FD).data, {
+                'file[0]': 23,
+                'file[1]': 42,
+            });
+            assert.deepEqual(convertData({ file: files3 }, 'formData', Array, FD).data, {
+                'file[0]': 23,
+                'file[1]': 42,
+                'file[2]': 42,
+            });
+
+            assert.deepEqual(convertData({ file: { lol: 'lal' } }, 'formData', Array, FD).data, { 'file[lol]': 'lal' });
+            assert.deepEqual(convertData({ file: 'kek' }, 'formData', Array, FD).data, { file: 'kek' });
         });
     });
 });
