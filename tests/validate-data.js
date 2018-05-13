@@ -60,11 +60,11 @@ describe('Validate data', () => {
             assert.deepEqual(validateField(rules.phone2, methods, data.phone2, 'phone2', errorMessages, data, translate), [errorMessages.phone2.regexp]);
             assert.deepEqual(validateField({
                 ...rules.phone,
-                url: null
+                url: null,
             }, methods, 'dfsdf', 'phone', errorMessages, data, translate), ['Only digits available']);
             assert.deepEqual(validateField({
                 ...rules.phone,
-                lol: true
+                lol: true,
             }, methods, data.phone, 'phone', errorMessages, data, translate), ['Method "lol" not found']);
         });
     });

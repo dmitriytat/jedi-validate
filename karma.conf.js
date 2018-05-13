@@ -6,7 +6,7 @@ module.exports = function (config) {
         customLaunchers: {
             ChromeHeadlessNoSandbox: {
                 base: 'ChromeHeadless',
-                flags: ['--no-sandbox'],
+                flags: ['--no-sandbox', '--disable-translate', '--disable-extensions', '--remote-debugging-port=9223'],
             },
         },
         frameworks: ['mocha', 'chai'],
@@ -25,16 +25,13 @@ module.exports = function (config) {
             dir: 'coverage',
         },
         webpack: {
+            mode: 'none',
             module: {
                 rules: [
                     {
                         test: /\.js$/,
                         exclude: /(node_modules|bower_components)/,
                         loader: 'babel-loader?cacheDirectory=true',
-                    },
-                    {
-                        test: /\.json$/,
-                        loader: 'json-loader',
                     },
                 ],
             },
