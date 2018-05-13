@@ -46,9 +46,11 @@ export function convertNameToPath(name) {
  * Convert data object to value for sending
  * @param {object} data - data object
  * @param {string} type - type of conversion
+ * @param {function} FileListType
+ * @param {function} FormDataType
  * @returns {string|FormData} - output value
  */
-export function convertData(data, type) {
+export function convertData(data, type, FileListType = FileList, FormDataType = FormData) {
     let convertedData;
 
     switch (type) {
@@ -58,7 +60,7 @@ export function convertData(data, type) {
             return convertedData.length ? convertedData.slice(0, -1) : '';
         case 'formData':
             return Object.keys(data).reduce((formData, name) => {
-                if (data[name] instanceof FileList) {
+                if (data[name] instanceof FileListType) {
                     if (data[name].length > 1) {
                         for (let i = 0; i < data[name].length; i += 1) {
                             formData.append(`${name}[${i}]`, data[name][i]);
@@ -73,7 +75,7 @@ export function convertData(data, type) {
                 }
 
                 return formData;
-            }, new FormData());
+            }, new FormDataType());
         case 'json':
         default:
             return JSON.stringify(data);
