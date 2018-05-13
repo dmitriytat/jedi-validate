@@ -86,6 +86,7 @@ describe('Get data', () => {
             });
 
             assert.deepEqual(convertData({ file: { lol: 'lal' } }, 'formData', Array, FD).data, { 'file[lol]': 'lal' });
+            assert.deepEqual(convertData({ file: 'kek' }, 'formData', Array, FD).data, { file: 'kek' });
         });
     });
 });
