@@ -22,7 +22,7 @@ export function regexp(value, exp) {
 }
 
 /**
- * Check value is email
+ * Check value is an email
  * @param {string} value - email
  * @returns {boolean} - true == valid, false == invalid
  */
@@ -31,7 +31,7 @@ export function email(value) {
 }
 
 /**
- * Check size of all files is less then max
+ * Check file sizes are less than max
  * @param {FileList} value - FileList
  * @param {number} size - max file size
  * @returns {boolean} - true == valid, false == invalid
@@ -41,7 +41,7 @@ export function filesize(value, size) {
 }
 
 /**
- * Check the extension of all files
+ * Check file extensions
  * @param {FileList} value - FileList
  * @param {string} extensions - extensions list
  * @returns {boolean} - true == valid, false == invalid

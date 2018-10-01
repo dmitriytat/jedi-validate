@@ -5,7 +5,7 @@ import { convertNameToPath } from './convert-data';
 /**
  * Create object by path and value
  * @param {Array} path - path array
- * @param {string|FileList} value - value on input
+ * @param {string|FileList} value - input value
  * @returns {object} - data object
  */
 export function createObject(path, value) {
@@ -52,9 +52,9 @@ export function getRadioGroupValue(inputs) {
 }
 
 /**
- * Get value form input
+ * Get form input value
  * @param {Element|HTMLInputElement|HTMLSelectElement|Array} input - input
- * @returns {string|Date|FileList|Array} - value of input, or array of value if input is select
+ * @returns {string|Date|FileList|Array} - value of input, or array of values if input is select
  */
 export function getInputValue(input) {
     if (!input) return '';
@@ -92,7 +92,7 @@ export function getInputName(input) {
 }
 
 /**
- * Get object which key is name of input and value is value of input
+ * Get input value as an object keyed by input name
  * @param {HTMLInputElement|Array} input - input element or Array of HTMLInputElements
  * @returns {object} - data
  */

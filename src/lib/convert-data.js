@@ -1,5 +1,5 @@
 /**
- * Create part url for serialize method
+ * Create query portion of url for serialize method
  * @param {string} name
  * @param {object|Array|string} data
  * @returns {string} - part of url
@@ -21,8 +21,8 @@ export function getQueryPart(name, data) {
 const NAME = /(\[(\w*)\]|\w*)/gi;
 
 /**
- * Convert name of input to path array
- * @param {string} name - name of input
+ * Convert input name to path array
+ * @param {string} name - input name
  * @returns {Array} - path to value in data object
  */
 export function convertNameToPath(name) {
@@ -43,7 +43,7 @@ export function convertNameToPath(name) {
 }
 
 /**
- * Convert data object to value for sending
+ * Convert data object to a value for sending
  * @param {object} data - data object
  * @param {string} type - type of conversion
  * @param {function} FileListType

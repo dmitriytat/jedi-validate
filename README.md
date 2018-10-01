@@ -49,16 +49,16 @@ Because it provides a strict json format for interaction, you can send a form in
 
 * serialized
 * as a JSON object
-* as FormData.
+* as FormData
 
-But server answer always has one structure, it is easier to implement.
+But the server response always has one structure. It is easier to implement.
 
 <h2>
     <a name="install"></a>
     Build and Test
 </h2>
 
-If you would like to build the source code, run tests, or contribute, then first fork or clone this repo onto your local machine. Ensure NodeJS is installed and in turn npm. Check in a terminal with `node -v` and `npm -v`.
+If you would like to build the source code, run tests, or contribute, then first fork or clone this repo onto your local machine. Ensure NodeJS and npm are installed. Check in a terminal with `node -v` and `npm -v`.
 
 To install project dependencies first run,
 
@@ -203,7 +203,7 @@ Rules used to validate input. Each form element will be matched by the 'name' at
 
 #### Basic Rules:
 
-Rules are not defined by default, but they can be set via attributes or classes in HTML, or in the init options.
+Rules are not defined by default, but they can be set via attributes, or classes in HTML, or in the init options.
 
 > - required :  boolean
 > - regexp : RegExp
@@ -270,7 +270,7 @@ Add rules as part of your options object when initializing:
     });
 ```
 
-You can recollect data of all form or just input by name. Method return new data.
+You can recollect data from the entire form or just by input name. The method returns new data.
 
 ```
 validator.collect(); // all form
@@ -283,7 +283,7 @@ validator.collect('two-files-checkbox'); // one field
   Error Messages
 </h1>
 
-You can define your own error messages in case validation fails. In case a form element fails validation, then the message corresponding to the element's 'name' attribute will apply.
+You can define your own error messages in case validation fails. In case a form element fails validation, the message corresponding to the element's 'name' attribute will apply.
 
 ```javascript
     messages: {

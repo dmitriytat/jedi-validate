@@ -2,9 +2,9 @@ import { getValueByName } from './get-data';
 
 /**
  * Check rule for dependencies
- * @param {*} params - params of validation
- * @param {object} data - data of form
- * @returns {*} - params of validation or null if rule not checkable
+ * @param {*} params - validation params
+ * @param {object} data - form data
+ * @returns {*} - validation params or null if rule is not checkable
  */
 export function isCheckable(params, data) {
     if (!params) {
@@ -38,11 +38,11 @@ export function isCheckable(params, data) {
  * Validate field
  * @param {object} rules - object with rules for validation
  * @param {object} methods - validation methods
- * @param {string|FileList|Array} value - value of input
- * @param {string} name - name on input
+ * @param {string|FileList|Array} value - input value
+ * @param {string} name - input name
  * @param {object} errorMessages - object with error messages
- * @param {object} data - data of form
- * @param {function} translate - translate function
+ * @param {object} data - form data
+ * @param {function} translate - translation function
  * @returns {Array.<string>} - array of field errors
  */
 export function validateField(rules, methods, value, name, errorMessages, data, translate) {
@@ -85,7 +85,7 @@ export function validateField(rules, methods, value, name, errorMessages, data, 
  * @param {object} methods - validation methods
  * @param {object} data - data object
  * @param {object} errorMessages - object with error messages
- * @param {function} translate - translate function
+ * @param {function} translate - translation function
  * @returns {object.<string, Array.<string>>} - object of fields error arrays
  */
 export function validateData(rules, methods, data, errorMessages, translate) {

@@ -17,7 +17,7 @@ export function getFormOptions(form) {
 }
 
 /**
- * Get validate options from input attribute of className
+ * Get validatation options from input attribute of className
  * @param {HTMLInputElement|HTMLSelectElement} input - input for validation
  * @returns {object} - rules
  */
