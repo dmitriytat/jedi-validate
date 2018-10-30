@@ -1,10 +1,10 @@
 # Jedi Validate
 
 [![npm version](https://badge.fury.io/js/jedi-validate.svg)](https://www.npmjs.com/package/jedi-validate)
-[![doc coverage](http://dmitriytat.github.io/jedi-validate/badge.svg)](http://dmitriytat.github.io/jedi-validate/)
+[![doc coverage](https://dmitriytat.github.io/jedi-validate/badge.svg)](https://dmitriytat.github.io/jedi-validate/)
 [![Build Status](https://travis-ci.org/dmitriytat/jedi-validate.svg?branch=master)](https://travis-ci.org/dmitriytat/jedi-validate)
 [![Coverage Status](https://coveralls.io/repos/github/dmitriytat/jedi-validate/badge.svg?branch=master)](https://coveralls.io/github/dmitriytat/jedi-validate?branch=master)
-![Coverage Status](https://badge.stryker-mutator.io/github.com/dmitriytat/jedi-validate}/master)
+[![Mutation testing badge](https://badge.stryker-mutator.io/github.com/dmitriytat/jedi-validate/master)](https://stryker-mutator.github.io)
 [![Dependencies](https://david-dm.org/dmitriytat/jedi-validate.svg)](https://david-dm.org/dmitriytat/jedi-validate)
 
 * [Introduction & documentation](#intro)
