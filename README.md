@@ -6,6 +6,7 @@
 [![Coverage Status](https://coveralls.io/repos/github/dmitriytat/jedi-validate/badge.svg?branch=master)](https://coveralls.io/github/dmitriytat/jedi-validate?branch=master)
 [![Mutation testing badge](https://badge.stryker-mutator.io/github.com/dmitriytat/jedi-validate/master)](https://stryker-mutator.github.io)
 [![Dependencies](https://david-dm.org/dmitriytat/jedi-validate.svg)](https://david-dm.org/dmitriytat/jedi-validate)
+[![Known Vulnerabilities](https://snyk.io/test/github/dmitriytat/jedi-validate/badge.svg?targetFile=package.json)](https://snyk.io/test/github/dmitriytat/jedi-validate?targetFile=package.json)
 
 * [Introduction & documentation](#intro)
 * [Installation and Usage](#install)
