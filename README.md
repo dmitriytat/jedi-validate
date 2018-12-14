@@ -8,28 +8,29 @@
 [![Dependencies](https://david-dm.org/dmitriytat/jedi-validate.svg)](https://david-dm.org/dmitriytat/jedi-validate)
 [![Known Vulnerabilities](https://snyk.io/test/github/dmitriytat/jedi-validate/badge.svg?targetFile=package.json)](https://snyk.io/test/github/dmitriytat/jedi-validate?targetFile=package.json)
 
-* [Introduction & documentation](#intro)
-* [Installation and Usage](#install)
+* [Introduction & documentation](#jedi-validate)
+* [Installation and Usage](#installation-and-usage)
+* [Motivation](#motivation)
+* [Build and Test](#build-and-test)
 * [Options](#options)
-  * [Default Options](#default)
-  * [Ajax Parameters](#ajax)
-  * [Data Encoding Options](#encoding)
-* [Validation Rules](#rules)
-* [Error Message](#error)
+  * [Default Options](#default-options)
+  * [Ajax Options](#ajax-options)
+  * [Data Encoding Options](#data-encoding-options)
+* [Validation Rules](#validation-rules)
+* [Error Messages](#error-messages)
 
 
-<h1>
-    <a name="intro"></a>
-    Introduction
-</h1>
-
+# Jedi Validate
 
 Jedi Validate is a lightweight form validation component.
 
+- Demo:
+    - [Bootstrap 3](http://dmitriytat.github.io/jedi-validate/example/bootstrap.html)
+    - [Bootstrap 4](http://dmitriytat.github.io/jedi-validate/example/bootstrap-4.html)
 - [Documentation](http://dmitriytat.github.io/jedi-validate/)
 - [Test coverage](https://coveralls.io/github/dmitriytat/jedi-validate)
 
-## How Can I Use It?
+## Installation and Usage
 
 This is a JS class and you can create a new instance by passing in a DOM element and an options object.
 
@@ -45,7 +46,7 @@ const JediValidate = new JediValidate(document.querySelector('#form5'));
 
 By default, the form will be sent via ajax with the parameters which were set in HTML.
 
-## Why Should I Use It?
+## Motivation
 
 Because it provides a strict json format for interaction, you can send a form in many different ways:
 
@@ -55,10 +56,7 @@ Because it provides a strict json format for interaction, you can send a form in
 
 But the server response always has one structure. It is easier to implement.
 
-<h2>
-    <a name="install"></a>
-    Build and Test
-</h2>
+## Build and Test
 
 If you would like to build the source code, run tests, or contribute, then first fork or clone this repo onto your local machine. Ensure NodeJS and npm are installed. Check in a terminal with `node -v` and `npm -v`.
 
@@ -86,10 +84,7 @@ This will open a webpack local server where you can navigate to the desired dire
 ### Running Tests
 The tests are not yet complete and runtime errors will occur when attempting to run the tests in the console or through the test browser.
 
-<h1>
-    <a name="options"></a>
-    Options
-</h1>
+## Options
 
 There are three types of options:
 
@@ -97,11 +92,7 @@ There are three types of options:
 * Form attributes such as action or method
 * Initialization options
 
-<h2>
-   <a name="default"></a>
-   Default Options
-</h2>
-
+### Default Options
 
 ```javascript
     {
@@ -135,10 +126,7 @@ There are three types of options:
     }
 ```
 
-<h2>
-  <a name="ajax"></a>
-  ajax
-</h2>
+### Ajax Options
 
 Under the ajax option we define how to send the form.
 It can be ```null``` if we do not want the form to be sent,
@@ -156,7 +144,8 @@ Can be overridden by the `enctype` form attribute, init options, or `sendType`.
 default: ```'GET'```
 Can be overridden by the `method` form attribute or init options.
 
-<a name="encoding"></a>
+### Data Encoding Options
+
 #### sendType
 default: ```'serialize'```
 
@@ -196,14 +185,11 @@ Content-Disposition: form-data; name="email"
     {"name":"111","phone":"222222222","email":"wow@wow.com","file":"index.html"}
 ```
 
-<h1>
-  <a name="rules"></a>
-  Validation Rules
-</h1>
+## Validation Rules
 
 Rules used to validate input. Each form element will be matched by the 'name' attribute with a corresponding rule, if one exists. If no rule exists, then no validation will occur.
 
-#### Basic Rules:
+### Basic Rules:
 
 Rules are not defined by default, but they can be set via attributes, or classes in HTML, or in the init options.
 
@@ -230,13 +216,13 @@ Example:
 * type="email" or class="email" to validate as email
 * required or class="required" to validate as a required field
 
-#### Custom Validation Rules
+### Custom Validation Rules
 
 You can set your own rules using the ```addMethod``` function:
 
-```
+```javascript
 JediValidate.addMethod('methodName', function (value, options) {
-    return // true if valid
+    return true // true if valid
 }, 'Error message');
 ```
 
@@ -274,16 +260,13 @@ Add rules as part of your options object when initializing:
 
 You can recollect data from the entire form or just by input name. The method returns new data.
 
-```
+```javascript
 validator.collect(); // all form
 validator.collect('two-files-checkbox'); // one field
 ```
 
 
-<h1>
-  <a name="error"></a>
-  Error Messages
-</h1>
+## Error Messages
 
 You can define your own error messages in case validation fails. In case a form element fails validation, the message corresponding to the element's 'name' attribute will apply.
 

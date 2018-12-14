@@ -41,6 +41,10 @@
         "validation",
         "formdata"
     ],
+    "files": [
+        "src",
+        "dist"
+    ],
     "author": "Dmitriy Tatarintsev <tatarintsevd@gmail.com>",
     "license": "MIT",
     "bugs": {
