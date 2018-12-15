@@ -29,7 +29,7 @@ Jedi Validate is a lightweight form validation component.
     - [Bootstrap 4](http://dmitriytat.github.io/jedi-validate/example/bootstrap-4.html)
 - [Documentation](http://dmitriytat.github.io/jedi-validate/)
 - [Test coverage](https://coveralls.io/github/dmitriytat/jedi-validate)
-- [Stryker report](http://dmitriytat.github.io/jedi-validate/stryker)
+- [Stryker report](http://dmitriytat.github.io/jedi-validate/stryker/html)
 
 ## Installation and Usage
 
