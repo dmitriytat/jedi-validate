@@ -1,4 +1,10 @@
-export default function deepmerge(first, second) {
+/**
+ * Merge literal object deeply and concat arrays
+ * @param {Object|Array|*} first
+ * @param {Object|Array|*} second
+ * @return {Object|Array|*}
+ */
+function deepmerge(first, second) {
     if (Array.isArray(first)) {
         return [].concat(first).concat(second);
     }
@@ -15,3 +21,5 @@ export default function deepmerge(first, second) {
 
     return second || first;
 }
+
+export default deepmerge;
