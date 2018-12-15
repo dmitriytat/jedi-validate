@@ -131,12 +131,13 @@ export default class JediValidate {
 
         this.root = root;
 
-        this.options = deepmerge(defaultOptions, options);
+        const baseMessageClass =
+            (options.containers && options.containers.baseMessage) || defaultOptions.containers.baseMessage;
 
         this.nodes = {
             form: this.root.querySelector('form'),
             inputs: this.root.querySelectorAll('form [name]'),
-            baseMessage: this.root.querySelector(`.${this.options.containers.baseMessage}`),
+            baseMessage: this.root.querySelector(`.${baseMessageClass}`),
         };
 
         const formOptions = getFormOptions(this.nodes.form);

@@ -337,7 +337,7 @@ describe('Merge options', () => {
         expect(validator.rules).toEqual({
             'parent[child]': {},
             phone: {
-                check: ['phone2', true, 'phone2', true],
+                check: ['phone2', true],
                 required: true,
                 tel: true,
             },
