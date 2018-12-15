@@ -5,7 +5,7 @@ script:
   - npm run build
   - npm run test:coveralls
   - if [ "$TRAVIS_BRANCH" == "master" ]; then mkdir -p docs/dist && cp -a dist/jedi-validate.js docs/dist/ && cp -a example docs/example; fi
-  - if [ "$TRAVIS_BRANCH" == "master" ]; then npm run stryker; fi
+  - if [ "$TRAVIS_BRANCH" == "master" ]; then npm run stryker && mkdir -p docs/stryker && cp -a reports/mutation/html/ docs/stryker/; fi
 deploy:
   - provider: pages
     target-branch: gh-pages
