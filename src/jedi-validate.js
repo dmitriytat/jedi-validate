@@ -7,6 +7,7 @@ import { validateData, validateField } from './lib/validate-data';
 import { ajax } from './lib/ajax';
 import { initErrorMessages, markField } from './lib/utils';
 import defaultMethods from './lib/methods';
+import defaultOptions from './options';
 
 /**
  * JediValidate - validation
@@ -96,39 +97,6 @@ export default class JediValidate {
      * @param {object} options - object with options
      */
     constructor(root, options = {}) {
-        const defaultOptions = {
-            ajax: {
-                url: null,
-                enctype: 'application/x-www-form-urlencoded',
-                sendType: 'serialize', // 'serialize', 'formData', 'json'
-                method: 'GET',
-            },
-            rules: {},
-            messages: {},
-            containers: {
-                parent: 'form-group',
-                message: 'help-block',
-                baseMessage: 'base-error',
-            },
-            states: {
-                error: 'error',
-                valid: 'valid',
-                pristine: 'pristine',
-                dirty: 'dirty',
-            },
-            formStatePrefix: 'jedi-',
-            callbacks: {
-                // eslint-disable-next-line no-unused-vars
-                success({ event, response }) {},
-                // eslint-disable-next-line no-unused-vars
-                error({ errors }) {},
-            },
-            clean: true,
-            redirect: true,
-            language: 'en',
-            translations: {},
-        };
-
         this.root = root;
 
         const baseMessageClass =

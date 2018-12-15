@@ -184,6 +184,51 @@ describe('Jedi Validate', () => {
 });
 
 describe('Merge options', () => {
+    it('Should use default options', () => {
+        const wrapper = document.createElement('div');
+        wrapper.innerHTML = `<form></form>`;
+
+        const callback = jest.fn();
+
+        const validator = new JediValidate(wrapper, {
+            callbacks: {
+                success: callback,
+                error: callback,
+            },
+        });
+
+        expect(validator.options).toEqual({
+            ajax: {
+                url: null,
+                enctype: 'application/x-www-form-urlencoded',
+                sendType: 'serialize', // 'serialize', 'formData', 'json'
+                method: 'GET',
+            },
+            rules: {},
+            messages: {},
+            containers: {
+                parent: 'form-group',
+                message: 'help-block',
+                baseMessage: 'base-error',
+            },
+            states: {
+                error: 'error',
+                valid: 'valid',
+                pristine: 'pristine',
+                dirty: 'dirty',
+            },
+            formStatePrefix: 'jedi-',
+            callbacks: {
+                success: callback,
+                error: callback,
+            },
+            clean: true,
+            redirect: true,
+            language: 'en',
+            translations: {},
+        });
+    });
+
     it('Should merge options', () => {
         const template = `
             <form id="myForm4" action="./ajax.php" method="post" enctype="multipart/form-data" class="form-horizontal">
