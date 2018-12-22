@@ -1,14 +1,22 @@
 {
     "presets": [
-        ["@babel/env", {
-            "targets": {
-                "browsers": ["last 2 versions"]
-            },
-            "useBuiltIns": "usage"
-        }]
+        [
+            "@babel/env",
+            {
+                "targets": {
+                    "browsers": [
+                        "last 2 versions"
+                    ]
+                },
+                "useBuiltIns": "usage"
+            }
+        ],
+        "@babel/flow"
     ],
     "plugins": [
         "@babel/plugin-proposal-class-properties",
         "@babel/plugin-proposal-export-default-from"
     ]
 }
+
+

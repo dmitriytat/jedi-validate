@@ -1,6 +1,10 @@
-export default {
+// @flow
+
+import type { Options } from './types';
+
+const options: Options = {
     ajax: {
-        url: null,
+        url: './',
         enctype: 'application/x-www-form-urlencoded',
         sendType: 'serialize', // 'serialize', 'formData', 'json'
         method: 'GET',
@@ -20,13 +24,13 @@ export default {
     },
     formStatePrefix: 'jedi-',
     callbacks: {
-        // eslint-disable-next-line no-unused-vars
-        success({ event, response }) {},
-        // eslint-disable-next-line no-unused-vars
-        error({ errors }) {},
+        success() {},
+        error() {},
     },
     clean: true,
     redirect: true,
     language: 'en',
     translations: {},
 };
+
+export default options;

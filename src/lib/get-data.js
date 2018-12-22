@@ -1,5 +1,9 @@
+// @flow
+
 import deepmerge from './deepmerge';
 import { convertNameToPath } from './convert-data';
+import type { Path, Data, Input, InputMap } from '../types';
+import GroupInput from './group-input';
 
 /**
  * Create object by path and value
@@ -7,7 +11,7 @@ import { convertNameToPath } from './convert-data';
  * @param {string|FileList} value - input value
  * @returns {object} - data object
  */
-export function createObject(path, value) {
+export function createObject(path: Path, value: Data): Data {
     const segment = path[0];
 
     if (!segment || segment.length === 0) {
@@ -18,7 +22,9 @@ export function createObject(path, value) {
         return [createObject(path.slice(1), value)];
     }
 
-    return { [segment]: createObject(path.slice(1), value) };
+    const data: Data = { [segment]: createObject(path.slice(1), value) };
+
+    return data;
 }
 
 /**
@@ -27,7 +33,7 @@ export function createObject(path, value) {
  * @param {object} data - data object
  * @returns {string} - value
  */
-export function getValueByPath(path, data) {
+export function getValueByPath(path: Path, data: Data) {
     return path.reduce((value, segment) => (segment && value ? value[segment] : value), data || '');
 }
 
@@ -36,7 +42,7 @@ export function getValueByPath(path, data) {
  * @param {string} name - input name
  * @param {object} data - data object
  */
-export function getValueByName(name, data) {
+export function getValueByName(name: string, data: Data) {
     const path = convertNameToPath(name);
     return getValueByPath(path, data);
 }
@@ -46,8 +52,8 @@ export function getValueByName(name, data) {
  * @param {Array} inputs - array of radio inputs
  * @returns {string|Array.<string>} - value of checked input
  */
-export function getRadioGroupValue(inputs) {
-    const values = [...inputs].map(radio => getInputValue(radio)).filter(Boolean);
+export function getRadioGroupValue(input: GroupInput) {
+    const values = input.inputs.map(radio => getInputValue(radio)).filter(Boolean);
 
     return values.length > 1 ? values : values[0];
 }
@@ -57,12 +63,12 @@ export function getRadioGroupValue(inputs) {
  * @param {Element|HTMLInputElement|HTMLSelectElement|Array} input - input
  * @returns {string|Date|FileList|Array} - value of input, or array of values if input is select
  */
-export function getInputValue(input) {
+export function getInputValue(input: Input): Data {
     if (!input) return '';
 
     const { type } = input;
 
-    if (Array.isArray(input)) {
+    if (input instanceof GroupInput) {
         return getRadioGroupValue(input);
     }
 
@@ -84,23 +90,13 @@ export function getInputValue(input) {
 }
 
 /**
- * Get name from input or array of inputs
- * @param {HTMLInputElement|Array} input - input element or Array of HTMLInputElements
- * @returns {string} - input name
- */
-export function getInputName(input) {
-    return Array.isArray(input) ? input[0].name : input.name;
-}
-
-/**
  * Get input value as an object keyed by input name
  * @param {HTMLInputElement|Array} input - input element or Array of HTMLInputElements
  * @returns {object} - data
  */
-export function getInputData(input) {
+export function getInputData(input: Input | GroupInput): Data {
     const value = getInputValue(input);
-    const name = getInputName(input);
-    const path = convertNameToPath(name);
+    const path = convertNameToPath(input.name);
 
     return createObject(path, value);
 }
@@ -110,6 +106,6 @@ export function getInputData(input) {
  * @param {object} inputs - inputs object
  * @returns {object} - data object
  */
-export function getData(inputs) {
+export function getData(inputs: InputMap): Data {
     return Object.keys(inputs).reduce((data, name) => deepmerge(data, getInputData(inputs[name])), {});
 }
