@@ -1,10 +1,12 @@
+// @flow
+
 /**
  * Merge literal object deeply and concat arrays
  * @param {Object|Array|*} first
  * @param {Object|Array|*} second
  * @return {Object|Array|*}
  */
-function deepmerge(first, second) {
+function deepmerge(first: any, second: any): any {
     if (Array.isArray(first)) {
         return [].concat(first).concat(second);
     }

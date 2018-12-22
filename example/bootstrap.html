@@ -16,361 +16,390 @@
 <div class="container">
     <div class="row">
         <div>
-            <div class="page-header">
-                <h1>Jedi Validate
-                    <small>Lightweight form validation component.</small>
-                </h1>
-            </div>
-            <div class="panel panel-primary">
-                <div class="panel-heading">User Details</div>
-                <div class="panel-body" id="form1">
-                    <form id="myForm" action="./ajax.php" name="ddd" method="post" class="form-horizontal">
-                        <div class="help-block base-error"></div>
-                        <div class="form-group">
-                            <label for="name" class="col-sm-2 control-label">Name:</label>
+            <div class="panel-body" id="frm">
+                <form id="frmfrm" action="http://localhost:3000/form" name="frm" method="get" class="form-horizontal">
+                    <div class="help-block base-error"></div>
+                    <div class="form-group">
+                        <label for="name" class="col-sm-2 control-label">Name:</label>
 
-                            <div class="col-sm-4">
-                                <input name="name" type="text" class="form-control" id="name" placeholder="First Last"
-                                       pattern="\w+\s.\w+" required>
-                            </div>
+                        <div class="col-sm-4">
+                            <input name="name" type="text" class="form-control" id="name" placeholder="name">
                         </div>
-                        <div class="form-group">
-                            <label for="number" class="col-sm-2 control-label">Number:</label>
+                    </div>
+                    <div class="form-group">
+                        <label for="email" class="col-sm-2 control-label">Email:</label>
 
-                            <div class="col-sm-4">
-                                <input name="number" type="number" class="form-control" step="2" min="4" max="30"
-                                       id="number" placeholder="Number" required>
-                            </div>
+                        <div class="col-sm-4">
+                            <input name="email" type="text" class="form-control" id="email" placeholder="email">
                         </div>
-                        <div class="form-group">
-                            <label for="date" class="col-sm-2 control-label">Date:</label>
+                    </div>
 
-                            <div class="col-sm-4">
-                                <input name="date" type="date" class="form-control" min="2010/01/01" max="2020/01/01"
-                                       id="date" placeholder="Date" required>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="phone1" class="col-sm-2 control-label">Phone:</label>
-
-                            <div class="col-sm-4">
-                                <input name="phone[0]" type="tel" class="form-control" id="phone1" placeholder="Phone"
-                                       required>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="phone2" class="col-sm-2 control-label">Phone #2:</label>
-
-                            <div class="col-sm-4">
-                                <input name="phone[1]" type="tel" class="form-control" id="phone2"
-                                       placeholder="Phone #2">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="email" class="col-sm-2 control-label">E-mail:</label>
-
-                            <div class="col-sm-4">
-                                <input name="email" type="email" class="form-control" id="email" placeholder="E-mail"
-                                       required>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="file" class="col-sm-2 control-label">File (html, css, txt):</label>
-
-                            <div class="col-sm-4">
-                                <input name="file" type="file" class="form-control" id="file" multiple>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <div class="col-sm-offset-2 col-sm-4">
-                                <div class="radio">
-                                    <label><input type="radio" name="optradio" value="1" required checked>Option
-                                        1</label>
-                                </div>
-                                <div class="radio">
-                                    <label><input type="radio" name="optradio" value="2">Option 2</label>
-                                </div>
-                                <div class="radio disabled">
-                                    <label><input type="radio" name="optradio" value="3" disabled>Option 3</label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <div class="col-sm-offset-2 col-sm-4">
-                                <div class="checkbox">
-                                    <label>
-                                        <input name="check" type="checkbox" required> Check it:
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                        <hr />
-                        <button type="submit" class="btn  btn-lg btn-success pull-right">Send</button>
-
-                    </form>
-                    <div class="base-error alert alert-danger" role="alert" style="display: none"></div>
-
-                </div>
-            </div>
-            <div class="panel panel-primary">
-                <div class="panel-heading">Text area</div>
-                <div class="panel-body" id="form2">
-                    <form action="./ajax.php" method="post" class="form-horizontal">
-                        <div class="help-block base-error"></div>
-                        <div class="form-group">
-                            <label for="text" class="col-sm-2 control-label">Text:</label>
-
-                            <div class="col-sm-4">
-                                <textarea name="text" id="text" cols="30" rows="10" required></textarea>
-                            </div>
-                        </div>
-                        <hr />
-                        <button type="submit" class="btn  btn-lg btn-success pull-right">Send</button>
-                    </form>
-                    <div class="base-error alert alert-danger" role="alert" style="display: none"></div>
-                </div>
-            </div>
-            <div class="panel panel-primary">
-                <div class="panel-heading">Select</div>
-                <div class="panel-body" id="form3">
-                    <form action="./ajax.php" method="post" class="form-horizontal">
-                        <div class="help-block base-error"></div>
-                        <div class="form-group">
-                            <label for="select" class="col-sm-2 control-label">select:</label>
-
-                            <div class="col-sm-4">
-                                <select name="select" id="select" required>
-                                    <option value="1">1</option>
-                                    <option value="2">2</option>
-                                    <option value="3">3</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="select2" class="col-sm-2 control-label">multiple:</label>
-
-                            <div class="col-sm-4">
-                                <select name="select2" id="select2" multiple="multiple" required>
-                                    <option value="1">1</option>
-                                    <option value="2">2</option>
-                                    <option value="3">3</option>
-                                </select>
-                            </div>
-                        </div>
-                        <hr />
-                        <button type="submit" class="btn  btn-lg btn-success pull-right">Send</button>
-                    </form>
-                    <div class="base-error alert alert-danger" role="alert" style="display: none"></div>
-                </div>
-            </div>
-            <div class="panel panel-primary">
-                <div class="panel-heading">Fields with same name like phone[]</div>
-                <div class="panel-body" id="form4">
-                    <form id="myForm4" action="./ajax.php" method="post" class="form-horizontal">
-                        <div class="form-group">
-                            <label for="phoned1" class="col-sm-2 control-label">Phone:</label>
-
-                            <div class="col-sm-4">
-                                <input name="phone[]" type="tel" class="form-control" id="phoned1" placeholder="Phone"
-                                       required value="1">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="phoned2" class="col-sm-2 control-label">Phone #2:</label>
-
-                            <div class="col-sm-4">
-                                <input name="phone[]" type="tel" class="form-control" id="phoned2"
-                                       placeholder="Phone #2" value="2">
-                            </div>
-                        </div>
-                        <hr />
-                        <button type="submit" class="btn  btn-lg btn-success pull-right">Send</button>
-                    </form>
-                    <div class="base-error alert alert-danger" role="alert" style="display: none"></div>
-                </div>
-            </div>
-            <div class="panel panel-primary">
-                <div class="panel-heading">Depended field</div>
-                <div class="panel-body" id="form5">
-                    <form id="myForm5" action="./ajax.php" method="post" class="form-horizontal">
-                        <div class="form-group">
-                            <div class="col-sm-offset-2 col-sm-4">
-                                <div class="checkbox">
-                                    <label>
-                                        <input name="checkbox" type="checkbox"> Validate phone:
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="phonedv2" class="col-sm-2 control-label">Phone:</label>
-
-                            <div class="col-sm-4">
-                                <input name="phone" type="text" class="form-control" id="phonedv2" placeholder="Phone">
-                            </div>
-                        </div>
-                        <hr />
-                        <button type="submit" class="btn  btn-lg btn-success pull-right">Send</button>
-                    </form>
-                    <div class="base-error alert alert-danger" role="alert" style="display: none"></div>
-                </div>
-            </div>
-            <div class="panel panel-primary">
-                <div class="panel-heading">Complicated depended fields</div>
-                <div class="panel-body" id="form6">
-                    <form id="myForm6" action="./ajax.php" method="post" class="form-horizontal">
-                        <div class="form-group">
-                            <div class="col-sm-offset-2 col-sm-4">
-                                <input type="hidden" value="0" name="complicated1">
-                                <label class="checkbox checkbox_size_m checkbox-group__checkbox">
-                                    <input type="checkbox" value="1" name="complicated1"> First
-                                </label>
-                                <input type="hidden" value="0" name="complicated2">
-                                <label class="checkbox checkbox_size_m checkbox-group__checkbox">
-                                    <input type="checkbox" value="1" name="complicated2"> Second
-                                </label>
-                                <input type="hidden" value="0" name="complicated3">
-                                <label class="checkbox checkbox_size_m checkbox-group__checkbox">
-                                    <input type="checkbox" value="1" name="complicated3"> Third
-                                </label>
-                                <br>
-                                <input class="form-control" name="alternative" placeholder="Alternative">
-                            </div>
-                            <div class="field__error"></div>
-                        </div>
-                        <hr />
-                        <button type="submit" class="btn  btn-lg btn-success pull-right">Send</button>
-                    </form>
-                    <div class="base-error alert alert-danger" role="alert" style="display: none"></div>
-                </div>
-            </div>
+                    <button type="submit" class="btn  btn-lg btn-success">Send</button>
+                </form>
         </div>
     </div>
+
+
+    <!--<div class="row">-->
+        <!--<div>-->
+            <!--<div class="page-header">-->
+                <!--<h1>Jedi Validate-->
+                    <!--<small>Lightweight form validation component.</small>-->
+                <!--</h1>-->
+            <!--</div>-->
+            <!--<div class="panel panel-primary">-->
+                <!--<div class="panel-heading">User Details</div>-->
+                <!--<div class="panel-body" id="form1">-->
+                    <!--<form id="myForm" action="./ajax.php" name="ddd" method="post" class="form-horizontal">-->
+                        <!--<div class="help-block base-error"></div>-->
+                        <!--<div class="form-group">-->
+                            <!--<label for="name" class="col-sm-2 control-label">Name:</label>-->
+
+                            <!--<div class="col-sm-4">-->
+                                <!--<input name="name" type="text" class="form-control" id="name" placeholder="First Last"-->
+                                       <!--pattern="\w+\s.\w+" required>-->
+                            <!--</div>-->
+                        <!--</div>-->
+                        <!--<div class="form-group">-->
+                            <!--<label for="number" class="col-sm-2 control-label">Number:</label>-->
+
+                            <!--<div class="col-sm-4">-->
+                                <!--<input name="number" type="number" class="form-control" step="2" min="4" max="30"-->
+                                       <!--id="number" placeholder="Number" required>-->
+                            <!--</div>-->
+                        <!--</div>-->
+                        <!--<div class="form-group">-->
+                            <!--<label for="date" class="col-sm-2 control-label">Date:</label>-->
+
+                            <!--<div class="col-sm-4">-->
+                                <!--<input name="date" type="date" class="form-control" min="2010/01/01" max="2020/01/01"-->
+                                       <!--id="date" placeholder="Date" required>-->
+                            <!--</div>-->
+                        <!--</div>-->
+                        <!--<div class="form-group">-->
+                            <!--<label for="phone1" class="col-sm-2 control-label">Phone:</label>-->
+
+                            <!--<div class="col-sm-4">-->
+                                <!--<input name="phone[0]" type="tel" class="form-control" id="phone1" placeholder="Phone"-->
+                                       <!--required>-->
+                            <!--</div>-->
+                        <!--</div>-->
+                        <!--<div class="form-group">-->
+                            <!--<label for="phone2" class="col-sm-2 control-label">Phone #2:</label>-->
+
+                            <!--<div class="col-sm-4">-->
+                                <!--<input name="phone[1]" type="tel" class="form-control" id="phone2"-->
+                                       <!--placeholder="Phone #2">-->
+                            <!--</div>-->
+                        <!--</div>-->
+                        <!--<div class="form-group">-->
+                            <!--<label for="email" class="col-sm-2 control-label">E-mail:</label>-->
+
+                            <!--<div class="col-sm-4">-->
+                                <!--<input name="email" type="email" class="form-control" id="email" placeholder="E-mail"-->
+                                       <!--required>-->
+                            <!--</div>-->
+                        <!--</div>-->
+                        <!--<div class="form-group">-->
+                            <!--<label for="file" class="col-sm-2 control-label">File (html, css, txt):</label>-->
+
+                            <!--<div class="col-sm-4">-->
+                                <!--<input name="file" type="file" class="form-control" id="file" multiple>-->
+                            <!--</div>-->
+                        <!--</div>-->
+                        <!--<div class="form-group">-->
+                            <!--<div class="col-sm-offset-2 col-sm-4">-->
+                                <!--<div class="radio">-->
+                                    <!--<label><input type="radio" name="optradio" value="1" required checked>Option-->
+                                        <!--1</label>-->
+                                <!--</div>-->
+                                <!--<div class="radio">-->
+                                    <!--<label><input type="radio" name="optradio" value="2">Option 2</label>-->
+                                <!--</div>-->
+                                <!--<div class="radio disabled">-->
+                                    <!--<label><input type="radio" name="optradio" value="3" disabled>Option 3</label>-->
+                                <!--</div>-->
+                            <!--</div>-->
+                        <!--</div>-->
+                        <!--<div class="form-group">-->
+                            <!--<div class="col-sm-offset-2 col-sm-4">-->
+                                <!--<div class="checkbox">-->
+                                    <!--<label>-->
+                                        <!--<input name="check" type="checkbox" required> Check it:-->
+                                    <!--</label>-->
+                                <!--</div>-->
+                            <!--</div>-->
+                        <!--</div>-->
+                        <!--<hr />-->
+                        <!--<button type="submit" class="btn  btn-lg btn-success pull-right">Send</button>-->
+
+                    <!--</form>-->
+                    <!--<div class="base-error alert alert-danger" role="alert" style="display: none"></div>-->
+
+                <!--</div>-->
+            <!--</div>-->
+            <!--<div class="panel panel-primary">-->
+                <!--<div class="panel-heading">Text area</div>-->
+                <!--<div class="panel-body" id="form2">-->
+                    <!--<form action="./ajax.php" method="post" class="form-horizontal">-->
+                        <!--<div class="help-block base-error"></div>-->
+                        <!--<div class="form-group">-->
+                            <!--<label for="text" class="col-sm-2 control-label">Text:</label>-->
+
+                            <!--<div class="col-sm-4">-->
+                                <!--<textarea name="text" id="text" cols="30" rows="10" required></textarea>-->
+                            <!--</div>-->
+                        <!--</div>-->
+                        <!--<hr />-->
+                        <!--<button type="submit" class="btn  btn-lg btn-success pull-right">Send</button>-->
+                    <!--</form>-->
+                    <!--<div class="base-error alert alert-danger" role="alert" style="display: none"></div>-->
+                <!--</div>-->
+            <!--</div>-->
+            <!--<div class="panel panel-primary">-->
+                <!--<div class="panel-heading">Select</div>-->
+                <!--<div class="panel-body" id="form3">-->
+                    <!--<form action="./ajax.php" method="post" class="form-horizontal">-->
+                        <!--<div class="help-block base-error"></div>-->
+                        <!--<div class="form-group">-->
+                            <!--<label for="select" class="col-sm-2 control-label">select:</label>-->
+
+                            <!--<div class="col-sm-4">-->
+                                <!--<select name="select" id="select" required>-->
+                                    <!--<option value="1">1</option>-->
+                                    <!--<option value="2">2</option>-->
+                                    <!--<option value="3">3</option>-->
+                                <!--</select>-->
+                            <!--</div>-->
+                        <!--</div>-->
+                        <!--<div class="form-group">-->
+                            <!--<label for="select2" class="col-sm-2 control-label">multiple:</label>-->
+
+                            <!--<div class="col-sm-4">-->
+                                <!--<select name="select2" id="select2" multiple="multiple" required>-->
+                                    <!--<option value="1">1</option>-->
+                                    <!--<option value="2">2</option>-->
+                                    <!--<option value="3">3</option>-->
+                                <!--</select>-->
+                            <!--</div>-->
+                        <!--</div>-->
+                        <!--<hr />-->
+                        <!--<button type="submit" class="btn  btn-lg btn-success pull-right">Send</button>-->
+                    <!--</form>-->
+                    <!--<div class="base-error alert alert-danger" role="alert" style="display: none"></div>-->
+                <!--</div>-->
+            <!--</div>-->
+            <!--<div class="panel panel-primary">-->
+                <!--<div class="panel-heading">Fields with same name like phone[]</div>-->
+                <!--<div class="panel-body" id="form4">-->
+                    <!--<form id="myForm4" action="./ajax.php" method="post" class="form-horizontal">-->
+                        <!--<div class="form-group">-->
+                            <!--<label for="phoned1" class="col-sm-2 control-label">Phone:</label>-->
+
+                            <!--<div class="col-sm-4">-->
+                                <!--<input name="phone[]" type="tel" class="form-control" id="phoned1" placeholder="Phone"-->
+                                       <!--required value="1">-->
+                            <!--</div>-->
+                        <!--</div>-->
+                        <!--<div class="form-group">-->
+                            <!--<label for="phoned2" class="col-sm-2 control-label">Phone #2:</label>-->
+
+                            <!--<div class="col-sm-4">-->
+                                <!--<input name="phone[]" type="tel" class="form-control" id="phoned2"-->
+                                       <!--placeholder="Phone #2" value="2">-->
+                            <!--</div>-->
+                        <!--</div>-->
+                        <!--<hr />-->
+                        <!--<button type="submit" class="btn  btn-lg btn-success pull-right">Send</button>-->
+                    <!--</form>-->
+                    <!--<div class="base-error alert alert-danger" role="alert" style="display: none"></div>-->
+                <!--</div>-->
+            <!--</div>-->
+            <!--<div class="panel panel-primary">-->
+                <!--<div class="panel-heading">Depended field</div>-->
+                <!--<div class="panel-body" id="form5">-->
+                    <!--<form id="myForm5" action="./ajax.php" method="post" class="form-horizontal">-->
+                        <!--<div class="form-group">-->
+                            <!--<div class="col-sm-offset-2 col-sm-4">-->
+                                <!--<div class="checkbox">-->
+                                    <!--<label>-->
+                                        <!--<input name="checkbox" type="checkbox"> Validate phone:-->
+                                    <!--</label>-->
+                                <!--</div>-->
+                            <!--</div>-->
+                        <!--</div>-->
+                        <!--<div class="form-group">-->
+                            <!--<label for="phonedv2" class="col-sm-2 control-label">Phone:</label>-->
+
+                            <!--<div class="col-sm-4">-->
+                                <!--<input name="phone" type="text" class="form-control" id="phonedv2" placeholder="Phone">-->
+                            <!--</div>-->
+                        <!--</div>-->
+                        <!--<hr />-->
+                        <!--<button type="submit" class="btn  btn-lg btn-success pull-right">Send</button>-->
+                    <!--</form>-->
+                    <!--<div class="base-error alert alert-danger" role="alert" style="display: none"></div>-->
+                <!--</div>-->
+            <!--</div>-->
+            <!--<div class="panel panel-primary">-->
+                <!--<div class="panel-heading">Complicated depended fields</div>-->
+                <!--<div class="panel-body" id="form6">-->
+                    <!--<form id="myForm6" action="./ajax.php" method="post" class="form-horizontal">-->
+                        <!--<div class="form-group">-->
+                            <!--<div class="col-sm-offset-2 col-sm-4">-->
+                                <!--<input type="hidden" value="0" name="complicated1">-->
+                                <!--<label class="checkbox checkbox_size_m checkbox-group__checkbox">-->
+                                    <!--<input type="checkbox" value="1" name="complicated1"> First-->
+                                <!--</label>-->
+                                <!--<input type="hidden" value="0" name="complicated2">-->
+                                <!--<label class="checkbox checkbox_size_m checkbox-group__checkbox">-->
+                                    <!--<input type="checkbox" value="1" name="complicated2"> Second-->
+                                <!--</label>-->
+                                <!--<input type="hidden" value="0" name="complicated3">-->
+                                <!--<label class="checkbox checkbox_size_m checkbox-group__checkbox">-->
+                                    <!--<input type="checkbox" value="1" name="complicated3"> Third-->
+                                <!--</label>-->
+                                <!--<br>-->
+                                <!--<input class="form-control" name="alternative" placeholder="Alternative">-->
+                            <!--</div>-->
+                            <!--<div class="field__error"></div>-->
+                        <!--</div>-->
+                        <!--<hr />-->
+                        <!--<button type="submit" class="btn  btn-lg btn-success pull-right">Send</button>-->
+                    <!--</form>-->
+                    <!--<div class="base-error alert alert-danger" role="alert" style="display: none"></div>-->
+                <!--</div>-->
+            <!--</div>-->
+        <!--</div>-->
+    <!--</div>-->
 </div>
 
 <script src="../dist/jedi-validate.js"></script>
 
 <script>
-    var options = {
-        ajax: {
-            url: '/example/ajax.json',
-            sendType: 'formData',
-            method: 'post',
-        },
-        states: {
-            error: 'has-error',
-            valid: 'has-success',
-            dirty: 'has-warning',
-        },
-        rules: {
-            file: {
-                filesize: 2 * 1024 * 1024,
-                extension: 'html|css|txt',
-            },
-        },
-        messages: {
-            name: {
-                regexp: 'Two words with space',
-            },
-            file: {
-                filesize: 'File is too big',
-            },
-            check: {
-                required: 'Check it, please!',
-            },
-        },
-        callbacks: {
-            success: function (response) {
-            },
-            error: function (errors) {
-            },
-        },
-    };
-
-    var formWrapper = document.querySelector('#form1');
-    new JediValidate(formWrapper, options);
-
-    new JediValidate(document.querySelector('#form2'), Object.assign({}, options, {
-        translations: {
-            'it': {
-                'This field is required': 'Questo campo è obbligatorio',
-            },
-        },
-        language: 'it',
-    }));
-
-    new JediValidate(document.querySelector('#form3'), Object.assign({}, options, {
-        language: 'ru',
-    }));
-
-    new JediValidate(document.querySelector('#form4'), Object.assign({}, options));
-
-    var validator = new JediValidate(document.querySelector('#form5'), Object.assign({}, {
-        states: {
-            error: 'has-error',
-            valid: 'has-success',
-            dirty: 'has-warning',
-        },
-        rules: {
-            phone: {
-                required: [true, function (oldData) {
-                    const newData = validator.collect('checkbox'); // manual data recollect for concrete field
-                    return !!newData['checkbox'];
-                }],
-                tel: [true, 'checkbox'], // without recollect
-            },
-        },
-    }));
-
-    var formValidator6 = new JediValidate(document.querySelector('#form6'), {
-        states: {
-            error: 'has-error',
-            valid: 'has-success',
-            dirty: 'has-warning',
-        },
-        rules: {
-            complicated1: {
-                required: [true, checkAlter.bind(null, ['complicated2', 'complicated3', 'alternative'])],
-                alternative: [true, checkAlter.bind(null, ['complicated2', 'complicated3', 'alternative'])],
-            },
-            complicated2: {
-                required: [true, checkAlter.bind(null, ['complicated1', 'complicated3', 'alternative'])],
-                alternative: [true, checkAlter.bind(null, ['complicated1', 'complicated3', 'alternative'])],
-            },
-            complicated3: {
-                required: [true, checkAlter.bind(null, ['complicated1', 'complicated2', 'alternative'])],
-                alternative: [true, checkAlter.bind(null, ['complicated1', 'complicated2', 'alternative'])],
-            },
-            alternative: {
-                required: [true, checkAlter.bind(null, ['complicated1', 'complicated2', 'complicated3'])],
-                alternative: [true, checkAlter.bind(null, ['complicated1', 'complicated2', 'complicated3'])],
-            },
-        },
-    });
-
-    formValidator6.addMethod('alternative', function (value) {
-            if (value === '0') return false;
-
-            return true;
-        }, 'At least one field must be filled',
-    );
-
-    function checkAlter(names) {
-        var values = formValidator6.collect(names);
-
-        return Object.keys(values)
-            .map(function (key) {
-                return values[key];
-            })
-            .reduce(function (check, value) {
-                value = typeof value === 'string' ? value.trim() : value;
-
-                var isNotEmpty = !!value;
-                var isNotZero = value !== '0';
-
-                return check && !(isNotEmpty && isNotZero);
-            }, true);
-    }
+    var frmNode = document.querySelector('#frm');
+    new JediValidate(frmNode);
+    //
+    // var options = {
+    //     ajax: {
+    //         url: '/example/ajax.json',
+    //         sendType: 'formData',
+    //         method: 'post',
+    //     },
+    //     states: {
+    //         error: 'has-error',
+    //         valid: 'has-success',
+    //         dirty: 'has-warning',
+    //     },
+    //     rules: {
+    //         file: {
+    //             filesize: 2 * 1024 * 1024,
+    //             extension: 'html|css|txt',
+    //         },
+    //     },
+    //     messages: {
+    //         name: {
+    //             regexp: 'Two words with space',
+    //         },
+    //         file: {
+    //             filesize: 'File is too big',
+    //         },
+    //         check: {
+    //             required: 'Check it, please!',
+    //         },
+    //     },
+    //     callbacks: {
+    //         success: function (response) {
+    //         },
+    //         error: function (errors) {
+    //         },
+    //     },
+    // };
+    //
+    // var formWrapper = document.querySelector('#form1');
+    // new JediValidate(formWrapper, options);
+    //
+    // new JediValidate(document.querySelector('#form2'), Object.assign({}, options, {
+    //     translations: {
+    //         'it': {
+    //             'This field is required': 'Questo campo è obbligatorio',
+    //         },
+    //     },
+    //     language: 'it',
+    // }));
+    //
+    // new JediValidate(document.querySelector('#form3'), Object.assign({}, options, {
+    //     language: 'ru',
+    // }));
+    //
+    // new JediValidate(document.querySelector('#form4'), Object.assign({}, options));
+    //
+    // var validator = new JediValidate(document.querySelector('#form5'), Object.assign({}, {
+    //     states: {
+    //         error: 'has-error',
+    //         valid: 'has-success',
+    //         dirty: 'has-warning',
+    //     },
+    //     rules: {
+    //         phone: {
+    //             required: [true, function (oldData) {
+    //                 const newData = validator.collect('checkbox'); // manual data recollect for concrete field
+    //                 return !!newData['checkbox'];
+    //             }],
+    //             tel: [true, 'checkbox'], // without recollect
+    //         },
+    //     },
+    // }));
+    //
+    // var formValidator6 = new JediValidate(document.querySelector('#form6'), {
+    //     states: {
+    //         error: 'has-error',
+    //         valid: 'has-success',
+    //         dirty: 'has-warning',
+    //     },
+    //     rules: {
+    //         complicated1: {
+    //             required: [true, checkAlter.bind(null, ['complicated2', 'complicated3', 'alternative'])],
+    //             alternative: [true, checkAlter.bind(null, ['complicated2', 'complicated3', 'alternative'])],
+    //         },
+    //         complicated2: {
+    //             required: [true, checkAlter.bind(null, ['complicated1', 'complicated3', 'alternative'])],
+    //             alternative: [true, checkAlter.bind(null, ['complicated1', 'complicated3', 'alternative'])],
+    //         },
+    //         complicated3: {
+    //             required: [true, checkAlter.bind(null, ['complicated1', 'complicated2', 'alternative'])],
+    //             alternative: [true, checkAlter.bind(null, ['complicated1', 'complicated2', 'alternative'])],
+    //         },
+    //         alternative: {
+    //             required: [true, checkAlter.bind(null, ['complicated1', 'complicated2', 'complicated3'])],
+    //             alternative: [true, checkAlter.bind(null, ['complicated1', 'complicated2', 'complicated3'])],
+    //         },
+    //     },
+    // });
+    //
+    // formValidator6.addMethod('alternative', function (value) {
+    //         if (value === '0') return false;
+    //
+    //         return true;
+    //     }, 'At least one field must be filled',
+    // );
+    //
+    // function checkAlter(names) {
+    //     var values = formValidator6.collect(names);
+    //
+    //     return Object.keys(values)
+    //         .map(function (key) {
+    //             return values[key];
+    //         })
+    //         .reduce(function (check, value) {
+    //             value = typeof value === 'string' ? value.trim() : value;
+    //
+    //             var isNotEmpty = !!value;
+    //             var isNotZero = value !== '0';
+    //
+    //             return check && !(isNotEmpty && isNotZero);
+    //         }, true);
+    // }
 </script>
 </body>
 

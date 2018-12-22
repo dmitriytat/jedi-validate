@@ -1,19 +1,23 @@
+// @flow
+
+import type { Data, Path } from '../types';
+
 /**
  * Create query portion of url for serialize method
  * @param {string} name
  * @param {object|Array|string} data
  * @returns {string} - part of url
  */
-export function getQueryPart(name, data) {
+export function getQueryPart(name: string, data: Data): string {
     if (Array.isArray(data)) {
         return data.reduce((part, value) => part + getQueryPart(`${name}[]`, value), '');
     }
 
     if (typeof data === 'object') {
-        return Object.keys(data).reduce((part, index) => part + getQueryPart(`${name}[${index}]`, data[index]), '');
+        return Object.keys(data).reduce((part, key) => part + getQueryPart(`${name}[${key}]`, data[key]), '');
     }
 
-    return `${name}=${encodeURIComponent(data)}&`;
+    return `${name}=${encodeURIComponent(String(data))}&`;
 }
 
 /**
@@ -27,7 +31,7 @@ const NAME = /(\[(\w*)\]|\w*)/gi;
  * @param {string} name - input name
  * @returns {Array} - path to value in data object
  */
-export function convertNameToPath(name) {
+export function convertNameToPath(name: string): Path {
     const path = [];
 
     let matches = NAME.exec(name);
@@ -52,7 +56,12 @@ export function convertNameToPath(name) {
  * @param {function} FormDataType
  * @returns {string|FormData} - output value
  */
-export function convertData(data, type, FileListType = FileList, FormDataType = FormData) {
+export function convertData(
+    data: Data,
+    type: string,
+    FileListType: typeof FileList = FileList,
+    FormDataType: typeof FormData = FormData,
+) {
     let convertedData;
 
     switch (type) {
@@ -70,7 +79,7 @@ export function convertData(data, type, FileListType = FileList, FormDataType = 
                         formData.append(name, data[name][0]);
                     }
                 } else if (typeof data[name] === 'object') {
-                    Object.keys(data[name]).forEach(key => formData.append(`${name}[${key}]`, data[name][key]));
+                    Object.keys(data[name]).forEach(key => formData.append(`${name}[${key}]`, String(data[name][key])));
                 } else {
                     formData.append(name, data[name]);
                 }

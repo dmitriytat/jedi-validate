@@ -1,3 +1,7 @@
+// @flow
+
+import type { MessagesOptions, MethodMap, RulesOptions } from '../types';
+
 /**
  * Mark field as invalid
  * @private
@@ -8,12 +12,22 @@
  * @param {string} classes.valid
  * @param {Array.<string>} errors
  */
-export function markError(field, message, { error, valid }, errors) {
+export function markError(
+    field: HTMLElement,
+    message: HTMLElement,
+    { error, valid }: ContainerClasses,
+    errors: Array<string>,
+) {
     field.classList.add(error);
     field.classList.remove(valid);
 
     message.innerHTML = errors.join(', '); // eslint-disable-line no-param-reassign
 }
+
+type ContainerClasses = {
+    error: string,
+    valid: string,
+};
 
 /**
  * Mark field as valid
@@ -24,7 +38,7 @@ export function markError(field, message, { error, valid }, errors) {
  * @param {string} classes.error
  * @param {string} classes.valid
  */
-export function markValid(field, message, { error, valid }) {
+export function markValid(field: HTMLElement, message: HTMLElement, { error, valid }: ContainerClasses) {
     field.classList.add(valid);
     field.classList.remove(error);
 
@@ -35,11 +49,11 @@ export function markValid(field, message, { error, valid }) {
  * Mark field
  * @private
  * @param {Element} field
- * @param message
- * @param states
- * @param errors
+ * @param {Element} message
+ * @param {{error:string, valid:string}} states
+ * @param {Array.<string>} errors
  */
-export function markField(field, message, states, errors) {
+export function markField(field: HTMLElement, message: HTMLElement, states: ContainerClasses, errors: Array<string>) {
     if (errors && errors.length) {
         markError(field, message, states, errors);
     } else {
@@ -55,7 +69,7 @@ export function markField(field, message, states, errors) {
  * @param {object} methods
  * @returns {Object.<string, Object.<string, string>>}
  */
-export function initErrorMessages(rules, messages, methods) {
+export function initErrorMessages(rules: RulesOptions, messages: MessagesOptions, methods: MethodMap) {
     return Object.keys(rules).reduce(
         (names, name) => ({
             ...names,

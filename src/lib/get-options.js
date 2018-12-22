@@ -1,16 +1,20 @@
+// @flow
+
+import type { FormOptions, RulesOptions } from '../types';
+
 /**
  * Get ajax options from form
  * @param {HTMLFormElement} form - form element
  * @returns {{ajax: {url: string, method: string, enctype: string, sendType: *}}} - options
  */
-export function getFormOptions(form) {
-    const enctype = form.getAttribute('enctype');
+export function getFormOptions(form: HTMLFormElement): FormOptions {
+    const enctype = form.getAttribute('enctype') || undefined;
 
     return {
         ajax: {
             enctype,
-            url: form.getAttribute('action'),
-            method: form.getAttribute('method'),
+            url: form.getAttribute('action') || undefined,
+            method: form.getAttribute('method') || undefined,
             sendType: enctype === 'multipart/form-data' ? 'formData' : undefined,
         },
     };
@@ -21,10 +25,10 @@ export function getFormOptions(form) {
  * @param {HTMLInputElement|HTMLSelectElement} input - input for validation
  * @returns {object} - rules
  */
-export function getInputRules(input) {
+export function getInputRules(input: HTMLInputElement | HTMLSelectElement): RulesOptions {
     const defaultRules = ['required', 'email', 'tel', 'url'];
 
-    const rules = defaultRules.reduce((inputRules, rule) => {
+    const rules: RulesOptions = defaultRules.reduce((inputRules, rule) => {
         const newRules = {};
         const newRule = input.hasAttribute(rule) || input.type === rule || input.classList.contains(rule);
 
@@ -38,23 +42,45 @@ export function getInputRules(input) {
         };
     }, {});
 
-    const regexp = input.hasAttribute('pattern') ? new RegExp(input.getAttribute('pattern')) : undefined;
-    const step = input.hasAttribute('step') ? parseInt(input.getAttribute('step'), 10) : undefined;
+    if (input.hasAttribute('step')) {
+        const step = parseInt(input.getAttribute('step'), 10);
 
-    if (input.type === 'date') {
-        const min = input.hasAttribute('min') ? new Date(input.getAttribute('min')) : undefined;
-        const max = input.hasAttribute('max') ? new Date(input.getAttribute('max')) : undefined;
-        if (min) rules.minDate = min;
-        if (max) rules.maxDate = max;
-    } else {
-        const min = input.hasAttribute('min') ? parseInt(input.getAttribute('min'), 10) : undefined;
-        const max = input.hasAttribute('max') ? parseInt(input.getAttribute('max'), 10) : undefined;
-        if (min) rules.min = min;
-        if (max) rules.max = max;
+        if (typeof step === 'number') {
+            rules.step = step;
+        }
     }
 
-    if (regexp) rules.regexp = regexp;
-    if (step) rules.step = step;
+    if (input.hasAttribute('pattern')) {
+        const pattern = input.getAttribute('pattern');
+
+        if (pattern) {
+            rules.regexp = new RegExp(pattern);
+        }
+    }
+
+    let convert;
+
+    if (input.type === 'date') {
+        convert = value => new Date(value);
+    } else {
+        convert = value => parseInt(value, 10) || 0;
+    }
+
+    if (input.hasAttribute('min')) {
+        const min = input.getAttribute('min');
+
+        if (min) {
+            rules.min = convert(min);
+        }
+    }
+
+    if (input.hasAttribute('max')) {
+        const max = input.getAttribute('max');
+
+        if (max) {
+            rules.max = convert(max);
+        }
+    }
 
     return rules;
 }

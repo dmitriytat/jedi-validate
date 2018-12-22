@@ -1,3 +1,7 @@
+// @flow
+
+import type { TranslationMap } from '../types';
+
 const defaultDictionary = require('./jedi-validate-i18n-data.json');
 
 /**
@@ -8,19 +12,19 @@ export default class Dictionary {
      * Dictionary store
      * @type {Object}
      */
-    dictionary = {};
+    dictionary: TranslationMap = {};
 
     /**
      * Default language
      * @type {string}
      */
-    defaultLanguage = 'en';
+    defaultLanguage: string = 'en';
 
     /**
      * Dictionary
      * @param {Object} translations
      */
-    constructor(translations) {
+    constructor(translations: TranslationMap) {
         this.addTranslations(defaultDictionary);
         this.addTranslations(translations);
     }
@@ -31,7 +35,7 @@ export default class Dictionary {
      * @param {string} language - language token
      * @returns {string} - translated text
      */
-    translate(text, language = this.defaultLanguage) {
+    translate(text: string, language: string = this.defaultLanguage) {
         return (this.dictionary[language] && this.dictionary[language][text]) || text;
     }
 
@@ -41,7 +45,7 @@ export default class Dictionary {
      * @param {string} translatedText - translated phrase
      * @param {string} language - language token
      */
-    addTranslation(sourceText, translatedText, language = this.defaultLanguage) {
+    addTranslation(sourceText: string, translatedText: string, language: string = this.defaultLanguage) {
         if (this.dictionary[language] === undefined) {
             this.dictionary[language] = {};
         }
@@ -51,9 +55,9 @@ export default class Dictionary {
 
     /**
      * Add translations to dictionary
-     * @param {Object} translations
+     * @param {Object<string, Object<string, string>>} translations
      */
-    addTranslations(translations) {
+    addTranslations(translations: TranslationMap) {
         Object.keys(translations).forEach(language => {
             Object.keys(translations[language]).forEach(translation => {
                 this.addTranslation(translation, translations[language][translation], language);

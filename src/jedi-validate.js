@@ -1,3 +1,5 @@
+// @flow
+
 import deepmerge from './lib/deepmerge';
 import { getData, getInputData, getValueByName } from './lib/get-data';
 import { convertData } from './lib/convert-data';
@@ -8,6 +10,16 @@ import { ajax } from './lib/ajax';
 import { initErrorMessages, markField } from './lib/utils';
 import defaultMethods from './lib/methods';
 import defaultOptions from './options';
+import type {
+    AjaxOptions,
+    MethodFunction,
+    MethodMap,
+    Options,
+    RulesOptions,
+    ValidationErrorMap,
+    Response,
+} from './types';
+import GroupInput from './lib/group-input';
 
 /**
  * JediValidate - validation
@@ -18,28 +30,28 @@ export default class JediValidate {
      * @private
      * @type {Object.<string, Element>}
      */
-    fields = {};
+    fields: { [string]: HTMLElement } = {};
 
     /**
      * Object with inputs nodes
      * @private
      * @type {Object.<string, HTMLInputElement|HTMLSelectElement|Array>}
      */
-    inputs = {};
+    inputs: { [string]: HTMLInputElement | HTMLSelectElement | Array<HTMLInputElement> } = {};
 
     /**
      * Object with message nodes
      * @private
      * @type {Object.<string, Element>}
      */
-    messages = {};
+    messages: { [string]: HTMLElement } = {};
 
     /**
      * Object with error message
      * @private
      * @type {Object.<string, Object.<string, string>>}
      */
-    errorMessages = {};
+    errorMessages: ValidationErrorMap = {};
 
     /**
      * Object with error message
@@ -53,14 +65,14 @@ export default class JediValidate {
      * @private
      * @type {Object.<string, {func: Function, message: string}>}
      */
-    methods = { ...defaultMethods };
+    methods: MethodMap = { ...defaultMethods };
     /* eslint-disable */
     /**
      * Validator options
      * @private
      * @type {{ajax: {url: string, enctype: string, sendType: string, method: string}, rules: {}, messages: {}, containers: {parent: string, message: string, baseMessage: string}, states: {error: string, valid: string, pristine: string, dirty: string}, formStatePrefix: string, callbacks: {success: function, error: function}, clean: boolean, redirect: boolean, language: string, translations: {}}}
      */
-    options = {};
+    options: Options = {};
 
     /* eslint-enable */
     /**
@@ -68,44 +80,64 @@ export default class JediValidate {
      * @private
      * @type {object}
      */
-    rules = {};
+    rules: RulesOptions = {};
 
     /**
      * Translation dictionary
      * @private
      * @type {Dictionary}
      */
-    dictionary = null;
+    dictionary: Dictionary;
 
     /**
      * Elements
      * @private
      * @type {object}
      */
-    nodes = null;
+    nodes: {
+        form: HTMLFormElement,
+        inputs: Array<HTMLElement>,
+        baseMessage: HTMLElement,
+    };
 
     /**
      * Root element
      * @private
      * @type {Element}
      */
-    root = null;
+    root: HTMLElement;
 
     /**
      * JediValidate
      * @param {HTMLElement} root - element which wraps form element
      * @param {object} options - object with options
      */
-    constructor(root, options = {}) {
+    constructor(root: HTMLElement, options: Options = {}) {
         this.root = root;
 
         const baseMessageClass =
-            (options.containers && options.containers.baseMessage) || defaultOptions.containers.baseMessage;
+            (options.containers && options.containers.baseMessage) ||
+            (defaultOptions.containers && defaultOptions.containers.baseMessage) ||
+            'base-error';
+
+        const form = this.root.querySelector('form');
+        let baseMessage = this.root.querySelector(`.${baseMessageClass}`);
+
+        if (!form || !(form instanceof HTMLFormElement)) {
+            return console.error('Error: has no "form" element');
+        }
+
+        if (!baseMessage) {
+            baseMessage = document.createElement('div');
+            this.root.insertBefore(baseMessage, form);
+        }
+
+        const inputs = Array.from(this.root.querySelectorAll('form [name]'));
 
         this.nodes = {
-            form: this.root.querySelector('form'),
-            inputs: this.root.querySelectorAll('form [name]'),
-            baseMessage: this.root.querySelector(`.${baseMessageClass}`),
+            form,
+            baseMessage,
+            inputs,
         };
 
         const formOptions = getFormOptions(this.nodes.form);
@@ -133,18 +165,20 @@ export default class JediValidate {
         this.nodes.form.addEventListener('submit', this.handleSubmit);
 
         Array.from(this.nodes.inputs).forEach(input => {
+            if (!(input instanceof HTMLInputElement) || !Array.isArray(input)) {
+                return;
+            }
+
             // fixme "name" and "name in data" not the same
             // name === "phone[]",
             // data: { phone: [] } - name === "phone"
             const name = input.name; // eslint-disable-line prefer-destructuring
 
             if (this.inputs[name]) {
-                if (Array.isArray(this.inputs[name])) {
-                    this.inputs[name].push(input);
+                if (this.inputs[name] instanceof GroupInput) {
+                    this.inputs[name].add(input);
                 } else {
-                    const groupInput = [this.inputs[name], input];
-                    groupInput.name = name;
-                    this.inputs[name] = groupInput;
+                    this.inputs[name] = new GroupInput(name, [this.inputs[name], input]);
                 }
             } else {
                 this.inputs[name] = input;
@@ -152,7 +186,7 @@ export default class JediValidate {
                 let field = input.parentNode;
 
                 do {
-                    if (field.classList.contains(this.options.containers.parent)) {
+                    if (this.options.containers && field.classList.contains(this.options.containers.parent)) {
                         this.fields[name] = field;
                         break;
                     }
@@ -188,7 +222,6 @@ export default class JediValidate {
                     }
                 });
             }
-
             input.addEventListener('change', this.handleInputChange.bind(this, name));
             input.addEventListener('input', this.handleInputInput.bind(this, name));
         });
@@ -199,7 +232,7 @@ export default class JediValidate {
      * @private
      * @param {string} name
      */
-    handleInputChange(name) {
+    handleInputChange(name: string) {
         this.fields[name].classList.remove(this.options.states.dirty);
 
         const inputData = getInputData(this.inputs[name]);
@@ -229,7 +262,7 @@ export default class JediValidate {
      * @private
      * @param {string} name
      */
-    handleInputInput(name) {
+    handleInputInput(name: string) {
         this.fields[name].classList.remove(this.options.states.pristine);
         this.fields[name].classList.add(this.options.states.dirty);
     }
@@ -239,7 +272,7 @@ export default class JediValidate {
      * @private
      * @param {Event} event
      */
-    handleSubmit = event => {
+    handleSubmit = (event: Event) => {
         this.data = getData(this.inputs);
 
         const errors = validateData(this.rules, this.methods, this.data, this.errorMessages, this.translate);
@@ -293,7 +326,7 @@ export default class JediValidate {
      * @private
      * @param {string} text - text to translate
      */
-    translate = text => this.dictionary.translate(text, this.options.language);
+    translate = (text: string) => this.dictionary.translate(text, this.options.language);
 
     /**
      * Send form
@@ -305,9 +338,9 @@ export default class JediValidate {
      * @param {string} options.method
      * @param {string|FormData} options.data
      */
-    send(options) {
+    send(options: AjaxOptions) {
         ajax(options, this.translate)
-            .then(response => {
+            .then((response: Response) => {
                 if (response.validationErrors) {
                     try {
                         this.options.callbacks.error({
@@ -370,7 +403,7 @@ export default class JediValidate {
      * @param {string|Array.<string>} params - field
      * @returns {Object}
      */
-    collect(params = '') {
+    collect(params: string | Array<string> = '') {
         if (!params) {
             this.data = getData(this.inputs);
 
@@ -411,7 +444,7 @@ export default class JediValidate {
      * @param {Function} func - function
      * @param {string} message - error message
      */
-    addMethod(rule, func, message) {
+    addMethod(rule: string, func: MethodFunction, message: string) {
         this.methods[rule] = {
             func,
             message,
@@ -427,7 +460,7 @@ export default class JediValidate {
      * @param {string} translatedText - text on needed language
      * @param {string} language - language
      */
-    addToDictionary(sourceText, translatedText, language) {
+    addToDictionary(sourceText: string, translatedText: string, language: string) {
         this.dictionary.addTranslation(sourceText, translatedText, language);
     }
 }
