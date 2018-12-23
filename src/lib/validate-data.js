@@ -35,9 +35,7 @@ export function isCheckable(params: Param, data: Data): Param | null {
                 checkable,
             );
         } catch (error) {
-            if (process.env.NODE_ENV === 'development') {
-                console.warn(`Dependency function error: ${error.toString()}`);
-            }
+            console.warn(`Dependency function error: ${String(error)}`);
         }
     }
 

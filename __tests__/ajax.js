@@ -1,6 +1,10 @@
 import { ajax } from '../src/lib/ajax';
 
 describe('Ajax', () => {
+    beforeEach(() => {
+        window.fetch = jest.fn().mockImplementation(() => Promise.resolve({ ok: true, json() {} }));
+    });
+
     it('Should work GET', () => {
         const options = {
             method: 'GET',
@@ -11,17 +15,14 @@ describe('Ajax', () => {
         };
 
         const translate = jest.fn();
-        const RequestType = function RequestType() {};
 
-        RequestType.prototype.open = jest.fn();
-        RequestType.prototype.setRequestHeader = jest.fn();
-        RequestType.prototype.send = jest.fn();
+        ajax(options, translate);
 
-        ajax(options, translate, RequestType);
-
-        expect(RequestType.prototype.open).toHaveBeenCalledWith('GET', '/?hello=2', true);
-        expect(RequestType.prototype.setRequestHeader).toHaveBeenCalledWith('Content-type', 'enctype');
-        expect(RequestType.prototype.send).toHaveBeenCalledWith('');
+        expect(window.fetch).toHaveBeenCalledWith('/?hello=2', {
+            body: undefined,
+            headers: { 'Content-type': 'enctype' },
+            method: 'GET',
+        });
     });
 
     it('Should work POST', () => {
@@ -34,42 +35,45 @@ describe('Ajax', () => {
         };
 
         const translate = jest.fn();
-        const RequestType = function RequestType() {};
 
-        RequestType.prototype.open = jest.fn();
-        RequestType.prototype.setRequestHeader = jest.fn();
-        RequestType.prototype.send = jest.fn();
+        ajax(options, translate);
 
-        ajax(options, translate, RequestType);
-
-        expect(RequestType.prototype.open).toHaveBeenCalledWith('POST', '/', true);
-        expect(RequestType.prototype.setRequestHeader).toHaveBeenCalledWith(
-            'Content-type',
-            'application/json; charset=utf-8',
-        );
-        expect(RequestType.prototype.send).toHaveBeenCalledWith('{}');
+        expect(window.fetch).toHaveBeenCalledWith('/', {
+            body: '{}',
+            headers: { 'Content-type': 'application/json; charset=utf-8' },
+            method: 'POST',
+        });
     });
 
     it('Should work POST formData', () => {
+        const formData = new FormData();
         const options = {
             method: 'POST',
             url: '/',
-            data: '{}',
+            data: formData,
             sendType: 'formData',
             enctype: 'multipart/form-data',
         };
 
         const translate = jest.fn();
-        const RequestType = function RequestType() {};
 
-        RequestType.prototype.open = jest.fn();
-        RequestType.prototype.setRequestHeader = jest.fn();
-        RequestType.prototype.send = jest.fn();
+        ajax(options, translate);
 
-        ajax(options, translate, RequestType);
+        expect(window.fetch).toHaveBeenCalledWith('/', {
+            body: formData,
+            headers: {},
+            method: 'POST',
+        });
+    });
 
-        expect(RequestType.prototype.open).toHaveBeenCalledWith('POST', '/', true);
-        expect(RequestType.prototype.setRequestHeader).not.toHaveBeenCalled();
-        expect(RequestType.prototype.send).toHaveBeenCalledWith('{}');
+    it('Should reject on error', done => {
+        const translate = jest.fn(a => a);
+        window.fetch = jest.fn().mockImplementation(() => Promise.reject('So bad'));
+
+        ajax({}, translate).catch(errors => {
+            expect(window.fetch).toHaveBeenCalledWith(undefined, { body: undefined, headers: {}, method: 'GET' });
+            expect(errors).toEqual({ validationErrors: { base: ['Something went wrong', 'So bad'] } });
+            done();
+        });
     });
 });

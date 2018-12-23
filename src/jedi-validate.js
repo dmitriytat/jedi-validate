@@ -18,6 +18,7 @@ import type {
     RulesOptions,
     ValidationErrorMap,
     Response,
+    Input,
 } from './types';
 import GroupInput from './lib/group-input';
 
@@ -96,7 +97,7 @@ export default class JediValidate {
      */
     nodes: {
         form: HTMLFormElement,
-        inputs: Array<HTMLElement>,
+        inputs: Array<Input>,
         baseMessage: HTMLElement,
     };
 
@@ -164,66 +165,65 @@ export default class JediValidate {
 
         this.nodes.form.addEventListener('submit', this.handleSubmit);
 
-        Array.from(this.nodes.inputs).forEach(input => {
-            if (!(input instanceof HTMLInputElement) || !Array.isArray(input)) {
-                return;
-            }
-
+        this.nodes.inputs.forEach(input => {
             // fixme "name" and "name in data" not the same
             // name === "phone[]",
             // data: { phone: [] } - name === "phone"
             const name = input.name; // eslint-disable-line prefer-destructuring
 
-            if (this.inputs[name]) {
+            input.addEventListener('change', this.handleInputChange.bind(this, name));
+            input.addEventListener('input', this.handleInputInput.bind(this, name));
+
+            if (this.inputs[name] && (input instanceof HTMLInputElement || input instanceof HTMLSelectElement)) {
                 if (this.inputs[name] instanceof GroupInput) {
                     this.inputs[name].add(input);
                 } else {
                     this.inputs[name] = new GroupInput(name, [this.inputs[name], input]);
                 }
-            } else {
-                this.inputs[name] = input;
 
-                let field = input.parentNode;
-
-                do {
-                    if (this.options.containers && field.classList.contains(this.options.containers.parent)) {
-                        this.fields[name] = field;
-                        break;
-                    }
-
-                    field = field.parentNode;
-                } while (field && field.classList);
-
-                if (!this.fields[name]) {
-                    console.warn(`Input ${name} has no parent field`);
-                    delete this.inputs[name];
-                    return;
-                }
-
-                this.fields[name].classList.add(this.options.states.pristine);
-
-                const messageElement = this.fields[name].querySelector(`.${this.options.containers.message}`);
-
-                if (messageElement) {
-                    this.messages[name] = messageElement;
-                } else {
-                    this.messages[name] = document.createElement('div');
-                    this.messages[name].classList.add(this.options.containers.message);
-                    this.fields[name].appendChild(this.messages[name]);
-                }
-
-                this.rules[name] = this.rules[name] || {};
-                const inputRules = getInputRules(input);
-                this.rules[name] = deepmerge(inputRules, this.rules[name]);
-
-                Object.keys(this.rules[name]).forEach(rule => {
-                    if (this.rules[name][rule]) {
-                        this.fields[name].classList.add(rule);
-                    }
-                });
+                return;
             }
-            input.addEventListener('change', this.handleInputChange.bind(this, name));
-            input.addEventListener('input', this.handleInputInput.bind(this, name));
+
+            this.inputs[name] = input;
+
+            let field = input.parentNode;
+
+            do {
+                if (this.options.containers && field.classList.contains(this.options.containers.parent)) {
+                    this.fields[name] = field;
+                    break;
+                }
+
+                field = field.parentNode;
+            } while (field && field.classList);
+
+            if (!this.fields[name]) {
+                console.warn(`Input ${name} has no parent field`);
+                delete this.inputs[name];
+                return;
+            }
+
+            this.fields[name].classList.add(this.options.states.pristine);
+
+            const messageElement = this.fields[name].querySelector(`.${this.options.containers.message}`);
+
+            if (messageElement) {
+                this.messages[name] = messageElement;
+            } else {
+                this.messages[name] = document.createElement('div');
+                this.messages[name].classList.add(this.options.containers.message);
+                this.fields[name].appendChild(this.messages[name]);
+            }
+
+            this.rules[name] = this.rules[name] || {};
+            const inputRules = getInputRules(input);
+            this.rules[name] = deepmerge(inputRules, this.rules[name]);
+
+            Object.keys(this.rules[name]).forEach(rule => {
+                if (this.rules[name][rule]) {
+                    this.fields[name].classList.add(rule);
+                }
+            });
         });
     }
 
@@ -388,12 +388,16 @@ export default class JediValidate {
                     }
                 }
             })
-            .catch(({ method, url, status, statusText }) => {
-                console.warn(`${method} ${url} ${status} (${statusText})`);
-
+            .catch(response => {
                 this.nodes.baseMessage.innerHTML = this.translate('Can not send form!');
                 this.root.classList.add(this.options.formStatePrefix + this.options.states.error);
                 this.root.classList.remove(this.options.formStatePrefix + this.options.states.valid);
+
+                if (response.validationErrors.base) {
+                    this.nodes.baseMessage.innerHTML = response.validationErrors.base.join(', ');
+                } else {
+                    this.nodes.baseMessage.innerHTML = this.translate('Can not send form!');
+                }
             });
     }
 
