@@ -16,7 +16,7 @@ import type { AjaxOptions, Response } from '../types';
 export function ajax(options: AjaxOptions, translate: Function): Promise<Response> {
     let { url } = options;
     let body;
-    const method = options.method.toUpperCase();
+    const method = options.method ? options.method.toUpperCase() : 'GET';
     const headers = {};
 
     if (method === 'GET' && typeof options.data === 'string') {
@@ -35,8 +35,8 @@ export function ajax(options: AjaxOptions, translate: Function): Promise<Respons
         method,
         headers,
         body,
-    })
-        .then(response => {
+    }).then(
+        response => {
             try {
                 return response.json();
             } catch (e) {
@@ -46,14 +46,14 @@ export function ajax(options: AjaxOptions, translate: Function): Promise<Respons
                     },
                 });
             }
-        })
-        .catch(message =>
+        },
+        message =>
             Promise.reject({
                 validationErrors: {
                     base: [translate('Something went wrong'), translate(message)],
                 },
             }),
-        );
+    );
 }
 
 export default ajax;

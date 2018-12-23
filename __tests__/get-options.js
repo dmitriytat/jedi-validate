@@ -100,8 +100,8 @@ describe('Get options', () => {
             input.setAttribute('max', '2019/04/01');
 
             expect(getInputRules(input)).toEqual({
-                minDate: new Date('2017/04/01'),
-                maxDate: new Date('2019/04/01'),
+                min: new Date('2017/04/01'),
+                max: new Date('2019/04/01'),
             });
         });
 

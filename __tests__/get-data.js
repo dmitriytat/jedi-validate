@@ -9,6 +9,7 @@ import {
     createObject,
     getInputData,
 } from '../src/lib/get-data';
+import GroupInput from '../src/lib/group-input';
 
 const data = {
     date: new Date('2017-10-12'),
@@ -20,17 +21,16 @@ const data = {
     },
 };
 
-
 const inputs = {
     date: document.createElement('input'),
     phone: document.createElement('input'),
     phone2: document.createElement('input'),
     'parent[child]': document.createElement('input'),
-    radio: [
+    radio: new GroupInput('radio', [
         createCheckableElement('radio', 1),
         createCheckableElement('radio', 2, true),
         createCheckableElement('radio', 3),
-    ],
+    ]),
 };
 
 inputs.phone.name = 'phone';
@@ -61,10 +61,14 @@ describe('Get data', () => {
 
     it('getRadioGroupValue', () => {
         expect(getRadioGroupValue(inputs.radio)).toEqual(data.radio);
-        expect(getRadioGroupValue([
-            createCheckableElement('radio', 2, true, 'checkbox'),
-            createCheckableElement('radio', 3, true, 'checkbox'),
-        ])).toEqual(['2', '3']);
+        expect(
+            getRadioGroupValue(
+                new GroupInput('radio', [
+                    createCheckableElement('radio', 2, true, 'checkbox'),
+                    createCheckableElement('radio', 3, true, 'checkbox'),
+                ]),
+            ),
+        ).toEqual(['2', '3']);
     });
 
     describe('getInputValue', () => {
