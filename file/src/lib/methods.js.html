@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../../">
+  <title data-ice="title">src/lib/methods.js | jedi-validate</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  <script src="script/manual.js"></script>
+<meta name="description" content="A lightweight form validation component"><meta property="twitter:card" content="summary"><meta property="twitter:title" content="jedi-validate"><meta property="twitter:description" content="A lightweight form validation component"></head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+<a style="position:relative; top:3px;" href="https://github.com/dmitriytat/jedi-validate"><img width="20px" src="./image/github.png"></a></header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/jedi-validate.js~JediValidate.html">JediValidate</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#i18n">i18n</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/i18n/jedi-validate-i18n.js~Dictionary.html">Dictionary</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#lib">lib</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-ajax">ajax</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-convertData">convertData</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-convertNameToPath">convertNameToPath</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getQueryPart">getQueryPart</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-deepmerge">deepmerge</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-createObject">createObject</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getData">getData</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getInputData">getInputData</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getInputName">getInputName</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getInputValue">getInputValue</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getRadioGroupValue">getRadioGroupValue</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getValueByName">getValueByName</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getValueByPath">getValueByPath</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getFormOptions">getFormOptions</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getInputRules">getInputRules</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-email">email</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-extension">extension</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-filesize">filesize</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-max">max</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-maxDate">maxDate</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-min">min</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-minDate">minDate</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-regexp">regexp</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-required">required</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-step">step</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-tel">tel</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-url">url</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-initErrorMessages">initErrorMessages</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-markError">markError</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-markField">markField</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-markValid">markValid</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-isCheckable">isCheckable</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-validateData">validateData</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-validateField">validateField</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">src/lib/methods.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">/**
+ * Check value is not empty
+ * @param {string|FileList|Array} value
+ * @returns {boolean} - true == valid, false == invalid
+ */
+export function required(value) {
+    if (!value) return false;
+    if (value.length === 0) return false;
+    if (typeof value === &apos;string&apos; &amp;&amp; value.trim() === &apos;&apos;) return false;
+
+    return true;
+}
+
+/**
+ * Test RegExp
+ * @param {string} value
+ * @param {RegExp} exp - regular expression
+ * @returns {boolean} - true == valid, false == invalid
+ */
+export function regexp(value, exp) {
+    return exp.test(value);
+}
+
+/**
+ * Check value is an email
+ * @param {string} value - email
+ * @returns {boolean} - true == valid, false == invalid
+ */
+export function email(value) {
+    return /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i.test(value);
+}
+
+/**
+ * Check file sizes are less than max
+ * @param {FileList} value - FileList
+ * @param {number} size - max file size
+ * @returns {boolean} - true == valid, false == invalid
+ */
+export function filesize(value, size) {
+    return Array.from(value).reduce((r, file) =&gt; file.size &lt;= size &amp;&amp; r, true);
+}
+
+/**
+ * Check file extensions
+ * @param {FileList} value - FileList
+ * @param {string} extensions - extensions list
+ * @returns {boolean} - true == valid, false == invalid
+ */
+export function extension(value, extensions) {
+    return Array.from(value).reduce((r, file) =&gt; extensions.indexOf(file.name.split(&apos;.&apos;).pop()) !== -1 &amp;&amp; r, true);
+}
+
+/**
+ * Check value is phone number
+ * @param {string} value - phone number
+ * @returns {boolean} - true == valid, false == invalid
+ */
+export function tel(value) {
+    return /^([+]+)*[0-9\x20\x28\x29-]{5,20}$/.test(value);
+}
+
+/**
+ * Check value is url
+ * @param {string} value - url
+ * @returns {boolean} - true == valid, false == invalid
+ */
+export function url(value) {
+    return /[-a-zA-Z0-9@:%_+.~#?&amp;//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_+.~#?&amp;//=]*)?/gi.test(value);
+}
+
+/**
+ * Check value is greater than min number
+ * @param {number} value - number
+ * @param {number} number - min number
+ * @returns {boolean} - true == valid, false == invalid
+ */
+export function min(value, number) {
+    return number &lt;= value;
+}
+
+/**
+ * Check value is less than max number
+ * @param {number} value - number
+ * @param {number} number - max number
+ * @returns {boolean} - true == valid, false == invalid
+ */
+export function max(value, number) {
+    return value &lt;= number;
+}
+
+/**
+ * Check value is multiple of number
+ * @param {number} value - number
+ * @param {number} number - factor
+ * @returns {boolean} - true == valid, false == invalid
+ */
+export function step(value, number) {
+    return value % number === 0;
+}
+
+/**
+ * Check value is greater than min date
+ * @param {Date} date - current date
+ * @param {Date} mindate - max date
+ * @returns {boolean} - true == valid, false == invalid
+ */
+export function minDate(date, mindate) {
+    return mindate &lt;= date;
+}
+
+/**
+ * Check date is less than max date
+ * @param {Date} date - current date
+ * @param {Date} maxdate - max date
+ * @returns {boolean} - true == valid, false == invalid
+ */
+export function maxDate(date, maxdate) {
+    return date &lt;= maxdate;
+}
+
+export default {
+    required: {
+        func: required,
+        message: &apos;This field is required&apos;,
+    },
+    regexp: {
+        func: regexp,
+        message: &apos;Please, provide correct value&apos;,
+    },
+    email: {
+        func: email,
+        message: &apos;This email is incorrect&apos;,
+    },
+    filesize: {
+        func: filesize,
+        message: &apos;This file is too large&apos;,
+    },
+    extension: {
+        func: extension,
+        message: &apos;This extension is not supported&apos;,
+    },
+    tel: {
+        func: tel,
+        message: &apos;This phone number is incorrect&apos;,
+    },
+    url: {
+        func: url,
+        message: &apos;Wrong url&apos;,
+    },
+    min: {
+        func: min,
+        message: &apos;This number is too less&apos;,
+    },
+    max: {
+        func: max,
+        message: &apos;This number is too large&apos;,
+    },
+    step: {
+        func: step,
+        message: &apos;This value is not a multiple of the specified step value&apos;,
+    },
+    minDate: {
+        func: minDate,
+        message: &apos;This date is too early&apos;,
+    },
+    maxDate: {
+        func: maxDate,
+        message: &apos;This date is too late&apos;,
+    },
+};
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(1.1.0)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

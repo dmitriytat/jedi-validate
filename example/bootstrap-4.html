@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Jedi Validate - Lightweight form validation component.</title>
+    <link
+        rel="stylesheet"
+        href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+        integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+        crossorigin="anonymous"
+    >
+</head>
+
+<body>
+    <div class="container">
+        <div class="row">
+            <div
+                class="col-sm-12"
+            >
+                <div class="page-header">
+                    <h1>Jedi Validate
+                        <small>– lightweight form validation component.</small>
+                    </h1>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="row">
+            <div
+                id="file-form"
+                class="col-sm-12 col-md-6"
+            >
+                <form
+                    action="./ajax.php"
+                    name="Bootstrap 4"
+                    method="post"
+                >
+                    <div class="text-danger"></div>
+                    <br>
+                    <div class="form-group">
+                        <label for="text">Text*</label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="text"
+                            name="text"
+                            aria-describedby="textMessage"
+                            placeholder="Enter text"
+                            required
+                        >
+                        <small
+                            id="textMessage"
+                            class="text-danger form-text"
+                        ></small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="file">File</label>
+                        <input
+                            type="file"
+                            class="form-control-file"
+                            id="file"
+                            name="file"
+                            aria-describedby="fileMessage"
+                        >
+                        <small
+                            id="fileMessage"
+                            class="text-danger form-text"
+                        ></small>
+                    </div>
+
+                    <br>
+                    <button
+                        type="submit"
+                        class="btn btn-primary"
+                    >Submit
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <div
+                id="form1"
+                class="col-sm-12 col-md-6"
+            >
+                <form
+                    action="./ajax.php"
+                    name="Bootstrap 4"
+                    method="post"
+                >
+                    <div class="text-danger"></div>
+                    <br>
+                    <div class="form-group">
+                        <label for="email">Email*</label>
+                        <input
+                            type="email"
+                            class="form-control"
+                            id="email"
+                            name="email"
+                            aria-describedby="emailMessage"
+                            placeholder="Enter email"
+                            required
+                        >
+                        <small
+                            id="emailMessage"
+                            class="text-danger form-text"
+                        ></small>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Phone*</label>
+                        <input
+                            type="tel"
+                            class="form-control"
+                            id="phone"
+                            name="phone"
+                            aria-describedby="phoneMessage"
+                            placeholder="Enter phone"
+                            required
+                        >
+                        <small
+                            id="phoneMessage"
+                            class="text-danger form-text"
+                        ></small>
+                    </div>
+                    <div class="form-group">
+                        <label for="continent">Continent*</label>
+                        <select
+                            class="form-control"
+                            id="continent"
+                            name="continent"
+                            aria-describedby="continentMessage"
+                            required
+                        >
+                            <option
+                                selected
+                                value=""
+                            ></option>
+                            <option value="1">Asia</option>
+                            <option value="2">Africa</option>
+                            <option value="3">North America</option>
+                            <option value="4">South America</option>
+                            <option value="5">Antarctica</option>
+                            <option value="6">Europe</option>
+                            <option value="7">Australia</option>
+                        </select>
+                        <small
+                            id="continentMessage"
+                            class="text-danger form-text"
+                        ></small>
+                    </div>
+                    <div class="form-group">
+                        <label for="number">Numbers*</label>
+                        <select
+                            class="form-control"
+                            id="number"
+                            name="number"
+                            aria-describedby="numberMessage"
+                            required
+                            multiple
+                        >
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                        </select>
+                        <small
+                            id="numberMessage"
+                            class="text-danger form-text"
+                        ></small>
+                    </div>
+                    <div class="form-group">
+                        <label for="message">Message</label>
+                        <textarea
+                            class="form-control"
+                            id="message"
+                            name="message"
+                            aria-describedby="messageMessage"
+                            rows="3"
+                        ></textarea>
+                        <small
+                            id="messageMessage"
+                            class="text-danger form-text"
+                        ></small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="image">Optional image loader</label>
+                        <input
+                            type="file"
+                            class="form-control-file"
+                            id="image"
+                            name="image"
+                            aria-describedby="imageMessage"
+                        >
+                        <small
+                            id="imageMessage"
+                            class="text-danger form-text"
+                        ></small>
+                    </div>
+
+                    <div
+                        class="form-group"
+                        role="radiogroup"
+                        aria-labelledby="radioMessage"
+                    >
+                        <div>
+                            <div class="form-check form-check-inline">
+                                <input
+                                    class="form-check-input"
+                                    type="radio"
+                                    name="radio"
+                                    id="radio1"
+                                    value="1"
+                                >
+                                <label
+                                    class="form-check-label"
+                                    for="radio1"
+                                >1</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input
+                                    class="form-check-input"
+                                    type="radio"
+                                    name="radio"
+                                    id="radio2"
+                                    value="2"
+                                >
+                                <label
+                                    class="form-check-label"
+                                    for="radio2"
+                                >2</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input
+                                    class="form-check-input"
+                                    type="radio"
+                                    name="radio"
+                                    id="radio3"
+                                    value="3"
+                                    disabled
+                                >
+                                <label
+                                    class="form-check-label"
+                                    for="radio3"
+                                >3 (disabled)</label>
+                            </div>
+                        </div>
+                        <small
+                            id="radioMessage"
+                            class="text-danger form-text"
+                        ></small>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="form-check">
+                            <input
+                                type="checkbox"
+                                class="form-check-input"
+                                id="checkbox"
+                                name="checkbox"
+                                required
+                                aria-labelledby="checkboxMessage"
+                            >
+                            <label
+                                class="form-check-label"
+                                for="checkbox"
+                            >I want to submit</label>
+                        </div>
+                        <small
+                            id="checkboxMessage"
+                            class="text-danger form-text"
+                        ></small>
+                    </div>
+
+                    <br>
+                    <button
+                        type="submit"
+                        class="btn btn-primary"
+                    >Submit
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="../dist/jedi-validate.js"></script>
+
+    <script>
+        var options = {
+            ajax: {
+                url: '/example/ajax.json',
+                sendType: 'formData',
+                method: 'post',
+            },
+            states: {
+                error: 'is-invalid',
+                valid: 'is-valid',
+                dirty: 'is-warning',
+            },
+            containers: {
+                parent: 'form-group',
+                message: 'text-danger',
+                baseMessage: 'text-danger',
+            },
+            rules: {
+                image: {
+                    filesize: 1000000,
+                    extension: 'jpg|jpeg|png|gif',
+                },
+                message: {
+                    maxLength: 128,
+                },
+                radio: {
+                    'not-2': true,
+                },
+            },
+            messages: {},
+            callbacks: {
+                success: function(response) {},
+                error: function(errors) {},
+            },
+        };
+
+        var formWrapper = document.querySelector('#form1');
+        var formValidator = new JediValidate(formWrapper, options);
+
+        formValidator.addMethod('not-2', function(value) {
+                return value !== '2';
+            }, '2 is not valid value',
+        );
+
+        formValidator.addMethod('maxLength', function(value, maxLength) {
+                return maxLength >= value.length;
+            }, 'More then max length',
+        );
+
+
+        var fileFormWrapper = document.querySelector('#file-form');
+        var fileFormValidator = new JediValidate(fileFormWrapper, options);
+    </script>
+</body>
+
+</html>

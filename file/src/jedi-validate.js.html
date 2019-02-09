@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../">
+  <title data-ice="title">src/jedi-validate.js | jedi-validate</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  <script src="script/manual.js"></script>
+<meta name="description" content="A lightweight form validation component"><meta property="twitter:card" content="summary"><meta property="twitter:title" content="jedi-validate"><meta property="twitter:description" content="A lightweight form validation component"></head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+<a style="position:relative; top:3px;" href="https://github.com/dmitriytat/jedi-validate"><img width="20px" src="./image/github.png"></a></header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/jedi-validate.js~JediValidate.html">JediValidate</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#i18n">i18n</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/i18n/jedi-validate-i18n.js~Dictionary.html">Dictionary</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#lib">lib</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-ajax">ajax</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-convertData">convertData</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-convertNameToPath">convertNameToPath</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getQueryPart">getQueryPart</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-deepmerge">deepmerge</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-createObject">createObject</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getData">getData</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getInputData">getInputData</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getInputName">getInputName</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getInputValue">getInputValue</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getRadioGroupValue">getRadioGroupValue</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getValueByName">getValueByName</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getValueByPath">getValueByPath</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getFormOptions">getFormOptions</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getInputRules">getInputRules</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-email">email</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-extension">extension</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-filesize">filesize</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-max">max</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-maxDate">maxDate</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-min">min</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-minDate">minDate</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-regexp">regexp</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-required">required</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-step">step</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-tel">tel</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-url">url</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-initErrorMessages">initErrorMessages</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-markError">markError</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-markField">markField</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-markValid">markValid</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-isCheckable">isCheckable</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-validateData">validateData</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-validateField">validateField</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">src/jedi-validate.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import deepmerge from &apos;./lib/deepmerge&apos;;
+import { getData, getInputData, getValueByName } from &apos;./lib/get-data&apos;;
+import { convertData } from &apos;./lib/convert-data&apos;;
+import Dictionary from &apos;./i18n/jedi-validate-i18n&apos;;
+import { getFormOptions, getInputRules } from &apos;./lib/get-options&apos;;
+import { validateData, validateField } from &apos;./lib/validate-data&apos;;
+import { ajax } from &apos;./lib/ajax&apos;;
+import { initErrorMessages, markField } from &apos;./lib/utils&apos;;
+import defaultMethods from &apos;./lib/methods&apos;;
+import defaultOptions from &apos;./options&apos;;
+
+/**
+ * JediValidate - validation
+ */
+export default class JediValidate {
+    /**
+     * Object with fields
+     * @private
+     * @type {Object.&lt;string, Element&gt;}
+     */
+    fields = {};
+
+    /**
+     * Object with inputs nodes
+     * @private
+     * @type {Object.&lt;string, HTMLInputElement|HTMLSelectElement|Array&gt;}
+     */
+    inputs = {};
+
+    /**
+     * Object with message nodes
+     * @private
+     * @type {Object.&lt;string, Element&gt;}
+     */
+    messages = {};
+
+    /**
+     * Object with error message
+     * @private
+     * @type {Object.&lt;string, Object.&lt;string, string&gt;&gt;}
+     */
+    errorMessages = {};
+
+    /**
+     * Object with error message
+     * @private
+     * @type {object} - data object
+     */
+    data = {};
+
+    /**
+     * Validate methods
+     * @private
+     * @type {Object.&lt;string, {func: Function, message: string}&gt;}
+     */
+    methods = { ...defaultMethods };
+    /* eslint-disable */
+    /**
+     * Validator options
+     * @private
+     * @type {{ajax: {url: string, enctype: string, sendType: string, method: string}, rules: {}, messages: {}, containers: {parent: string, message: string, baseMessage: string}, states: {error: string, valid: string, pristine: string, dirty: string}, formStatePrefix: string, callbacks: {success: function, error: function}, clean: boolean, redirect: boolean, language: string, translations: {}}}
+     */
+    options = {};
+
+    /* eslint-enable */
+    /**
+     * Validator rules
+     * @private
+     * @type {object}
+     */
+    rules = {};
+
+    /**
+     * Translation dictionary
+     * @private
+     * @type {Dictionary}
+     */
+    dictionary = null;
+
+    /**
+     * Elements
+     * @private
+     * @type {object}
+     */
+    nodes = null;
+
+    /**
+     * Root element
+     * @private
+     * @type {Element}
+     */
+    root = null;
+
+    /**
+     * JediValidate
+     * @param {HTMLElement} root - element which wraps form element
+     * @param {object} options - object with options
+     */
+    constructor(root, options = {}) {
+        this.root = root;
+
+        const baseMessageClass =
+            (options.containers &amp;&amp; options.containers.baseMessage) || defaultOptions.containers.baseMessage;
+
+        this.nodes = {
+            form: this.root.querySelector(&apos;form&apos;),
+            inputs: this.root.querySelectorAll(&apos;form [name]&apos;),
+            baseMessage: this.root.querySelector(`.${baseMessageClass}`),
+        };
+
+        const formOptions = getFormOptions(this.nodes.form);
+
+        this.options = deepmerge(this.options, defaultOptions);
+        this.options = deepmerge(this.options, formOptions);
+        this.options = deepmerge(this.options, options);
+
+        this.rules = { ...this.options.rules };
+
+        this.dictionary = new Dictionary(this.options.translations);
+
+        this.ready();
+
+        this.errorMessages = initErrorMessages(this.rules, this.options.messages, this.methods);
+    }
+
+    /**
+     * Ready
+     * @private
+     */
+    ready() {
+        this.nodes.form.setAttribute(&apos;novalidate&apos;, &apos;novalidate&apos;);
+
+        this.nodes.form.addEventListener(&apos;submit&apos;, this.handleSubmit);
+
+        Array.from(this.nodes.inputs).forEach(input =&gt; {
+            // fixme &quot;name&quot; and &quot;name in data&quot; not the same
+            // name === &quot;phone[]&quot;,
+            // data: { phone: [] } - name === &quot;phone&quot;
+            const name = input.name; // eslint-disable-line prefer-destructuring
+
+            if (this.inputs[name]) {
+                if (Array.isArray(this.inputs[name])) {
+                    this.inputs[name].push(input);
+                } else {
+                    const groupInput = [this.inputs[name], input];
+                    groupInput.name = name;
+                    this.inputs[name] = groupInput;
+                }
+            } else {
+                this.inputs[name] = input;
+
+                let field = input.parentNode;
+
+                do {
+                    if (field.classList.contains(this.options.containers.parent)) {
+                        this.fields[name] = field;
+                        break;
+                    }
+
+                    field = field.parentNode;
+                } while (field &amp;&amp; field.classList);
+
+                if (!this.fields[name]) {
+                    console.warn(`Input ${name} has no parent field`);
+                    delete this.inputs[name];
+                    return;
+                }
+
+                this.fields[name].classList.add(this.options.states.pristine);
+
+                const messageElement = this.fields[name].querySelector(`.${this.options.containers.message}`);
+
+                if (messageElement) {
+                    this.messages[name] = messageElement;
+                } else {
+                    this.messages[name] = document.createElement(&apos;div&apos;);
+                    this.messages[name].classList.add(this.options.containers.message);
+                    this.fields[name].appendChild(this.messages[name]);
+                }
+
+                this.rules[name] = this.rules[name] || {};
+                const inputRules = getInputRules(input);
+                this.rules[name] = deepmerge(inputRules, this.rules[name]);
+
+                Object.keys(this.rules[name]).forEach(rule =&gt; {
+                    if (this.rules[name][rule]) {
+                        this.fields[name].classList.add(rule);
+                    }
+                });
+            }
+
+            input.addEventListener(&apos;change&apos;, this.handleInputChange.bind(this, name));
+            input.addEventListener(&apos;input&apos;, this.handleInputInput.bind(this, name));
+        });
+    }
+
+    /**
+     * Handle input change
+     * @private
+     * @param {string} name
+     */
+    handleInputChange(name) {
+        this.fields[name].classList.remove(this.options.states.dirty);
+
+        const inputData = getInputData(this.inputs[name]);
+        const value = getValueByName(name, inputData);
+
+        // fixme don&apos;t work with 2 inputs phone[]
+        this.data = {
+            ...this.data,
+            ...inputData,
+        };
+
+        const errors = validateField(
+            this.rules[name],
+            this.methods,
+            value,
+            name,
+            this.errorMessages,
+            this.data,
+            this.translate,
+        );
+
+        markField(this.fields[name], this.messages[name], this.options.states, errors);
+    }
+
+    /**
+     * Handle input
+     * @private
+     * @param {string} name
+     */
+    handleInputInput(name) {
+        this.fields[name].classList.remove(this.options.states.pristine);
+        this.fields[name].classList.add(this.options.states.dirty);
+    }
+
+    /**
+     * Handle form submit
+     * @private
+     * @param {Event} event
+     */
+    handleSubmit = event =&gt; {
+        this.data = getData(this.inputs);
+
+        const errors = validateData(this.rules, this.methods, this.data, this.errorMessages, this.translate);
+
+        const fieldNames = Object.keys(errors).filter(name =&gt; this.fields[name]);
+
+        if (fieldNames.length !== 0) {
+            fieldNames.forEach(name =&gt;
+                markField(this.fields[name], this.messages[name], this.options.states, errors[name]),
+            );
+        }
+
+        const errorFieldNames = fieldNames.filter(name =&gt; errors[name]);
+
+        if (errorFieldNames.length !== 0) {
+            try {
+                this.options.callbacks.error({ errors });
+            } catch (e) {
+                if (process.env.NODE_ENV === &apos;development&apos;) {
+                    console.error(e);
+                }
+            }
+
+            event.preventDefault();
+            return;
+        }
+
+        if (this.options.ajax &amp;&amp; this.options.ajax.url) {
+            event.preventDefault();
+        } else {
+            try {
+                this.options.callbacks.success({ event });
+            } catch (e) {
+                if (process.env.NODE_ENV === &apos;development&apos;) {
+                    console.error(e);
+                }
+            }
+
+            return;
+        }
+
+        const convertedData = convertData(this.data, this.options.ajax.sendType);
+        this.send({
+            ...this.options.ajax,
+            data: convertedData,
+        });
+    };
+
+    /**
+     * Translate
+     * @private
+     * @param {string} text - text to translate
+     */
+    translate = text =&gt; this.dictionary.translate(text, this.options.language);
+
+    /**
+     * Send form
+     * @private
+     * @param {object} options - object with options for sending
+     * @param {string} options.url
+     * @param {string} options.enctype
+     * @param {string} options.sendType
+     * @param {string} options.method
+     * @param {string|FormData} options.data
+     */
+    send(options) {
+        ajax(options, this.translate)
+            .then(response =&gt; {
+                if (response.validationErrors) {
+                    try {
+                        this.options.callbacks.error({
+                            errors: response.validationErrors,
+                        });
+                    } catch (e) {
+                        if (process.env.NODE_ENV === &apos;development&apos;) {
+                            console.error(e);
+                        }
+                    }
+
+                    if (response.validationErrors.base) {
+                        this.nodes.baseMessage.innerHTML = response.validationErrors.base.join(&apos;, &apos;);
+                        this.root.classList.add(this.options.formStatePrefix + this.options.states.error);
+                        this.root.classList.remove(this.options.formStatePrefix + this.options.states.valid);
+                        delete response.validationErrors.base;
+                    } else {
+                        this.nodes.baseMessage.innerHTML = &apos;&apos;;
+                    }
+
+                    Object.keys(response.validationErrors).forEach(name =&gt;
+                        markField(
+                            this.fields[name],
+                            this.messages[name],
+                            this.options.states,
+                            response.validationErrors[name],
+                        ),
+                    );
+                } else {
+                    try {
+                        this.options.callbacks.success({ response });
+                    } catch (e) {
+                        if (process.env.NODE_ENV === &apos;development&apos;) {
+                            console.error(e);
+                        }
+                    }
+
+                    if (this.options.redirect &amp;&amp; response.redirect) {
+                        window.location.href = response.redirect;
+                        return;
+                    }
+
+                    if (this.options.clean) {
+                        this.nodes.form.reset();
+                    }
+                }
+            })
+            .catch(({ method, url, status, statusText }) =&gt; {
+                console.warn(`${method} ${url} ${status} (${statusText})`);
+
+                this.nodes.baseMessage.innerHTML = this.translate(&apos;Can not send form!&apos;);
+                this.root.classList.add(this.options.formStatePrefix + this.options.states.error);
+                this.root.classList.remove(this.options.formStatePrefix + this.options.states.valid);
+            });
+    }
+
+    /**
+     * Collect data
+     * @public
+     * @param {string|Array.&lt;string&gt;} params - field
+     * @returns {Object}
+     */
+    collect(params = &apos;&apos;) {
+        if (!params) {
+            this.data = getData(this.inputs);
+
+            return this.data;
+        }
+
+        if (Array.isArray(params)) {
+            return params.reduce((collected, name) =&gt; {
+                const inputData = getInputData(this.inputs[name]);
+
+                this.data = {
+                    ...this.data,
+                    ...inputData,
+                };
+
+                return {
+                    ...collected,
+                    ...inputData,
+                };
+            }, {});
+        }
+
+        const inputData = getInputData(this.inputs[params]);
+
+        // fixme don&apos;t work with 2 inputs phone[]
+        this.data = {
+            ...this.data,
+            ...inputData,
+        };
+
+        return inputData;
+    }
+
+    /**
+     * Add rule to validator
+     * @public
+     * @param {string} rule - rule name
+     * @param {Function} func - function
+     * @param {string} message - error message
+     */
+    addMethod(rule, func, message) {
+        this.methods[rule] = {
+            func,
+            message,
+        };
+
+        this.errorMessages = initErrorMessages(this.rules, this.options.messages, this.methods);
+    }
+
+    /**
+     * Add localization to JediValidate
+     * @public
+     * @param {string} sourceText - text on english
+     * @param {string} translatedText - text on needed language
+     * @param {string} language - language
+     */
+    addToDictionary(sourceText, translatedText, language) {
+        this.dictionary.addTranslation(sourceText, translatedText, language);
+    }
+}
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(1.1.0)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

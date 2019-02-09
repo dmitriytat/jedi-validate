@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html><head><title>utils.js
+ - Stryker report</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link rel="stylesheet" href="../strykerResources/bootstrap/css/bootstrap.min.css">
+<link rel="stylesheet" href="../strykerResources/highlightjs/styles/default.css">
+<link rel="stylesheet" href="../strykerResources/stryker.css"></head>
+<body><img class="stryker-image" alt="Stryker" src="../strykerResources/stryker-80x80.png">
+<div class="container-fluid"><div class="row"><div class="col-lg-12"><h1 class="display-4">utils.js
+ 
+<small class="text-muted">- Stryker report</small></h1></div></div>
+<ol class="breadcrumb"><li class="breadcrumb-item"><a href="../index.html">All files</a></li><li class="breadcrumb-item"><a href="index.html">lib</a></li>
+<li class="breadcrumb-item active">utils.js</li></ol>
+<div class="row"><div class="col-lg-12"><div class="row"><div class="col-sm-11"><table class="table table-sm table-hover table-bordered table-no-top"><thead><tr><th style="width: 20%"><div><span>File / Directory</span></div></th>
+<th colspan="2"><div><span>Mutation score</span></div></th>
+<th class="rotate text-center" style="width: 50px"><div><span># Killed</span></div></th>
+<th class="rotate text-center" style="width: 50px"><div><span># Survived</span></div></th>
+<th class="rotate text-center" style="width: 50px"><div><span># Timeout</span></div></th>
+<th class="rotate text-center" style="width: 50px"><div><span># No coverage</span></div></th>
+<th class="rotate text-center" style="width: 50px"><div><span># Runtime errors</span></div></th>
+<th class="rotate text-center" style="width: 50px"><div><span># Transpile errors</span></div></th>
+<th class="rotate rotate-width-70 text-center" style="width: 70px"><div><span>Total detected</span></div></th>
+<th class="rotate rotate-width-70 text-center" style="width: 70px"><div><span>Total undetected</span></div></th>
+<th class="rotate rotate-width-70 text-center" style="width: 70px"><div><span>Total mutants</span></div></th></tr></thead>
+<tbody><tr><td>utils.js</td>
+<td><div class="progress"><div class="progress-bar bg-success" role="progressbar" aria-valuenow="96.15" aria-valuemin="0" aria-valuemax="100" style="width: 96.15%;">96.15
+%</div></div></td>
+<th class="text-center text-success" style="width: 10%">96.15</th>
+<td class="text-center">25</td>
+<td class="text-center">1</td>
+<td class="text-center">0</td>
+<td class="text-center">0</td>
+<td class="text-center">0</td>
+<td class="text-center">0</td>
+<th class="text-center">25</th>
+<th class="text-center">1</th>
+<th class="text-center">26</th></tr>
+</tbody></table></div></div>
+<div class="row"><div class="col-lg-7"><div class="row legend"><form class="col-md-12" novalidate="novalidate">
+<div class="form-check form-check-inline"><label class="form-check-label"><input class="form-check-input stryker-display" checked value="2" type="checkbox">
+Survived
+ 
+(1)</label></div>
+<div class="form-check form-check-inline"><label class="form-check-label"><input class="form-check-input stryker-display" value="1" type="checkbox">
+Killed
+ 
+(25)</label></div>
+
+
+
+<a href="#" class="stryker-collapse-expand-all">Expand all</a></form></div>
+<pre><code class="lang-javascript"><span class="bg-null">/**
+ * Mark field as invalid
+ * @private
+ * @param {Element} field
+ * @param {Element} message
+ * @param {object} classes
+ * @param {string} classes.error
+ * @param {string} classes.valid
+ * @param {Array.&lt;string&gt;} errors
+ */
+export function markError(field, message, { error, valid }, errors) </span><a href="#" class="stryker-mutant-button" tabindex="0" title="Block" data-content="status: Killed" data-mutant-status-annotation="success" data-mutant-status="1" data-mutant="0"><span class="badge badge-success">0</span></a><span class="badge badge-info stryker-mutant-replacement" hidden="hidden" data-mutant="0">{}</span><span class="stryker-original-code" data-mutant="0"><span class="bg-success-light">{
+    field.classList.add(error);
+    field.classList.remove(valid);
+
+    message.innerHTML = errors.join(</span><a href="#" class="stryker-mutant-button" tabindex="0" title="StringLiteral" data-content="status: Killed" data-mutant-status-annotation="success" data-mutant-status="1" data-mutant="1"><span class="badge badge-success">1</span></a><span class="badge badge-info stryker-mutant-replacement" hidden="hidden" data-mutant="1">&quot;&quot;</span><span class="stryker-original-code" data-mutant="1"><span class="bg-success-light">&#039;, &#039;</span></span><span class="bg-success-light">); // eslint-disable-line no-param-reassign
+}</span></span><span class="bg-null">
+
+/**
+ * Mark field as valid
+ * @private
+ * @param {Element} field
+ * @param {Element} message
+ * @param {object} classes
+ * @param {string} classes.error
+ * @param {string} classes.valid
+ */
+export function markValid(field, message, { error, valid }) </span><a href="#" class="stryker-mutant-button" tabindex="0" title="Block" data-content="status: Killed" data-mutant-status-annotation="success" data-mutant-status="1" data-mutant="2"><span class="badge badge-success">2</span></a><span class="badge badge-info stryker-mutant-replacement" hidden="hidden" data-mutant="2">{}</span><span class="stryker-original-code" data-mutant="2"><span class="bg-success-light">{
+    field.classList.add(valid);
+    field.classList.remove(error);
+
+    message.innerHTML = </span><a href="#" class="stryker-mutant-button" tabindex="0" title="StringLiteral" data-content="status: Killed" data-mutant-status-annotation="success" data-mutant-status="1" data-mutant="3"><span class="badge badge-success">3</span></a><span class="badge badge-info stryker-mutant-replacement" hidden="hidden" data-mutant="3">&quot;Stryker was here!&quot;</span><span class="stryker-original-code" data-mutant="3"><span class="bg-success-light">&#039;&#039;</span></span><span class="bg-success-light">; // eslint-disable-line no-param-reassign
+}</span></span><span class="bg-null">
+
+/**
+ * Mark field
+ * @private
+ * @param {Element} field
+ * @param message
+ * @param states
+ * @param errors
+ */
+export function markField(field, message, states, errors) </span><a href="#" class="stryker-mutant-button" tabindex="0" title="Block" data-content="status: Killed" data-mutant-status-annotation="success" data-mutant-status="1" data-mutant="4"><span class="badge badge-success">4</span></a><span class="badge badge-info stryker-mutant-replacement" hidden="hidden" data-mutant="4">{}</span><span class="stryker-original-code" data-mutant="4"><span class="bg-success-light">{
+    if (</span><a href="#" class="stryker-mutant-button" tabindex="0" title="IfStatement" data-content="status: Killed" data-mutant-status-annotation="success" data-mutant-status="1" data-mutant="5"><span class="badge badge-success">5</span></a><span class="badge badge-info stryker-mutant-replacement" hidden="hidden" data-mutant="5">false</span><a href="#" class="stryker-mutant-button" tabindex="0" title="IfStatement" data-content="status: Killed" data-mutant-status-annotation="success" data-mutant-status="1" data-mutant="6"><span class="badge badge-success">6</span></a><span class="badge badge-info stryker-mutant-replacement" hidden="hidden" data-mutant="6">true</span><a href="#" class="stryker-mutant-button" tabindex="0" title="BinaryExpression" data-content="status: Killed" data-mutant-status-annotation="success" data-mutant-status="1" data-mutant="7"><span class="badge badge-success">7</span></a><span class="badge badge-info stryker-mutant-replacement" hidden="hidden" data-mutant="7">errors || errors.length</span><span class="stryker-original-code" data-mutant="5"><span class="stryker-original-code" data-mutant="6"><span class="stryker-original-code" data-mutant="7"><span class="bg-success-light">errors &amp;&amp; errors.length</span></span></span></span><span class="bg-success-light">) </span><a href="#" class="stryker-mutant-button" tabindex="0" title="Block" data-content="status: Killed" data-mutant-status-annotation="success" data-mutant-status="1" data-mutant="8"><span class="badge badge-success">8</span></a><span class="badge badge-info stryker-mutant-replacement" hidden="hidden" data-mutant="8">{}</span><span class="stryker-original-code" data-mutant="8"><span class="bg-success-light">{
+        markError(field, message, states, errors);
+    }</span></span><span class="bg-success-light"> else </span><a href="#" class="stryker-mutant-button" tabindex="0" title="Block" data-content="status: Killed" data-mutant-status-annotation="success" data-mutant-status="1" data-mutant="9"><span class="badge badge-success">9</span></a><span class="badge badge-info stryker-mutant-replacement" hidden="hidden" data-mutant="9">{}</span><span class="stryker-original-code" data-mutant="9"><span class="bg-success-light">{
+        markValid(field, message, states);
+    }</span></span><span class="bg-success-light">
+}</span></span><span class="bg-null">
+
+/**
+ * Init error messages
+ * @private
+ * @param {object} rules
+ * @param {object} messages
+ * @param {object} methods
+ * @returns {Object.&lt;string, Object.&lt;string, string&gt;&gt;}
+ */
+export function initErrorMessages(rules, messages, methods) </span><a href="#" class="stryker-mutant-button" tabindex="0" title="Block" data-content="status: Killed" data-mutant-status-annotation="success" data-mutant-status="1" data-mutant="10"><span class="badge badge-success">10</span></a><span class="badge badge-info stryker-mutant-replacement" hidden="hidden" data-mutant="10">{}</span><span class="stryker-original-code" data-mutant="10"><span class="bg-success-light">{
+    return Object.keys(rules).reduce(
+        (names, name) =&gt; (</span><a href="#" class="stryker-mutant-button" tabindex="0" title="ObjectLiteral" data-content="status: Killed" data-mutant-status-annotation="success" data-mutant-status="1" data-mutant="11"><span class="badge badge-success">11</span></a><span class="badge badge-info stryker-mutant-replacement" hidden="hidden" data-mutant="11">{}</span><span class="stryker-original-code" data-mutant="11"><span class="bg-success-light">{
+            ...names,
+            [name]: Object.keys(rules[name]).reduce(
+                (ruleNames, method) =&gt; (</span><a href="#" class="stryker-mutant-button" tabindex="0" title="ObjectLiteral" data-content="status: Killed" data-mutant-status-annotation="success" data-mutant-status="1" data-mutant="12"><span class="badge badge-success">12</span></a><span class="badge badge-info stryker-mutant-replacement" hidden="hidden" data-mutant="12">{}</span><span class="stryker-original-code" data-mutant="12"><span class="bg-success-light">{
+                    ...ruleNames,
+                    [method]:
+                        </span><a href="#" class="stryker-mutant-button" tabindex="0" title="BinaryExpression" data-content="status: Killed" data-mutant-status-annotation="success" data-mutant-status="1" data-mutant="13"><span class="badge badge-success">13</span></a><span class="badge badge-info stryker-mutant-replacement" hidden="hidden" data-mutant="13">(messages[name] &amp;&amp; messages[name][method] || methods[method] &amp;&amp; methods[method].message) &amp;&amp; &#039;&#039;</span><a href="#" class="stryker-mutant-button" tabindex="0" title="ConditionalExpression" data-content="status: Killed" data-mutant-status-annotation="success" data-mutant-status="1" data-mutant="14"><span class="badge badge-success">14</span></a><span class="badge badge-info stryker-mutant-replacement" hidden="hidden" data-mutant="14">false</span><a href="#" class="stryker-mutant-button" tabindex="0" title="ConditionalExpression" data-content="status: Killed" data-mutant-status-annotation="success" data-mutant-status="1" data-mutant="15"><span class="badge badge-success">15</span></a><span class="badge badge-info stryker-mutant-replacement" hidden="hidden" data-mutant="15">true</span><a href="#" class="stryker-mutant-button" tabindex="0" title="BinaryExpression" data-content="status: Killed" data-mutant-status-annotation="success" data-mutant-status="1" data-mutant="16"><span class="badge badge-success">16</span></a><span class="badge badge-info stryker-mutant-replacement" hidden="hidden" data-mutant="16">messages[name] &amp;&amp; messages[name][method] &amp;&amp; methods[method] &amp;&amp; methods[method].message</span><a href="#" class="stryker-mutant-button" tabindex="0" title="ConditionalExpression" data-content="status: Killed" data-mutant-status-annotation="success" data-mutant-status="1" data-mutant="17"><span class="badge badge-success">17</span></a><span class="badge badge-info stryker-mutant-replacement" hidden="hidden" data-mutant="17">false</span><a href="#" class="stryker-mutant-button" tabindex="0" title="ConditionalExpression" data-content="status: Killed" data-mutant-status-annotation="success" data-mutant-status="1" data-mutant="18"><span class="badge badge-success">18</span></a><span class="badge badge-info stryker-mutant-replacement" hidden="hidden" data-mutant="18">true</span><span class="stryker-original-code" data-mutant="13"><span class="stryker-original-code" data-mutant="14"><span class="stryker-original-code" data-mutant="15"><span class="stryker-original-code" data-mutant="16"><span class="stryker-original-code" data-mutant="17"><span class="stryker-original-code" data-mutant="18"><span class="bg-success-light">(</span><a href="#" class="stryker-mutant-button" tabindex="0" title="BinaryExpression" data-content="status: Killed" data-mutant-status-annotation="success" data-mutant-status="1" data-mutant="19"><span class="badge badge-success">19</span></a><span class="badge badge-info stryker-mutant-replacement" hidden="hidden" data-mutant="19">messages[name] || messages[name][method]</span><a href="#" class="stryker-mutant-button" tabindex="0" title="ConditionalExpression" data-content="status: Killed" data-mutant-status-annotation="success" data-mutant-status="1" data-mutant="20"><span class="badge badge-success">20</span></a><span class="badge badge-info stryker-mutant-replacement" hidden="hidden" data-mutant="20">false</span><a href="#" class="stryker-mutant-button" tabindex="0" title="ConditionalExpression" data-content="status: Killed" data-mutant-status-annotation="success" data-mutant-status="1" data-mutant="21"><span class="badge badge-success">21</span></a><span class="badge badge-info stryker-mutant-replacement" hidden="hidden" data-mutant="21">true</span><span class="stryker-original-code" data-mutant="19"><span class="stryker-original-code" data-mutant="20"><span class="stryker-original-code" data-mutant="21"><span class="bg-success-light">messages[name] &amp;&amp; messages[name][method]</span></span></span></span><span class="bg-success-light">) ||
+                        (</span><a href="#" class="stryker-mutant-button" tabindex="0" title="BinaryExpression" data-content="status: Killed" data-mutant-status-annotation="success" data-mutant-status="1" data-mutant="22"><span class="badge badge-success">22</span></a><span class="badge badge-info stryker-mutant-replacement" hidden="hidden" data-mutant="22">methods[method] || methods[method].message</span><a href="#" class="stryker-mutant-button" tabindex="0" title="ConditionalExpression" data-content="status: Killed" data-mutant-status-annotation="success" data-mutant-status="1" data-mutant="23"><span class="badge badge-success">23</span></a><span class="badge badge-info stryker-mutant-replacement" hidden="hidden" data-mutant="23">false</span><a href="#" class="stryker-mutant-button" tabindex="0" title="ConditionalExpression" data-content="status: Killed" data-mutant-status-annotation="success" data-mutant-status="1" data-mutant="24"><span class="badge badge-success">24</span></a><span class="badge badge-info stryker-mutant-replacement" hidden="hidden" data-mutant="24">true</span><span class="stryker-original-code" data-mutant="22"><span class="stryker-original-code" data-mutant="23"><span class="stryker-original-code" data-mutant="24"><span class="bg-success-light">methods[method] &amp;&amp; methods[method].message</span></span></span></span><span class="bg-success-light">)</span></span></span></span><span class="bg-success-light"> ||
+                        </span><a href="#" class="stryker-mutant-button" tabindex="0" title="StringLiteral" data-content="status: Survived" data-mutant-status-annotation="danger" data-mutant-status="2" data-mutant="25"><span class="badge badge-danger">25</span></a><span class="badge badge-info stryker-mutant-replacement" hidden="hidden" data-mutant="25">&quot;Stryker was here!&quot;</span><span class="stryker-original-code" data-mutant="25"><span class="bg-danger-light">&#039;&#039;</span></span></span></span></span><span class="bg-success-light">,
+                }</span></span><span class="bg-success-light">),
+                {},
+            ),
+        }</span></span><span class="bg-success-light">),
+        {},
+    );
+}</span></span><span class="bg-null">
+</code></pre></div>
+<div class="col-lg-5"><table class="table table-sm table-hover mutant-table"><thead><tr><th>#</th>
+<th>Mutator</th>
+<th>State</th>
+<th>Location</th>
+<th>Original</th>
+<th>Replacement</th></tr></thead>
+<tbody><tr><th>0</th>
+<td>Block</td>
+<td>Killed</td>
+<td>10
+:
+68</td>
+<td><code>{
+   ...   
+}</code></td>
+<td><code>{}</code></td></tr>
+<tr><th>1</th>
+<td>StringLiteral</td>
+<td>Killed</td>
+<td>14
+:
+36</td>
+<td><code>', '</code></td>
+<td><code>""</code></td></tr>
+<tr><th>2</th>
+<td>Block</td>
+<td>Killed</td>
+<td>26
+:
+60</td>
+<td><code>{
+   ...   
+}</code></td>
+<td><code>{}</code></td></tr>
+<tr><th>3</th>
+<td>StringLiteral</td>
+<td>Killed</td>
+<td>30
+:
+24</td>
+<td><code>''</code></td>
+<td><code>"    ...   !"</code></td></tr>
+<tr><th>4</th>
+<td>Block</td>
+<td>Killed</td>
+<td>41
+:
+58</td>
+<td><code>{
+   ...  }
+}</code></td>
+<td><code>{}</code></td></tr>
+<tr><th>5</th>
+<td>IfStatement</td>
+<td>Killed</td>
+<td>42
+:
+8</td>
+<td><code>&&       .</code></td>
+<td><code></code></td></tr>
+<tr><th>6</th>
+<td>IfStatement</td>
+<td>Killed</td>
+<td>42
+:
+8</td>
+<td><code>&&       .</code></td>
+<td><code></code></td></tr>
+<tr><th>7</th>
+<td>BinaryExpression</td>
+<td>Killed</td>
+<td>42
+:
+8</td>
+<td><code>&&       .</code></td>
+<td><code>||       .</code></td></tr>
+<tr><th>8</th>
+<td>Block</td>
+<td>Killed</td>
+<td>42
+:
+33</td>
+<td><code>{
+   ...    }</code></td>
+<td><code>{}</code></td></tr>
+<tr><th>9</th>
+<td>Block</td>
+<td>Killed</td>
+<td>44
+:
+11</td>
+<td><code>{
+   ...    }</code></td>
+<td><code>{}</code></td></tr>
+<tr><th>10</th>
+<td>Block</td>
+<td>Killed</td>
+<td>57
+:
+60</td>
+<td><code>{
+   ... );
+}</code></td>
+<td><code>{}</code></td></tr>
+<tr><th>11</th>
+<td>ObjectLiteral</td>
+<td>Killed</td>
+<td>59
+:
+26</td>
+<td><code>{
+   ...    }</code></td>
+<td><code>{}</code></td></tr>
+<tr><th>12</th>
+<td>ObjectLiteral</td>
+<td>Killed</td>
+<td>62
+:
+40</td>
+<td><code>{
+   ...    }</code></td>
+<td><code>{}</code></td></tr>
+<tr><th>13</th>
+<td>BinaryExpression</td>
+<td>Killed</td>
+<td>65
+:
+24</td>
+<td><code>(    ...   ''</code></td>
+<td><code>(    ...&& ''</code></td></tr>
+<tr><th>14</th>
+<td>ConditionalExpression</td>
+<td>Killed</td>
+<td>65
+:
+24</td>
+<td><code>(    ...   ''</code></td>
+<td><code></code></td></tr>
+<tr><th>15</th>
+<td>ConditionalExpression</td>
+<td>Killed</td>
+<td>65
+:
+24</td>
+<td><code>(    ...   ''</code></td>
+<td><code></code></td></tr>
+<tr><th>16</th>
+<td>BinaryExpression</td>
+<td>Killed</td>
+<td>65
+:
+24</td>
+<td><code>(    ...    )</code></td>
+<td><code>[    ...   ].</code></td></tr>
+<tr><th>17</th>
+<td>ConditionalExpression</td>
+<td>Killed</td>
+<td>65
+:
+24</td>
+<td><code>(    ...    )</code></td>
+<td><code></code></td></tr>
+<tr><th>18</th>
+<td>ConditionalExpression</td>
+<td>Killed</td>
+<td>65
+:
+24</td>
+<td><code>(    ...    )</code></td>
+<td><code></code></td></tr>
+<tr><th>19</th>
+<td>BinaryExpression</td>
+<td>Killed</td>
+<td>65
+:
+25</td>
+<td><code>[    ...    ]</code></td>
+<td><code>[    ...    ]</code></td></tr>
+<tr><th>20</th>
+<td>ConditionalExpression</td>
+<td>Killed</td>
+<td>65
+:
+25</td>
+<td><code>[    ...    ]</code></td>
+<td><code></code></td></tr>
+<tr><th>21</th>
+<td>ConditionalExpression</td>
+<td>Killed</td>
+<td>65
+:
+25</td>
+<td><code>[    ...    ]</code></td>
+<td><code></code></td></tr>
+<tr><th>22</th>
+<td>BinaryExpression</td>
+<td>Killed</td>
+<td>66
+:
+25</td>
+<td><code>[    ...   ].</code></td>
+<td><code>[    ...   ].</code></td></tr>
+<tr><th>23</th>
+<td>ConditionalExpression</td>
+<td>Killed</td>
+<td>66
+:
+25</td>
+<td><code>[    ...   ].</code></td>
+<td><code></code></td></tr>
+<tr><th>24</th>
+<td>ConditionalExpression</td>
+<td>Killed</td>
+<td>66
+:
+25</td>
+<td><code>[    ...   ].</code></td>
+<td><code></code></td></tr>
+<tr><th>25</th>
+<td>StringLiteral</td>
+<td>Survived</td>
+<td>67
+:
+24</td>
+<td><code>''</code></td>
+<td><code>"    ...   !"</code></td></tr></tbody></table></div></div></div></div>
+<footer>Generated with stryker-html-reporter generator. Visit the 
+<a href="https://stryker-mutator.io" target="_blank">Stryker website</a></footer></div>
+<script src="../strykerResources/popper.js/dist/umd/popper.min.js" defer="defer"></script>
+<script src="../strykerResources/jquery/dist/jquery.slim.min.js" defer="defer"></script>
+<script src="../strykerResources/bootstrap/js/bootstrap.min.js" defer="defer"></script>
+<script src="../strykerResources/stryker.js" defer="defer"></script></body></html>
