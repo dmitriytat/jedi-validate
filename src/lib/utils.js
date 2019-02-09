@@ -1,7 +1,3 @@
-// @flow
-
-import type { MessagesOptions, MethodMap, RulesOptions } from '../types';
-
 /**
  * Mark field as invalid
  * @private
@@ -12,22 +8,12 @@ import type { MessagesOptions, MethodMap, RulesOptions } from '../types';
  * @param {string} classes.valid
  * @param {Array.<string>} errors
  */
-export function markError(
-    field: HTMLElement,
-    message: HTMLElement,
-    { error, valid }: ContainerClasses,
-    errors: Array<string>,
-) {
+export function markError(field, message, { error, valid }, errors) {
     field.classList.add(error);
     field.classList.remove(valid);
 
     message.innerHTML = errors.join(', '); // eslint-disable-line no-param-reassign
 }
-
-type ContainerClasses = {
-    error: string,
-    valid: string,
-};
 
 /**
  * Mark field as valid
@@ -38,7 +24,7 @@ type ContainerClasses = {
  * @param {string} classes.error
  * @param {string} classes.valid
  */
-export function markValid(field: HTMLElement, message: HTMLElement, { error, valid }: ContainerClasses) {
+export function markValid(field, message, { error, valid }) {
     field.classList.add(valid);
     field.classList.remove(error);
 
@@ -49,11 +35,11 @@ export function markValid(field: HTMLElement, message: HTMLElement, { error, val
  * Mark field
  * @private
  * @param {Element} field
- * @param {Element} message
- * @param {{error:string, valid:string}} states
- * @param {Array.<string>} errors
+ * @param message
+ * @param states
+ * @param errors
  */
-export function markField(field: HTMLElement, message: HTMLElement, states: ContainerClasses, errors: Array<string>) {
+export function markField(field, message, states, errors) {
     if (errors && errors.length) {
         markError(field, message, states, errors);
     } else {
@@ -69,7 +55,7 @@ export function markField(field: HTMLElement, message: HTMLElement, states: Cont
  * @param {object} methods
  * @returns {Object.<string, Object.<string, string>>}
  */
-export function initErrorMessages(rules: RulesOptions, messages: MessagesOptions, methods: MethodMap) {
+export function initErrorMessages(rules, messages, methods) {
     return Object.keys(rules).reduce(
         (names, name) => ({
             ...names,

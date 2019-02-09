@@ -1,13 +1,9 @@
-// @flow
-
-import type { Method, MethodMap } from '../types';
-
 /**
  * Check value is not empty
  * @param {string|FileList|Array} value
  * @returns {boolean} - true == valid, false == invalid
  */
-export function required(value: string): boolean {
+export function required(value) {
     if (!value) return false;
     if (value.length === 0) return false;
     if (typeof value === 'string' && value.trim() === '') return false;
@@ -21,7 +17,7 @@ export function required(value: string): boolean {
  * @param {RegExp} exp - regular expression
  * @returns {boolean} - true == valid, false == invalid
  */
-export function regexp(value: string, exp: RegExp): boolean {
+export function regexp(value, exp) {
     return exp.test(value);
 }
 
@@ -30,7 +26,7 @@ export function regexp(value: string, exp: RegExp): boolean {
  * @param {string} value - email
  * @returns {boolean} - true == valid, false == invalid
  */
-export function email(value: string): boolean {
+export function email(value) {
     return /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i.test(value);
 }
 
@@ -40,7 +36,7 @@ export function email(value: string): boolean {
  * @param {number} size - max file size
  * @returns {boolean} - true == valid, false == invalid
  */
-export function filesize(value: FileList, size: number): boolean {
+export function filesize(value, size) {
     return Array.from(value).reduce((r, file) => file.size <= size && r, true);
 }
 
@@ -50,7 +46,7 @@ export function filesize(value: FileList, size: number): boolean {
  * @param {string} extensions - extensions list
  * @returns {boolean} - true == valid, false == invalid
  */
-export function extension(value: FileList, extensions: string): boolean {
+export function extension(value, extensions) {
     return Array.from(value).reduce((r, file) => extensions.indexOf(file.name.split('.').pop()) !== -1 && r, true);
 }
 
@@ -59,7 +55,7 @@ export function extension(value: FileList, extensions: string): boolean {
  * @param {string} value - phone number
  * @returns {boolean} - true == valid, false == invalid
  */
-export function tel(value: string): boolean {
+export function tel(value) {
     return /^([+]+)*[0-9\x20\x28\x29-]{5,20}$/.test(value);
 }
 
@@ -68,7 +64,7 @@ export function tel(value: string): boolean {
  * @param {string} value - url
  * @returns {boolean} - true == valid, false == invalid
  */
-export function url(value: string): boolean {
+export function url(value) {
     return /[-a-zA-Z0-9@:%_+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_+.~#?&//=]*)?/gi.test(value);
 }
 
@@ -78,7 +74,7 @@ export function url(value: string): boolean {
  * @param {number} number - min number
  * @returns {boolean} - true == valid, false == invalid
  */
-export function min(value: number, number: number): boolean {
+export function min(value, number) {
     return number <= value;
 }
 
@@ -88,7 +84,7 @@ export function min(value: number, number: number): boolean {
  * @param {number} number - max number
  * @returns {boolean} - true == valid, false == invalid
  */
-export function max(value: number, number: number): boolean {
+export function max(value, number) {
     return value <= number;
 }
 
@@ -98,7 +94,7 @@ export function max(value: number, number: number): boolean {
  * @param {number} number - factor
  * @returns {boolean} - true == valid, false == invalid
  */
-export function step(value: number, number: number): boolean {
+export function step(value, number) {
     return value % number === 0;
 }
 
@@ -108,7 +104,7 @@ export function step(value: number, number: number): boolean {
  * @param {Date} mindate - max date
  * @returns {boolean} - true == valid, false == invalid
  */
-export function minDate(date: Date, mindate: Date): boolean {
+export function minDate(date, mindate) {
     return mindate <= date;
 }
 
@@ -118,83 +114,57 @@ export function minDate(date: Date, mindate: Date): boolean {
  * @param {Date} maxdate - max date
  * @returns {boolean} - true == valid, false == invalid
  */
-export function maxDate(date: Date, maxdate: Date): boolean {
+export function maxDate(date, maxdate) {
     return date <= maxdate;
 }
 
-const requiredMethod: Method = {
-    func: required,
-    message: 'This field is required',
+export default {
+    required: {
+        func: required,
+        message: 'This field is required',
+    },
+    regexp: {
+        func: regexp,
+        message: 'Please, provide correct value',
+    },
+    email: {
+        func: email,
+        message: 'This email is incorrect',
+    },
+    filesize: {
+        func: filesize,
+        message: 'This file is too large',
+    },
+    extension: {
+        func: extension,
+        message: 'This extension is not supported',
+    },
+    tel: {
+        func: tel,
+        message: 'This phone number is incorrect',
+    },
+    url: {
+        func: url,
+        message: 'Wrong url',
+    },
+    min: {
+        func: min,
+        message: 'This number is too less',
+    },
+    max: {
+        func: max,
+        message: 'This number is too large',
+    },
+    step: {
+        func: step,
+        message: 'This value is not a multiple of the specified step value',
+    },
+    minDate: {
+        func: minDate,
+        message: 'This date is too early',
+    },
+    maxDate: {
+        func: maxDate,
+        message: 'This date is too late',
+    },
 };
-
-const regexpMethod: Method = {
-    func: regexp,
-    message: 'Please, provide correct value',
-};
-
-const emailMethod: Method = {
-    func: email,
-    message: 'This email is incorrect',
-};
-
-const filesizeMethod: Method = {
-    func: filesize,
-    message: 'This file is too large',
-};
-
-const extensionMethod: Method = {
-    func: extension,
-    message: 'This extension is not supported',
-};
-
-const telMethod: Method = {
-    func: tel,
-    message: 'This phone number is incorrect',
-};
-
-const urlMethod: Method = {
-    func: url,
-    message: 'Wrong url',
-};
-
-const minMethod: Method = {
-    func: min,
-    message: 'This number is too less',
-};
-
-const maxMethod: Method = {
-    func: max,
-    message: 'This number is too large',
-};
-
-const stepMethod: Method = {
-    func: step,
-    message: 'This value is not a multiple of the specified step value',
-};
-
-const minDateMethod: Method = {
-    func: minDate,
-    message: 'This date is too early',
-};
-
-const maxDateMethod: Method = {
-    func: maxDate,
-    message: 'This date is too late',
-};
-
-const methods: MethodMap = {
-    required: requiredMethod,
-    regexp: regexpMethod,
-    email: emailMethod,
-    filesize: filesizeMethod,
-    extension: extensionMethod,
-    tel: telMethod,
-    url: urlMethod,
-    min: minMethod,
-    max: maxMethod,
-    step: stepMethod,
-    minDate: minDateMethod,
-    maxDate: maxDateMethod,
-};
-
-export default methods;
