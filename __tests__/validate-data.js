@@ -1,4 +1,8 @@
-import { validateField, validateData, isCheckable } from '../src/lib/validate-data';
+import {
+    validateField,
+    validateData,
+    isCheckable,
+} from '../src/lib/validate-data';
 import methods from '../src/lib/methods';
 
 // todo move to test context
@@ -54,46 +58,20 @@ function translate(text) {
 describe('Validate data', () => {
     describe('Validate Field', () => {
         it('Pass correct value', () => {
-            expect(validateField(rules.phone, methods, data.phone, 'phone', errorMessages, data, translate)).toEqual(
-                [],
-            );
-            expect(validateField(rules.empty, methods, data.empty, 'empty', errorMessages, data, translate)).toEqual(
-                [],
-            );
+            expect(validateField(rules.phone, methods, data.phone, 'phone', errorMessages, data, translate)).toEqual([]);
+            expect(validateField(rules.empty, methods, data.empty, 'empty', errorMessages, data, translate)).toEqual([]);
         });
 
         it('Pass incorrect value', () => {
-            expect(validateField(rules.phone2, methods, data.phone2, 'phone2', errorMessages, data, translate)).toEqual(
-                [errorMessages.phone2.regexp],
-            );
-            expect(
-                validateField(
-                    {
-                        ...rules.phone,
-                        url: null,
-                    },
-                    methods,
-                    'dfsdf',
-                    'phone',
-                    errorMessages,
-                    data,
-                    translate,
-                ),
-            ).toEqual(['Only digits available']);
-            expect(
-                validateField(
-                    {
-                        ...rules.phone,
-                        lol: true,
-                    },
-                    methods,
-                    data.phone,
-                    'phone',
-                    errorMessages,
-                    data,
-                    translate,
-                ),
-            ).toEqual(['Method lol not found']);
+            expect(validateField(rules.phone2, methods, data.phone2, 'phone2', errorMessages, data, translate)).toEqual([errorMessages.phone2.regexp]);
+            expect(validateField({
+                ...rules.phone,
+                url: null,
+            }, methods, 'dfsdf', 'phone', errorMessages, data, translate)).toEqual(['Only digits available']);
+            expect(validateField({
+                ...rules.phone,
+                lol: true,
+            }, methods, data.phone, 'phone', errorMessages, data, translate)).toEqual(['Method "lol" not found']);
         });
     });
 
@@ -120,9 +98,7 @@ describe('Validate data', () => {
                 dependedInput: '',
             };
 
-            expect(validateData(myRules, methods, myData, errorMessages, translate)).toEqual({
-                dependedInput: ['It is required'],
-            });
+            expect(validateData(myRules, methods, myData, errorMessages, translate)).toEqual({ dependedInput: ['It is required'] });
         });
 
         it('Validate valid values', () => {
@@ -138,9 +114,7 @@ describe('Validate data', () => {
             };
 
             // eslint-disable-next-line max-len
-            expect(validateData(myRules, methods, myData, errorMessages, translate)).toEqual({
-                dependedInput: undefined,
-            });
+            expect(validateData(myRules, methods, myData, errorMessages, translate)).toEqual({ dependedInput: undefined });
         });
     });
 
@@ -166,15 +140,9 @@ describe('Validate data', () => {
 
         it('Should not throw error if function incorrect', () => {
             expect(() => {
-                isCheckable(
-                    [
-                        true,
-                        () => {
-                            throw new Error('error');
-                        },
-                    ],
-                    {},
-                );
+                isCheckable([true, () => {
+                    throw new Error('error');
+                }], {});
             }).not.toThrow();
         });
 

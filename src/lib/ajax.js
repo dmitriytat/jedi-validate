@@ -1,7 +1,3 @@
-// @flow
-
-import type { AjaxOptions, Response } from '../types';
-
 /**
  * Sending request
  * @param {Object} options - Sending options
@@ -11,49 +7,52 @@ import type { AjaxOptions, Response } from '../types';
  * @param {string} options.method - Sending options
  * @param {string|FormData} options.data - Sending options
  * @param {function} translate
+ * @param {function} RequestType
  * @returns {Promise}
+ * todo rewrite to fetch
  */
-export function ajax(options: AjaxOptions, translate: Function): Promise<Response> {
-    let { url } = options;
-    let body;
-    const method = options.method ? options.method.toUpperCase() : 'GET';
-    const headers = {};
+export function ajax(options, translate, RequestType = XMLHttpRequest) {
+    return new Promise((resolve, reject) => {
+        const xhr = new RequestType();
 
-    if (method === 'GET' && typeof options.data === 'string') {
-        url += `?${options.data}`;
-    } else if (method === 'POST') {
-        body = options.data;
-    }
+        const url = options.url + (options.method.toUpperCase() === 'GET' && options.data ? `?${options.data}` : '');
 
-    if (options.sendType === 'serialize') {
-        headers['Content-type'] = options.enctype;
-    } else if (options.sendType === 'json') {
-        headers['Content-type'] = 'application/json; charset=utf-8';
-    }
+        xhr.open(options.method, url, true);
 
-    return fetch(url, {
-        method,
-        headers,
-        body,
-    }).then(
-        response => {
-            try {
-                return response.json();
-            } catch (e) {
-                return Promise.reject({
-                    validationErrors: {
-                        base: [translate('JSON parsing error')],
-                    },
-                });
+        if (options.sendType === 'serialize') {
+            xhr.setRequestHeader('Content-type', options.enctype);
+        } else if (options.sendType === 'json') {
+            xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+        }
+
+        xhr.onreadystatechange = () => {
+            if (xhr.readyState === 4) {
+                if (xhr.status === 200) {
+                    let response = {};
+
+                    try {
+                        response = JSON.parse(xhr.responseText);
+                    } catch (e) {
+                        response.validationErrors = {
+                            base: [translate('JSON parsing error')],
+                        };
+                    }
+
+                    resolve(response);
+                } else {
+                    reject({
+                        xhr,
+                        method: options.method,
+                        url: options.url,
+                        status: xhr.status,
+                        statusText: xhr.statusText,
+                    });
+                }
             }
-        },
-        message =>
-            Promise.reject({
-                validationErrors: {
-                    base: [translate('Something went wrong'), translate(message)],
-                },
-            }),
-    );
+        };
+
+        xhr.send(options.method.toUpperCase() === 'POST' ? options.data : '');
+    });
 }
 
 export default ajax;

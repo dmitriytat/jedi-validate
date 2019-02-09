@@ -1,23 +1,19 @@
-// @flow
-
-import type { Data, Path } from '../types';
-
 /**
  * Create query portion of url for serialize method
  * @param {string} name
  * @param {object|Array|string} data
  * @returns {string} - part of url
  */
-export function getQueryPart(name: string, data: Data): string {
+export function getQueryPart(name, data) {
     if (Array.isArray(data)) {
         return data.reduce((part, value) => part + getQueryPart(`${name}[]`, value), '');
     }
 
     if (typeof data === 'object') {
-        return Object.keys(data).reduce((part, key) => part + getQueryPart(`${name}[${key}]`, data[key]), '');
+        return Object.keys(data).reduce((part, index) => part + getQueryPart(`${name}[${index}]`, data[index]), '');
     }
 
-    return `${name}=${encodeURIComponent(String(data))}&`;
+    return `${name}=${encodeURIComponent(data)}&`;
 }
 
 /**
@@ -31,7 +27,7 @@ const NAME = /(\[(\w*)\]|\w*)/gi;
  * @param {string} name - input name
  * @returns {Array} - path to value in data object
  */
-export function convertNameToPath(name: string): Path {
+export function convertNameToPath(name) {
     const path = [];
 
     let matches = NAME.exec(name);
@@ -56,12 +52,7 @@ export function convertNameToPath(name: string): Path {
  * @param {function} FormDataType
  * @returns {string|FormData} - output value
  */
-export function convertData(
-    data: Data,
-    type: string,
-    FileListType: typeof FileList = FileList,
-    FormDataType: typeof FormData = FormData,
-) {
+export function convertData(data, type, FileListType = FileList, FormDataType = FormData) {
     let convertedData;
 
     switch (type) {
@@ -79,7 +70,7 @@ export function convertData(
                         formData.append(name, data[name][0]);
                     }
                 } else if (typeof data[name] === 'object') {
-                    Object.keys(data[name]).forEach(key => formData.append(`${name}[${key}]`, String(data[name][key])));
+                    Object.keys(data[name]).forEach(key => formData.append(`${name}[${key}]`, data[name][key]));
                 } else {
                     formData.append(name, data[name]);
                 }
