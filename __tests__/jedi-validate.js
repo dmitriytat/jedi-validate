@@ -80,10 +80,10 @@ describe('Jedi Validate', () => {
         const phoneInput = wrapper.querySelector('[name="phone"]').parentNode.parentNode; // find field
 
         expect(phoneInput.classList.contains('pristine')).toBe(true);
-        // expect(phoneInput.classList.contains('dirty')).toBe(false);
-        // validator.handleInputInput('phone');
-        // expect(phoneInput.classList.contains('pristine')).toBe(false);
-        // expect(phoneInput.classList.contains('dirty')).toBe(true);
+        expect(phoneInput.classList.contains('dirty')).toBe(false);
+        validator.handleInputInput('phone');
+        expect(phoneInput.classList.contains('pristine')).toBe(false);
+        expect(phoneInput.classList.contains('dirty')).toBe(true);
     });
 
     it('handleInputChange', () => {
@@ -175,7 +175,6 @@ describe('Jedi Validate', () => {
 
     describe('send', () => {
         it('Should call ajax', () => {
-            window.fetch = jest.fn().mockImplementation(() => Promise.resolve({ ok: true }));
             const ajaxFn = jest.spyOn(ajax, 'ajax');
             validator.send({});
 
@@ -200,7 +199,7 @@ describe('Merge options', () => {
 
         expect(validator.options).toEqual({
             ajax: {
-                url: './',
+                url: null,
                 enctype: 'application/x-www-form-urlencoded',
                 sendType: 'serialize', // 'serialize', 'formData', 'json'
                 method: 'GET',

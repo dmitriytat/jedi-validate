@@ -1,18 +1,22 @@
 // @flow
 
-import type { Input } from '../types';
-
 export default class GroupInput {
-    inputs: Array<Input> = [];
+    inputs: Array<HTMLInputElement> = [];
 
     name: string = '';
 
-    constructor(name: string, inputs: Array<Input>) {
+    constructor(name: string, inputs: Array<HTMLInputElement>) {
         this.name = name;
         this.inputs = inputs;
     }
 
-    add(input: Input): void {
+    length = {
+        get(): number {
+            return this.inputs.length;
+        },
+    };
+
+    add(input: HTMLInputElement): void {
         this.inputs.push(input);
     }
 }
